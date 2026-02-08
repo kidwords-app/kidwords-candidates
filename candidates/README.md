@@ -1,0 +1,1 @@
+This directory contains generated candidates for word definitions (which will include text as well as images). Github Actions will pull from inputs/ and run generation scripts which will place output assets in this location. An admin UI will be used to moderate the candidates and decide which ones are good enough to be pushed to the main repo. 
