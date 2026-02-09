@@ -1,13 +1,21 @@
 import importlib.util
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock
+from types import ModuleType
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "cartoon-gen.py"
 spec = importlib.util.spec_from_file_location("cartoon_gen", MODULE_PATH)
 cartoon_gen = importlib.util.module_from_spec(spec)
+google_module = ModuleType("google")
+genai_module = ModuleType("genai")
+google_module.genai = genai_module
+sys.modules.setdefault("google", google_module)
+sys.modules.setdefault("google.genai", genai_module)
+sys.modules[spec.name] = cartoon_gen
 spec.loader.exec_module(cartoon_gen)
 
 
@@ -58,10 +66,10 @@ class CartoonGenTests(unittest.TestCase):
         client = MagicMock()
         client.models.generate_content.return_value = FakeResponse([FakeTextPart(response_json)])
 
-        result = cartoon_gen.generate_text_examples(client, "rocket", "kid-6")
+        result = cartoon_gen.generate_text_examples(client, "rocket", "kindergartener")
 
         self.assertEqual(result, ["one", "two", "three"])
-        expected_prompt = cartoon_gen.build_text_prompt("rocket", "kid-6")
+        expected_prompt = cartoon_gen.build_text_prompt("rocket", "kindergartener")
         client.models.generate_content.assert_called_once_with(
             model=cartoon_gen.TEXT_MODEL,
             contents=[expected_prompt],
@@ -72,7 +80,7 @@ class CartoonGenTests(unittest.TestCase):
         client.models.generate_content.side_effect = Exception("RESOURCE_EXHAUSTED: quota")
 
         with self.assertRaises(cartoon_gen.BudgetLimitError):
-            cartoon_gen.generate_text_examples(client, "rocket", "kid-6")
+            cartoon_gen.generate_text_examples(client, "rocket", "kindergartener")
 
     def test_parse_text_response_invalid_json(self):
         with self.assertRaises(cartoon_gen.InvalidResponseError):

@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +10,7 @@ from unittest.mock import patch
 MODULE_PATH = Path(__file__).resolve().parents[1] / "generate-images.py"
 spec = importlib.util.spec_from_file_location("generate_images", MODULE_PATH)
 generate_images = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = generate_images
 spec.loader.exec_module(generate_images)
 
 
@@ -58,8 +60,8 @@ class GenerateImagesTests(unittest.TestCase):
                     "2026-02-08", candidates_repo, app_repo
                 )
 
-            self.assertEqual(created, 2)
-            self.assertEqual(run_mock.call_count, 2)
+            self.assertEqual(created, 2) # created for each level, K and G1
+            self.assertEqual(run_mock.call_count, 2) # called for each level, K and G1
 
             candidate_path = (
                 candidates_repo
