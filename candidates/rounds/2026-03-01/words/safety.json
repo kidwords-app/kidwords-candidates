@@ -1,0 +1,39 @@
+{
+  "createdAt": "2026-03-01T22:56:13.350597+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-03-01/assets/safety/preschooler-721796e490.png",
+      "createdAt": "2026-03-01T22:56:13.350597+00:00",
+      "imageId": "721796e490",
+      "model": "gemini",
+      "prompt": "generated via run_cartoon_pipeline for safety (preschooler)"
+    },
+    {
+      "assetPath": "candidates/rounds/2026-03-01/assets/safety/kindergartener-139d851d27.png",
+      "createdAt": "2026-03-01T22:56:13.350597+00:00",
+      "imageId": "139d851d27",
+      "model": "gemini",
+      "prompt": "generated via run_cartoon_pipeline for safety (kindergartener)"
+    },
+    {
+      "assetPath": "candidates/rounds/2026-03-01/assets/safety/first grader-0b947e034a.png",
+      "createdAt": "2026-03-01T22:56:13.350597+00:00",
+      "imageId": "0b947e034a",
+      "model": "gemini",
+      "prompt": "generated via run_cartoon_pipeline for safety (first grader)"
+    }
+  ],
+  "levels": {},
+  "partOfSpeech": "noun",
+  "roundId": "2026-03-01",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-03-01T22:56:13.350597+00:00",
+  "word": "safety",
+  "wordId": "safety"
+}

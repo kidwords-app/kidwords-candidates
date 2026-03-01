@@ -1,0 +1,39 @@
+{
+  "createdAt": "2026-03-01T22:56:13.350597+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-03-01/assets/respect/preschooler-c0f08baade.png",
+      "createdAt": "2026-03-01T22:56:13.350597+00:00",
+      "imageId": "c0f08baade",
+      "model": "gemini",
+      "prompt": "generated via run_cartoon_pipeline for respect (preschooler)"
+    },
+    {
+      "assetPath": "candidates/rounds/2026-03-01/assets/respect/kindergartener-5d6352276e.png",
+      "createdAt": "2026-03-01T22:56:13.350597+00:00",
+      "imageId": "5d6352276e",
+      "model": "gemini",
+      "prompt": "generated via run_cartoon_pipeline for respect (kindergartener)"
+    },
+    {
+      "assetPath": "candidates/rounds/2026-03-01/assets/respect/first grader-90105abc30.png",
+      "createdAt": "2026-03-01T22:56:13.350597+00:00",
+      "imageId": "90105abc30",
+      "model": "gemini",
+      "prompt": "generated via run_cartoon_pipeline for respect (first grader)"
+    }
+  ],
+  "levels": {},
+  "partOfSpeech": "noun",
+  "roundId": "2026-03-01",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-03-01T22:56:13.350597+00:00",
+  "word": "respect",
+  "wordId": "respect"
+}
