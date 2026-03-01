@@ -132,7 +132,7 @@ def process_round(
     candidates_repo: Path,
 ) -> int:
     """Run image generation for a round. Reads inputs from inputs/, writes to candidates/."""
-    print(f"Current working directory: {os.getcwd()}, candidates_repo: {candidates_repo}")
+    print(f"Current working directory: {os.getcwd()}, candidates_repo: {candidates_repo}", flush=True)
     batch_path = candidates_repo / "inputs" / "word-batches" / f"{round_id}.json"
     if not batch_path.exists():
         raise FileNotFoundError(f"Missing batch file: {batch_path}")

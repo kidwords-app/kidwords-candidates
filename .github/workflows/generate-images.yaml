@@ -51,7 +51,11 @@ jobs:
           CANDIDATES_REPO_PATH: .
         run: |
           set -euo pipefail
-          python scripts/generate-images.py
+          echo "::debug::PWD=$PWD"
+          echo "::debug::Batch file path: $PWD/inputs/word-batches/$ROUND_ID.json"
+          echo "::debug::Listing inputs/word-batches:"
+          ls -la inputs/word-batches/ 2>&1 || true
+          python -u scripts/generate-images.py
 
       - name: Commit and push
         run: |
