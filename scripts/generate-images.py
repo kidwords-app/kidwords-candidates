@@ -6,6 +6,7 @@ import json
 import os
 import re
 import sys
+import traceback
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -196,6 +197,7 @@ def main(argv: Iterable[str]) -> int:
         return 1
     except Exception as exc:
         print(f"Image generation failed: {exc}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
         return 1
 
     print(f"Generated {created} images.")

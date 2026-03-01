@@ -115,12 +115,14 @@ def generate_text_examples(
 ) -> List[str]:
     prompt = build_text_prompt(word, level)
     try:
-        response = client.models.generate_content(model=model, contents=[prompt])
+        response = client.models.generate_content(model=model, contents=prompt)
     except Exception as exc:  # pragma: no cover - defensive
         if is_budget_error(exc):
             raise BudgetLimitError("Budget or quota limit reached.") from exc
         raise TextGenerationError("Failed to generate text prompt.") from exc
 
+    if response is None:
+        raise TextGenerationError("API returned no response.")
     response_text = _extract_text_from_response(response)
     print("Raw text prompt response: ", response_text)
     return parse_text_response(response_text)
@@ -142,12 +144,14 @@ def generate_cartoon_image(
 ) -> Path:
     prompt = build_cartoon_prompt(phrase)
     try:
-        response = client.models.generate_content(model=model, contents=[prompt])
+        response = client.models.generate_content(model=model, contents=prompt)
     except Exception as exc:  # pragma: no cover - defensive
         if is_budget_error(exc):
             raise BudgetLimitError("Budget or quota limit reached.") from exc
         raise ImageGenerationError("Failed to generate cartoon image.") from exc
 
+    if response is None:
+        raise ImageGenerationError("API returned no response.")
     image = _extract_image_from_response(response)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     image.save(output_path)
