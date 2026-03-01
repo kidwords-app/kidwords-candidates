@@ -44,13 +44,14 @@ jobs:
           fi
 
       - name: Generate images
+        working-directory: candidates-repo
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ROUND_ID: ${{ steps.round.outputs.roundId }}
-          CANDIDATES_REPO_PATH: candidates-repo
+          CANDIDATES_REPO_PATH: .
         run: |
           set -euo pipefail
-          python "${CANDIDATES_REPO_PATH}/scripts/generate-images.py"
+          python scripts/generate-images.py
 
       - name: Commit and push
         run: |

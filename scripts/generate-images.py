@@ -131,6 +131,8 @@ def process_round(
     round_id: str,
     candidates_repo: Path,
 ) -> int:
+    """Run image generation for a round. Reads inputs from inputs/, writes to candidates/."""
+    print(f"Current working directory: {os.getcwd()}, candidates_repo: {candidates_repo}")
     batch_path = candidates_repo / "inputs" / "word-batches" / f"{round_id}.json"
     if not batch_path.exists():
         raise FileNotFoundError(f"Missing batch file: {batch_path}")
@@ -172,7 +174,7 @@ def parse_args(argv: Iterable[str]) -> Arguments:
     parser.add_argument(
         "--candidates-repo",
         default=os.environ.get("CANDIDATES_REPO_PATH"),
-        help="Path to candidates repo. Defaults to CANDIDATES_REPO_PATH.",
+        help="Repo root (inputs in inputs/, outputs in candidates/). Defaults to CANDIDATES_REPO_PATH.",
     )
     args = parser.parse_args(list(argv))
     if not args.round_id:
