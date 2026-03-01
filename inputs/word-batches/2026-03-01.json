@@ -1,0 +1,8 @@
+{
+  "roundId": "2026-03-01",
+  "words": [
+    {"word": "safety", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "noun", "syllables": 2, "tags": ["thinking"]},
+    {"word": "respect", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "noun", "syllables": 2, "tags": ["thinking"]},
+    {"word": "responsibility", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "noun", "syllables": 6, "tags": ["thinking"]}
+  ]
+}

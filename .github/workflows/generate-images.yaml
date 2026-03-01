@@ -15,12 +15,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Checkout app repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: app
-
       - name: Checkout candidates repo
         uses: actions/checkout@v4
         with:
@@ -38,7 +32,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r scripts/requirements.txt
-        working-directory: app
+        working-directory: candidates-repo
 
       - name: Resolve round id
         id: round
@@ -54,7 +48,6 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ROUND_ID: ${{ steps.round.outputs.roundId }}
           CANDIDATES_REPO_PATH: candidates-repo
-          APP_REPO_PATH: app
         run: |
           set -euo pipefail
           python "${CANDIDATES_REPO_PATH}/scripts/generate-images.py"
@@ -73,3 +66,20 @@ jobs:
           git push origin HEAD
         working-directory: candidates-repo
 
+      - name: Email notification
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "generate-images ${{ steps.round.outputs.roundId }}: ${{ job.status }}"
+          to: ${{ secrets.NOTIFY_EMAIL_TO }}
+          from: ${{ secrets.NOTIFY_EMAIL_FROM }}
+          body: |
+            Workflow: ${{ github.workflow }}
+            Status: ${{ job.status }}
+            Round: ${{ steps.round.outputs.roundId }}
+            Repo: ${{ github.repository }}
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

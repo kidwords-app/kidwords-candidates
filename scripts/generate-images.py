@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 import re
-import subprocess
 import sys
 import uuid
 from dataclasses import dataclass
@@ -12,7 +12,22 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, List
 
-DEFAULT_LEVELS = ["preK", "K", "G1"]
+ALLOWED_LEVELS = frozenset(["preschooler", "kindergartener", "first grader"])
+
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_cartoon_gen_module = None
+
+
+def _get_cartoon_gen():
+    """Load cartoon-gen.py (same dir); cache so we only load once."""
+    global _cartoon_gen_module
+    if _cartoon_gen_module is None:
+        spec = importlib.util.spec_from_file_location(
+            "cartoon_gen", _SCRIPT_DIR / "cartoon-gen.py"
+        )
+        _cartoon_gen_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_cartoon_gen_module)
+    return _cartoon_gen_module
 
 
 def slugify(value: str) -> str:
@@ -49,20 +64,30 @@ def build_candidate(entry: dict, word_id: str, round_id: str, now: str) -> dict:
     }
 
 
+def validate_levels(levels: List[str], word: str) -> None:
+    if not levels:
+        raise ValueError(f"Word '{word}': required field 'levels' is missing or empty.")
+    invalid = [lev for lev in levels if lev not in ALLOWED_LEVELS]
+    if invalid:
+        raise ValueError(
+            f"Word '{word}': invalid level(s) {invalid}. "
+            f"Allowed levels: {sorted(ALLOWED_LEVELS)}."
+        )
+
+
 def generate_images_for_entry(
     entry: dict,
     round_id: str,
     words_dir: Path,
     assets_dir: Path,
-    app_repo: Path,
     now: str,
-    default_levels: List[str],
 ) -> int:
     word = entry.get("word")
     if not word:
         return 0
+    levels = entry.get("levels")
+    validate_levels(levels if levels is not None else [], word)
     word_id = slugify(word)
-    levels = entry.get("levels") or default_levels
     candidate_path = words_dir / f"{word_id}.json"
     if candidate_path.exists():
         candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
@@ -81,19 +106,8 @@ def generate_images_for_entry(
         rel_path = str(output_path.as_posix())
         if rel_path in existing_paths:
             continue
-        subprocess.run(
-            [
-                sys.executable,
-                str(app_repo / "scripts" / "cartoon-gen.py"),
-                "--word",
-                word,
-                "--level",
-                level,
-                "--output",
-                str(output_path),
-            ],
-            check=True,
-        )
+        cartoon_gen = _get_cartoon_gen()
+        cartoon_gen.run_pipeline(word, level, output_path)
         images.append(
             {
                 "imageId": image_id,
@@ -116,15 +130,12 @@ def generate_images_for_entry(
 def process_round(
     round_id: str,
     candidates_repo: Path,
-    app_repo: Path,
-    default_levels: List[str] | None = None,
 ) -> int:
     batch_path = candidates_repo / "inputs" / "word-batches" / f"{round_id}.json"
     if not batch_path.exists():
         raise FileNotFoundError(f"Missing batch file: {batch_path}")
 
     words = load_batch_words(batch_path)
-    default_levels = default_levels or list(DEFAULT_LEVELS)
 
     now = datetime.now(timezone.utc).isoformat()
     round_dir = candidates_repo / "candidates" / "rounds" / round_id
@@ -140,9 +151,7 @@ def process_round(
             round_id,
             words_dir,
             assets_dir,
-            app_repo,
             now,
-            default_levels,
         )
     return created
 
@@ -151,7 +160,6 @@ def process_round(
 class Arguments:
     round_id: str
     candidates_repo: Path
-    app_repo: Path
 
 
 def parse_args(argv: Iterable[str]) -> Arguments:
@@ -166,11 +174,6 @@ def parse_args(argv: Iterable[str]) -> Arguments:
         default=os.environ.get("CANDIDATES_REPO_PATH"),
         help="Path to candidates repo. Defaults to CANDIDATES_REPO_PATH.",
     )
-    parser.add_argument(
-        "--app-repo",
-        default=os.environ.get("APP_REPO_PATH", "app"),
-        help="Path to app repo. Defaults to APP_REPO_PATH or 'app'.",
-    )
     args = parser.parse_args(list(argv))
     if not args.round_id:
         parser.error("Round id is required via --round-id or ROUND_ID.")
@@ -179,18 +182,17 @@ def parse_args(argv: Iterable[str]) -> Arguments:
     return Arguments(
         round_id=args.round_id,
         candidates_repo=Path(args.candidates_repo),
-        app_repo=Path(args.app_repo),
     )
 
 
 def main(argv: Iterable[str]) -> int:
     args = parse_args(argv)
     try:
-        created = process_round(args.round_id, args.candidates_repo, args.app_repo)
+        created = process_round(args.round_id, args.candidates_repo)
     except (FileNotFoundError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 1
-    except subprocess.CalledProcessError as exc:
+    except Exception as exc:
         print(f"Image generation failed: {exc}", file=sys.stderr)
         return 1
 

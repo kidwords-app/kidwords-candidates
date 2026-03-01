@@ -4,7 +4,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "generate-images.py"
@@ -23,15 +23,28 @@ class GenerateImagesTests(unittest.TestCase):
     def test_slugify(self):
         self.assertEqual(generate_images.slugify(" Blue  Bird! "), "blue-bird")
 
+    def test_validate_levels_rejects_missing_or_empty(self):
+        with self.assertRaises(ValueError) as ctx:
+            generate_images.validate_levels([], "test")
+        self.assertIn("required field 'levels' is missing or empty", str(ctx.exception))
+
+    def test_validate_levels_rejects_invalid_levels(self):
+        with self.assertRaises(ValueError) as ctx:
+            generate_images.validate_levels(["K", "G1"], "bird")
+        self.assertIn("invalid level(s)", str(ctx.exception))
+        self.assertIn("K", str(ctx.exception))
+        self.assertIn("preschooler", str(ctx.exception))
+
+    def test_validate_levels_accepts_allowed_levels(self):
+        generate_images.validate_levels(["preschooler"], "x")
+        generate_images.validate_levels(
+            ["preschooler", "kindergartener", "first grader"], "x"
+        )
+
     def test_process_round_creates_candidates_and_images(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
             candidates_repo = root / "candidates-repo"
-            app_repo = root / "app"
-            (app_repo / "scripts").mkdir(parents=True, exist_ok=True)
-            (app_repo / "scripts" / "cartoon-gen.py").write_text(
-                "print('stub')", encoding="utf-8"
-            )
 
             batch_path = (
                 candidates_repo / "inputs" / "word-batches" / "2026-02-08.json"
@@ -43,7 +56,7 @@ class GenerateImagesTests(unittest.TestCase):
                         "words": [
                             {
                                 "word": "Blue Bird",
-                                "levels": ["K", "G1"],
+                                "levels": ["kindergartener", "first grader"],
                                 "tags": ["animal"],
                             }
                         ]
@@ -53,15 +66,16 @@ class GenerateImagesTests(unittest.TestCase):
             )
 
             fake_ids = [FakeUUID("abc123def4"), FakeUUID("zzz999yyy8")]
+            mock_cartoon_gen = MagicMock()
             with patch.object(generate_images.uuid, "uuid4", side_effect=fake_ids), patch.object(
-                generate_images.subprocess, "run"
-            ) as run_mock:
+                generate_images, "_get_cartoon_gen", return_value=mock_cartoon_gen
+            ):
                 created = generate_images.process_round(
-                    "2026-02-08", candidates_repo, app_repo
+                    "2026-02-08", candidates_repo
                 )
 
-            self.assertEqual(created, 2) # created for each level, K and G1
-            self.assertEqual(run_mock.call_count, 2) # called for each level, K and G1
+            self.assertEqual(created, 2)  # created for each level
+            self.assertEqual(mock_cartoon_gen.run_pipeline.call_count, 2)  # once per level
 
             candidate_path = (
                 candidates_repo
