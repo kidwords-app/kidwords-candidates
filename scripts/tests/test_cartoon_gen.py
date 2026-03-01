@@ -7,16 +7,16 @@ from unittest.mock import MagicMock
 from types import ModuleType
 
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "cartoon-gen.py"
-spec = importlib.util.spec_from_file_location("cartoon_gen", MODULE_PATH)
-cartoon_gen = importlib.util.module_from_spec(spec)
+MODULE_PATH = Path(__file__).resolve().parents[1] / "generate-images.py"
+spec = importlib.util.spec_from_file_location("generate_images", MODULE_PATH)
+gen_images = importlib.util.module_from_spec(spec)
 google_module = ModuleType("google")
 genai_module = ModuleType("genai")
 google_module.genai = genai_module
 sys.modules.setdefault("google", google_module)
 sys.modules.setdefault("google.genai", genai_module)
-sys.modules[spec.name] = cartoon_gen
-spec.loader.exec_module(cartoon_gen)
+sys.modules[spec.name] = gen_images
+spec.loader.exec_module(gen_images)
 
 
 class FakeTextPart:
@@ -49,15 +49,15 @@ class FakeResponse:
         self.parts = parts
 
 
-class CartoonGenTests(unittest.TestCase):
+class CartoonPipelineTests(unittest.TestCase):
     def test_build_text_prompt(self):
-        prompt = cartoon_gen.build_text_prompt("rocket", "kid-6")
+        prompt = gen_images._build_text_prompt("rocket", "kid-6")
         self.assertIn("rocket", prompt)
         self.assertIn("kid-6", prompt)
         self.assertIn('"prompts"', prompt)
 
     def test_build_cartoon_prompt(self):
-        prompt = cartoon_gen.build_cartoon_prompt("A rocket ship")
+        prompt = gen_images._build_cartoon_prompt("A rocket ship")
         self.assertIn("A rocket ship", prompt)
         self.assertIn("Do not include any words", prompt)
 
@@ -66,25 +66,25 @@ class CartoonGenTests(unittest.TestCase):
         client = MagicMock()
         client.models.generate_content.return_value = FakeResponse([FakeTextPart(response_json)])
 
-        result = cartoon_gen.generate_text_examples(client, "rocket", "kindergartener")
+        result = gen_images._generate_text_examples(client, "rocket", "kindergartener")
 
         self.assertEqual(result, ["one", "two", "three"])
-        expected_prompt = cartoon_gen.build_text_prompt("rocket", "kindergartener")
+        expected_prompt = gen_images._build_text_prompt("rocket", "kindergartener")
         client.models.generate_content.assert_called_once_with(
-            model=cartoon_gen.TEXT_MODEL,
-            contents=[expected_prompt],
+            model=gen_images.TEXT_MODEL,
+            contents=expected_prompt,
         )
 
     def test_generate_text_examples_budget_error(self):
         client = MagicMock()
         client.models.generate_content.side_effect = Exception("RESOURCE_EXHAUSTED: quota")
 
-        with self.assertRaises(cartoon_gen.BudgetLimitError):
-            cartoon_gen.generate_text_examples(client, "rocket", "kindergartener")
+        with self.assertRaises(gen_images.BudgetLimitError):
+            gen_images._generate_text_examples(client, "rocket", "kindergartener")
 
     def test_parse_text_response_invalid_json(self):
-        with self.assertRaises(cartoon_gen.InvalidResponseError):
-            cartoon_gen.parse_text_response("not-json")
+        with self.assertRaises(gen_images.InvalidResponseError):
+            gen_images._parse_text_response("not-json")
 
     def test_generate_cartoon_image_saves_file(self):
         client = MagicMock()
@@ -93,7 +93,7 @@ class CartoonGenTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "cartoon.png"
-            result_path = cartoon_gen.generate_cartoon_image(
+            result_path = gen_images._generate_cartoon_image(
                 client, "A rocket ship", output_path
             )
 
@@ -103,4 +103,3 @@ class CartoonGenTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

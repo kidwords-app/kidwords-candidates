@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
 import os
 import re
@@ -13,23 +12,146 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, List
 
+from google import genai
+
 ALLOWED_LEVELS = frozenset(["preschooler", "kindergartener", "first grader"])
 
-_SCRIPT_DIR = Path(__file__).resolve().parent
-_cartoon_gen_module = None
+# ---- Cartoon pipeline (Gemini text + image generation) ----
+
+TEXT_PROMPT_RESPONSE_TEMPLATE = {
+    "prompts": [{"first": ""}, {"second": ""}, {"third": ""}],
+}
+TEXT_PROMPT_TEMPLATE = (
+    "Generate three written examples of {word} that a {level} would understand. "
+    "Return them in JSON format like so: {text_prompt_response_template}."
+    "Do not format the response in a code block or include any other text or formatting."
+)
+CARTOON_PROMPT_TEMPLATE = (
+    "Create a cartoon with a single frame or image, describing the following: {phrase}. "
+    "Do not include any words in the cartoon."
+)
+TEXT_MODEL = "gemini-2.5-flash"
+IMAGE_MODEL = "gemini-2.5-flash-image"
 
 
-def _get_cartoon_gen():
-    """Load cartoon-gen.py (same dir); cache so we only load once."""
-    global _cartoon_gen_module
-    if _cartoon_gen_module is None:
-        spec = importlib.util.spec_from_file_location(
-            "cartoon_gen", _SCRIPT_DIR / "cartoon-gen.py"
-        )
-        _cartoon_gen_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(_cartoon_gen_module)
-    return _cartoon_gen_module
+class BudgetLimitError(RuntimeError):
+    pass
 
+
+class TextGenerationError(RuntimeError):
+    pass
+
+
+class ImageGenerationError(RuntimeError):
+    pass
+
+
+class InvalidResponseError(ValueError):
+    pass
+
+
+class ConfigurationError(RuntimeError):
+    pass
+
+
+def _build_text_prompt(word: str, level: str) -> str:
+    return TEXT_PROMPT_TEMPLATE.format(
+        word=word, level=level, text_prompt_response_template=json.dumps(TEXT_PROMPT_RESPONSE_TEMPLATE)
+    )
+
+
+def _build_cartoon_prompt(phrase: str) -> str:
+    return CARTOON_PROMPT_TEMPLATE.format(phrase=phrase)
+
+
+def _is_budget_error(error: BaseException) -> bool:
+    message = str(error).lower()
+    return any(
+        hint in message
+        for hint in ("resource exhausted", "quota", "budget", "limit", "rate limit", "429")
+    )
+
+
+def _extract_text_from_response(response) -> str:
+    parts = getattr(response, "parts", []) or []
+    text_chunks = [part.text for part in parts if getattr(part, "text", None)]
+    if not text_chunks:
+        raise TextGenerationError("Text response contained no text parts.")
+    return "\n".join(text_chunks).strip()
+
+
+def _parse_text_response(response_text: str) -> List[str]:
+    try:
+        payload = json.loads(response_text)
+    except json.JSONDecodeError as exc:
+        raise InvalidResponseError("Text response is not valid JSON.") from exc
+    prompts = payload.get("prompts")
+    if not isinstance(prompts, list):
+        raise InvalidResponseError("Text response JSON missing 'prompts' list.")
+    values: List[str] = []
+    for item in prompts:
+        if not isinstance(item, dict) or len(item) != 1:
+            raise InvalidResponseError("Each prompt entry must be a single-key object.")
+        value = next(iter(item.values()))
+        if not isinstance(value, str) or not value.strip():
+            raise InvalidResponseError("Prompt entries must be non-empty strings.")
+        values.append(value.strip())
+    if not values:
+        raise InvalidResponseError("No prompts found in text response JSON.")
+    return values
+
+
+def _generate_text_examples(client: genai.Client, word: str, level: str, model: str = TEXT_MODEL) -> List[str]:
+    prompt = _build_text_prompt(word, level)
+    try:
+        response = client.models.generate_content(model=model, contents=prompt)
+    except Exception as exc:
+        if _is_budget_error(exc):
+            raise BudgetLimitError("Budget or quota limit reached.") from exc
+        raise TextGenerationError("Failed to generate text prompt.") from exc
+    if response is None:
+        raise TextGenerationError("API returned no response.")
+    response_text = _extract_text_from_response(response)
+    return _parse_text_response(response_text)
+
+
+def _extract_image_from_response(response):
+    parts = getattr(response, "parts", []) or []
+    for part in parts:
+        if getattr(part, "inline_data", None) is not None:
+            return part.as_image()
+    raise ImageGenerationError("Image response contained no image data.")
+
+
+def _generate_cartoon_image(
+    client: genai.Client, phrase: str, output_path: Path, model: str = IMAGE_MODEL
+) -> Path:
+    prompt = _build_cartoon_prompt(phrase)
+    try:
+        response = client.models.generate_content(model=model, contents=prompt)
+    except Exception as exc:
+        if _is_budget_error(exc):
+            raise BudgetLimitError("Budget or quota limit reached.") from exc
+        raise ImageGenerationError("Failed to generate cartoon image.") from exc
+    if response is None:
+        raise ImageGenerationError("API returned no response.")
+    image = _extract_image_from_response(response)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(output_path)
+    return output_path
+
+
+def run_cartoon_pipeline(word: str, level: str, output_path: Path) -> Path:
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ConfigurationError("GEMINI_API_KEY is missing from the environment.")
+    client = genai.Client(api_key=api_key)
+    prompts = _generate_text_examples(client, word, level)
+    phrase = prompts[0]
+    return _generate_cartoon_image(client, phrase, output_path)
+
+
+# ---- Batch / candidate logic ----
 
 def slugify(value: str) -> str:
     value = value.strip().lower()
@@ -107,12 +229,11 @@ def generate_images_for_entry(
         rel_path = str(output_path.as_posix())
         if rel_path in existing_paths:
             continue
-        cartoon_gen = _get_cartoon_gen()
-        cartoon_gen.run_pipeline(word, level, output_path)
+        run_cartoon_pipeline(word, level, output_path)
         images.append(
             {
                 "imageId": image_id,
-                "prompt": f"generated via cartoon-gen.py for {word} ({level})",
+                "prompt": f"generated via run_cartoon_pipeline for {word} ({level})",
                 "model": "gemini",
                 "assetPath": rel_path,
                 "createdAt": now,
@@ -159,39 +280,57 @@ def process_round(
     return created
 
 
-@dataclass(frozen=True)
-class Arguments:
-    round_id: str
-    candidates_repo: Path
-
-
-def parse_args(argv: Iterable[str]) -> Arguments:
-    parser = argparse.ArgumentParser(description="Generate images for batch words.")
-    parser.add_argument(
-        "--round-id",
-        default=os.environ.get("ROUND_ID"),
-        help="Batch round id (YYYY-MM-DD). Defaults to ROUND_ID.",
+def parse_args(argv: Iterable[str]):
+    parser = argparse.ArgumentParser(
+        description="Generate cartoon images: batch (from word-batches) or single word."
     )
+    parser.add_argument("--round-id", default=os.environ.get("ROUND_ID"), help="Batch round id (YYYY-MM-DD).")
     parser.add_argument(
         "--candidates-repo",
         default=os.environ.get("CANDIDATES_REPO_PATH"),
-        help="Repo root (inputs in inputs/, outputs in candidates/). Defaults to CANDIDATES_REPO_PATH.",
+        help="Repo root for batch mode. Defaults to CANDIDATES_REPO_PATH.",
     )
+    parser.add_argument("--word", help="Single-word mode: word to illustrate.")
+    parser.add_argument("--level", help="Single-word mode: audience level.")
+    parser.add_argument("--output", default="generated_image.png", help="Single-word mode: output path.")
     args = parser.parse_args(list(argv))
-    if not args.round_id:
-        parser.error("Round id is required via --round-id or ROUND_ID.")
-    if not args.candidates_repo:
-        parser.error("Candidates repo path is required via --candidates-repo or CANDIDATES_REPO_PATH.")
-    return Arguments(
-        round_id=args.round_id,
-        candidates_repo=Path(args.candidates_repo),
-    )
+    return args
 
 
 def main(argv: Iterable[str]) -> int:
     args = parse_args(argv)
+
+    # Single-word mode: generate one cartoon and exit
+    if args.word and args.level:
+        try:
+            out = run_cartoon_pipeline(args.word, args.level, Path(args.output))
+            print(f"Saved cartoon image to {out}")
+            return 0
+        except BudgetLimitError as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 2
+        except (
+            TextGenerationError,
+            ImageGenerationError,
+            InvalidResponseError,
+            ConfigurationError,
+        ) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+        except Exception as exc:
+            print(f"Unexpected error: {exc}", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            return 1
+
+    # Batch mode
+    if not args.round_id:
+        print("Error: --round-id (or ROUND_ID) required for batch mode.", file=sys.stderr)
+        return 1
+    if not args.candidates_repo:
+        print("Error: --candidates-repo (or CANDIDATES_REPO_PATH) required for batch mode.", file=sys.stderr)
+        return 1
     try:
-        created = process_round(args.round_id, args.candidates_repo)
+        created = process_round(args.round_id, Path(args.candidates_repo))
     except (FileNotFoundError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 1
@@ -199,7 +338,6 @@ def main(argv: Iterable[str]) -> int:
         print(f"Image generation failed: {exc}", file=sys.stderr)
         traceback.print_exc(file=sys.stderr)
         return 1
-
     print(f"Generated {created} images.")
     return 0
 
