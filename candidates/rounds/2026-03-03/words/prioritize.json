@@ -1,0 +1,39 @@
+{
+  "createdAt": "2026-03-03T22:44:01.642528+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-03-03/assets/prioritize/preschooler-64fd2fd536.png",
+      "createdAt": "2026-03-03T22:44:01.642528+00:00",
+      "imageId": "64fd2fd536",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: First, we need to put on our shoes, and then you can run outside to play!. Do not include any words in the cartoon."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-03-03/assets/prioritize/kindergartener-1d89ba95a4.png",
+      "createdAt": "2026-03-03T22:44:01.642528+00:00",
+      "imageId": "1d89ba95a4",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: You want to play with your favorite toy, but it's time to put on your shoes to go outside. Putting on your shoes first means you know that's what you need to do now.. Do not include any words in the cartoon."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-03-03/assets/prioritize/first grader-cd100579b7.png",
+      "createdAt": "2026-03-03T22:44:01.642528+00:00",
+      "imageId": "cd100579b7",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: You have to do your homework first before you can play outside, because school work is important.. Do not include any words in the cartoon."
+    }
+  ],
+  "levels": {},
+  "partOfSpeech": "verb",
+  "roundId": "2026-03-03",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 4,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-03-03T22:44:01.642528+00:00",
+  "word": "prioritize",
+  "wordId": "prioritize"
+}
