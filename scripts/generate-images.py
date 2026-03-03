@@ -154,6 +154,8 @@ def run_cartoon_pipeline(word: str, level: str, output_path: Path) -> tuple[Path
     print(f"[cartoon] client ready, generating text examples...", flush=True)
     prompts = _generate_text_examples(client, word, level)
     phrase = prompts[0]
+    for i, alt in enumerate(prompts[1:], start=2):
+        print(f"[cartoon] alternate prompt {i}: {alt!r}", flush=True)
     image_prompt = _build_cartoon_prompt(phrase)
     print(f"[cartoon] phrase chosen, generating image...", flush=True)
     out = _generate_cartoon_image(client, phrase, output_path)
