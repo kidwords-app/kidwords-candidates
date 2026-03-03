@@ -1,0 +1,8 @@
+{
+  "roundId": "2026-03-04",
+  "words": [
+    {"word": "dream", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "noun", "syllables": 1, "tags": ["thinking"]},
+    {"word": "impressive", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "adjective", "syllables": 3, "tags": ["thinking"]},
+    {"word": "mystery", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "noun", "syllables": 3, "tags": ["thinking"]}
+  ]
+}
