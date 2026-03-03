@@ -103,6 +103,7 @@ def _parse_text_response(response_text: str) -> List[str]:
 
 def _generate_text_examples(client: genai.Client, word: str, level: str, model: str = TEXT_MODEL) -> List[str]:
     prompt = _build_text_prompt(word, level)
+    print(f"[cartoon] API text request model={model} word={word!r} level={level!r}", flush=True)
     try:
         response = client.models.generate_content(model=model, contents=prompt)
     except Exception as exc:
@@ -112,7 +113,8 @@ def _generate_text_examples(client: genai.Client, word: str, level: str, model: 
     if response is None:
         raise TextGenerationError("API returned no response.")
     response_text = _extract_text_from_response(response)
-    return _parse_text_response(response_text)
+    parsed = _parse_text_response(response_text)
+    return parsed
 
 
 def _extract_image_from_response(response):
@@ -127,6 +129,7 @@ def _generate_cartoon_image(
     client: genai.Client, phrase: str, output_path: Path, model: str = IMAGE_MODEL
 ) -> Path:
     prompt = _build_cartoon_prompt(phrase)
+    print(f"[cartoon] API image request model={model} phrase={phrase[:50]!r}...", flush=True)
     try:
         response = client.models.generate_content(model=model, contents=prompt)
     except Exception as exc:
@@ -141,14 +144,21 @@ def _generate_cartoon_image(
     return output_path
 
 
-def run_cartoon_pipeline(word: str, level: str, output_path: Path) -> Path:
+def run_cartoon_pipeline(word: str, level: str, output_path: Path) -> tuple[Path, str]:
+    """Run text + image generation. Returns (output_path, image_prompt)."""
+    print(f"[cartoon] start word={word!r} level={level!r} output={output_path}", flush=True)
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ConfigurationError("GEMINI_API_KEY is missing from the environment.")
     client = genai.Client(api_key=api_key)
+    print(f"[cartoon] client ready, generating text examples...", flush=True)
     prompts = _generate_text_examples(client, word, level)
     phrase = prompts[0]
-    return _generate_cartoon_image(client, phrase, output_path)
+    image_prompt = _build_cartoon_prompt(phrase)
+    print(f"[cartoon] phrase chosen, generating image...", flush=True)
+    out = _generate_cartoon_image(client, phrase, output_path)
+    print(f"[cartoon] done -> {out}", flush=True)
+    return out, image_prompt
 
 
 # ---- Batch / candidate logic ----
@@ -211,6 +221,7 @@ def generate_images_for_entry(
     levels = entry.get("levels")
     validate_levels(levels if levels is not None else [], word)
     word_id = slugify(word)
+    print(f"[word] {word!r} levels={levels}", flush=True)
     candidate_path = words_dir / f"{word_id}.json"
     if candidate_path.exists():
         candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
@@ -228,12 +239,15 @@ def generate_images_for_entry(
         output_path = output_dir / f"{level}-{image_id}.png"
         rel_path = str(output_path.as_posix())
         if rel_path in existing_paths:
+            print(f"[word] {word!r} {level!r} skip (already exists)", flush=True)
             continue
-        run_cartoon_pipeline(word, level, output_path)
+        print(f"[word] {word!r} {level!r} generating -> {output_path}", flush=True)
+        _out_path, image_prompt = run_cartoon_pipeline(word, level, output_path)
+        print(f"[word] {word!r} {level!r} saved", flush=True)
         images.append(
             {
                 "imageId": image_id,
-                "prompt": f"generated via run_cartoon_pipeline for {word} ({level})",
+                "prompt": image_prompt,
                 "model": "gemini",
                 "assetPath": rel_path,
                 "createdAt": now,
@@ -254,12 +268,13 @@ def process_round(
     candidates_repo: Path,
 ) -> int:
     """Run image generation for a round. Reads inputs from inputs/, writes to candidates/."""
-    print(f"Current working directory: {os.getcwd()}, candidates_repo: {candidates_repo}", flush=True)
+    print(f"[batch] cwd={os.getcwd()!r}, candidates_repo={candidates_repo!r}", flush=True)
     batch_path = candidates_repo / "inputs" / "word-batches" / f"{round_id}.json"
     if not batch_path.exists():
         raise FileNotFoundError(f"Missing batch file: {batch_path}")
-
+    print(f"[batch] Loading batch: {batch_path}", flush=True)
     words = load_batch_words(batch_path)
+    print(f"[batch] Loaded {len(words)} words", flush=True)
 
     now = datetime.now(timezone.utc).isoformat()
     round_dir = candidates_repo / "candidates" / "rounds" / round_id
@@ -267,9 +282,12 @@ def process_round(
     assets_dir = round_dir / "assets"
     words_dir.mkdir(parents=True, exist_ok=True)
     assets_dir.mkdir(parents=True, exist_ok=True)
+    print(f"[batch] Round dirs ready: {round_dir}", flush=True)
 
     created = 0
-    for entry in words:
+    for i, entry in enumerate(words):
+        word = entry.get("word", "?")
+        print(f"[batch] Word {i + 1}/{len(words)}: {word!r}", flush=True)
         created += generate_images_for_entry(
             entry,
             round_id,
@@ -277,6 +295,7 @@ def process_round(
             assets_dir,
             now,
         )
+        print(f"[batch] Word {word!r} done (total created this round: {created})", flush=True)
     return created
 
 
@@ -303,8 +322,9 @@ def main(argv: Iterable[str]) -> int:
     # Single-word mode: generate one cartoon and exit
     if args.word and args.level:
         try:
-            out = run_cartoon_pipeline(args.word, args.level, Path(args.output))
+            out, image_prompt = run_cartoon_pipeline(args.word, args.level, Path(args.output))
             print(f"Saved cartoon image to {out}")
+            print(f"Image prompt: {image_prompt}")
             return 0
         except BudgetLimitError as exc:
             print(f"Error: {exc}", file=sys.stderr)
@@ -329,6 +349,7 @@ def main(argv: Iterable[str]) -> int:
     if not args.candidates_repo:
         print("Error: --candidates-repo (or CANDIDATES_REPO_PATH) required for batch mode.", file=sys.stderr)
         return 1
+    print(f"[batch] Starting batch round_id={args.round_id!r} repo={args.candidates_repo!r}", flush=True)
     try:
         created = process_round(args.round_id, Path(args.candidates_repo))
     except (FileNotFoundError, ValueError) as exc:
@@ -338,7 +359,7 @@ def main(argv: Iterable[str]) -> int:
         print(f"Image generation failed: {exc}", file=sys.stderr)
         traceback.print_exc(file=sys.stderr)
         return 1
-    print(f"Generated {created} images.")
+    print(f"[batch] Complete. Generated {created} images.", flush=True)
     return 0
 
 
