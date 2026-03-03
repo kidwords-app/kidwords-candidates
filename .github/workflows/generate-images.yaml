@@ -73,6 +73,7 @@ jobs:
 
       - name: Email notification
         if: always()
+        continue-on-error: true
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER }}
@@ -81,7 +82,7 @@ jobs:
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: "generate-images ${{ steps.round.outputs.roundId }}: ${{ job.status }}"
           to: ${{ secrets.NOTIFY_EMAIL_TO }}
-          from: ${{ secrets.NOTIFY_EMAIL_FROM }}
+          from: ${{ secrets.NOTIFY_EMAIL_FROM || 'github-actions[bot]@users.noreply.github.com' }}
           body: |
             Workflow: ${{ github.workflow }}
             Status: ${{ job.status }}
