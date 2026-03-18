@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KidWords Admin Review Portal</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal: #0d9488;
+    --teal-light: #ccfbf1;
+    --teal-dark: #0f766e;
+    --orange: #f97316;
+    --orange-light: #fff7ed;
+    --bg: #f8fafc;
+    --sidebar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --text-2: #475569;
+    --text-3: #94a3b8;
+    --sidebar-w: 220px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.06);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    font-size: 14px;
+  }
+
+  /* ─── SIDEBAR ───────────────────────────────────────────── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--teal), #059669);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 16px; font-weight: 700; flex-shrink: 0;
+  }
+  .logo-name { font-weight: 700; font-size: 14px; color: var(--text); line-height: 1.2; }
+  .logo-sub  { font-size: 11px; color: var(--text-3); }
+
+  .sidebar-section { padding: 16px 12px 8px; }
+  .sidebar-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--text-3);
+    padding: 0 4px; margin-bottom: 6px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 8px; border-radius: 6px; cursor: pointer;
+    transition: background .12s, color .12s; color: var(--text-2);
+    font-size: 13px; user-select: none;
+  }
+  .sidebar-item:hover { background: #f1f5f9; color: var(--text); }
+  .sidebar-item.active { background: var(--teal-light); color: var(--teal-dark); font-weight: 600; }
+  .sidebar-item-left { display: flex; align-items: center; gap: 8px; }
+  .sidebar-icon { font-size: 14px; line-height: 1; }
+
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 20px; height: 18px; padding: 0 5px;
+    border-radius: 99px; font-size: 11px; font-weight: 600;
+    background: #e2e8f0; color: var(--text-2);
+  }
+  .badge.teal   { background: var(--teal-light); color: var(--teal-dark); }
+  .badge.yellow { background: #fef9c3; color: #854d0e; }
+  .badge.red    { background: #fee2e2; color: #991b1b; }
+
+  .sidebar-footer {
+    margin-top: auto; padding: 12px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .sidebar-footer a {
+    font-size: 12px; color: var(--text-3); text-decoration: none;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .sidebar-footer a:hover { color: var(--text-2); }
+
+  /* ─── MAIN ───────────────────────────────────────────────── */
+  #main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+  .topbar {
+    background: #fff; border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0; position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-title { font-size: 16px; font-weight: 600; color: var(--text); flex: 1; }
+
+  .search-wrap { position: relative; }
+  .search-wrap input {
+    padding: 7px 12px 7px 34px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg);
+    font-size: 13px; width: 240px; outline: none; color: var(--text);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .search-wrap input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
+  .search-icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 14px; color: var(--text-3); pointer-events: none;
+  }
+
+  select.sort-select {
+    padding: 7px 28px 7px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg);
+    font-size: 13px; color: var(--text); outline: none; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    transition: border-color .15s;
+  }
+  select.sort-select:focus { border-color: var(--teal); }
+
+  .content-area { padding: 24px; flex: 1; }
+
+  /* ─── TABLE ──────────────────────────────────────────────── */
+  .card {
+    background: var(--card-bg); border-radius: 12px;
+    box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left; padding: 10px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--text-3);
+    background: #f8fafc; border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody td { padding: 11px 14px; vertical-align: middle; font-size: 13px; }
+
+  .word-cell { font-weight: 600; color: var(--text); }
+  .word-cell a { color: var(--teal-dark); text-decoration: none; cursor: pointer; }
+  .word-cell a:hover { text-decoration: underline; }
+  .level-chip { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; background: #f1f5f9; color: var(--text-2); }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 99px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .pill-pending      { background: #f1f5f9; color: #64748b; }
+  .pill-pending::before { background: #94a3b8; }
+  .pill-in_review    { background: #fef9c3; color: #854d0e; }
+  .pill-in_review::before { background: #eab308; }
+  .pill-approved     { background: var(--teal-light); color: var(--teal-dark); }
+  .pill-approved::before { background: var(--teal); }
+  .pill-needs_regen  { background: #fee2e2; color: #991b1b; }
+  .pill-needs_regen::before { background: #ef4444; }
+
+  .count-text { font-size: 12px; color: var(--text-2); }
+  .def-levels { font-size: 11px; color: var(--text-2); }
+  .def-levels span { margin-right: 4px; }
+  .date-text { font-size: 12px; color: var(--text-3); white-space: nowrap; }
+
+  /* ─── BUTTONS ────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; transition: all .15s; user-select: none; white-space: nowrap;
+  }
+  .btn-teal    { background: var(--teal); color: #fff; }
+  .btn-teal:hover { background: var(--teal-dark); }
+  .btn-outline { background: #fff; color: var(--text-2); border: 1px solid var(--border); }
+  .btn-outline:hover { background: #f1f5f9; border-color: #cbd5e1; color: var(--text); }
+  .btn-orange  { background: #fff; color: var(--orange); border: 1px solid var(--orange); }
+  .btn-orange:hover { background: var(--orange-light); }
+  .btn-orange-solid { background: var(--orange); color: #fff; border: none; }
+  .btn-orange-solid:hover { background: #ea6c10; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-review { background: var(--teal-light); color: var(--teal-dark); border: none; }
+  .btn-review:hover { background: #99f6e4; }
+  .btn-more {
+    background: none; border: 1px solid var(--border); color: var(--text-2);
+    padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 14px;
+    line-height: 1; transition: background .12s;
+  }
+  .btn-more:hover { background: #f1f5f9; }
+  .action-group { display: flex; align-items: center; gap: 6px; }
+
+  /* ─── TOOLTIP ────────────────────────────────────────────── */
+  .tooltip-wrap { position: relative; display: inline-flex; }
+  .tooltip-tip {
+    position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b; color: #fff;
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 11px; padding: 5px 9px; border-radius: 6px;
+    white-space: nowrap; pointer-events: none; z-index: 100;
+    opacity: 0; transition: opacity .15s;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+  }
+  .tooltip-tip::after {
+    content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: #1e293b;
+  }
+  .tooltip-wrap:hover .tooltip-tip { opacity: 1; }
+
+  /* ─── BREADCRUMB ─────────────────────────────────────────── */
+  .breadcrumb {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--text-3); margin-bottom: 20px;
+  }
+  .breadcrumb span { color: var(--text-2); }
+  .breadcrumb .sep { color: var(--text-3); }
+  .breadcrumb .current { color: var(--text); font-weight: 600; }
+
+  /* ─── WORD DETAIL HEADER ─────────────────────────────────── */
+  .detail-header {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow);
+  }
+  .detail-header-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .detail-word { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -.02em; }
+  .detail-meta { display: flex; align-items: center; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+  .meta-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-2); background: #f1f5f9; padding: 3px 9px; border-radius: 99px; }
+  .tag-chip { display: inline-flex; align-items: center; font-size: 11px; color: var(--teal-dark); background: var(--teal-light); padding: 3px 9px; border-radius: 99px; font-weight: 600; }
+  .round-chip { font-size: 11px; color: var(--text-3); font-family: ui-monospace, monospace; }
+  .action-bar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* ─── REGEN PANEL ────────────────────────────────────────── */
+  .regen-panel {
+    background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px;
+    padding: 18px 20px; margin-bottom: 16px;
+    display: none; box-shadow: var(--shadow);
+  }
+  .regen-panel.open { display: block; }
+  .regen-panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .regen-panel-title { font-size: 13px; font-weight: 700; color: #92400e; display: flex; align-items: center; gap: 8px; }
+  .regen-close {
+    background: none; border: none; cursor: pointer; font-size: 16px; color: #92400e;
+    line-height: 1; padding: 2px 6px; border-radius: 4px;
+  }
+  .regen-close:hover { background: #fef3c7; }
+  .regen-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .regen-card { background: #fff; border-radius: 10px; border: 1px solid #fde68a; padding: 14px 16px; }
+  .regen-card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .regen-card-desc { font-size: 11px; color: var(--text-2); margin-bottom: 12px; line-height: 1.6; }
+  .regen-warn { font-size: 11px; color: #92400e; background: #fef3c7; border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; line-height: 1.5; }
+  .regen-mode-row { display: flex; gap: 6px; margin-bottom: 10px; }
+  .regen-mode-btn {
+    flex: 1; padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border); background: #f8fafc; color: var(--text-2);
+    transition: all .12s; text-align: center;
+  }
+  .regen-mode-btn.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+  .regen-textarea {
+    width: 100%; padding: 7px 9px; border-radius: 7px;
+    border: 1px solid var(--border); font-size: 12px; color: var(--text);
+    background: var(--bg); outline: none; resize: none;
+    transition: border-color .15s; font-family: inherit;
+  }
+  .regen-textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(249,115,22,.12); }
+  .regen-footer { display: flex; justify-content: flex-end; margin-top: 10px; }
+
+  /* ─── TWO COLUMN ─────────────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .col-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .col-label-hint { font-size: 11px; font-weight: 500; color: var(--text-3); background: #f1f5f9; padding: 2px 7px; border-radius: 99px; }
+
+  /* ─── IMAGE CARDS ────────────────────────────────────────── */
+  .img-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow);
+    transition: box-shadow .15s, border-color .15s; cursor: pointer;
+  }
+  .img-card.selected { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
+  .img-card:hover { box-shadow: var(--shadow-md); }
+  .img-placeholder {
+    height: 120px; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .img-id-overlay {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(0,0,0,.5); color: #fff;
+    font-size: 10px; font-family: ui-monospace, monospace;
+    padding: 2px 7px; border-radius: 4px;
+  }
+  .img-card-body { padding: 10px 12px 12px; }
+  .img-prompt { font-size: 12px; color: var(--text-2); line-height: 1.4; margin-bottom: 8px; }
+  .img-card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+  .model-badge { font-size: 10px; font-family: ui-monospace, monospace; background: #f1f5f9; color: var(--text-2); padding: 2px 7px; border-radius: 4px; }
+  .card-date { font-size: 10px; color: var(--text-3); }
+  .radio-row { display: flex; align-items: center; gap: 8px; padding: 6px 12px 10px; }
+  .radio-row input[type=radio] { accent-color: var(--teal); width: 15px; height: 15px; }
+  .radio-row label { font-size: 12px; color: var(--text-2); cursor: pointer; }
+
+  /* ─── SUBPROMPT ──────────────────────────────────────────── */
+  .subprompt-section { margin-top: 4px; }
+  .subprompt-label { font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; }
+  .subprompt-input {
+    width: 100%; padding: 8px 10px; border-radius: 7px;
+    border: 1px solid var(--border); font-size: 12px; color: var(--text);
+    background: var(--bg); outline: none; resize: none; font-family: inherit;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .subprompt-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
+  .save-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+  /* ─── FIELD SELECTION (mix-and-match) ───────────────────── */
+  .field-section { margin-bottom: 18px; }
+  .field-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-3);
+    margin-bottom: 7px; padding: 0 2px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .field-section-label-text { color: var(--text-2); }
+  .field-option {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 9px 11px; border-radius: 8px; border: 1px solid var(--border);
+    margin-bottom: 6px; cursor: pointer; background: #fff;
+    transition: border-color .12s, background .12s;
+    position: relative;
+  }
+  .field-option:hover { border-color: #cbd5e1; background: #f8fafc; }
+  .field-option.selected { border-color: var(--teal); background: #f0fdfa; }
+  .field-option input[type=radio] { accent-color: var(--teal); margin-top: 3px; flex-shrink: 0; cursor: pointer; }
+  .field-option-body { flex: 1; min-width: 0; }
+  .field-option-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .field-option-text { font-size: 12px; color: var(--text); line-height: 1.5; }
+  .attempt-num { font-size: 10px; color: var(--text-3); font-family: ui-monospace, monospace; }
+
+  /* ─── TABS ───────────────────────────────────────────────── */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 16px; }
+  .tab-btn {
+    padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+    border: none; background: none; color: var(--text-3);
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: color .12s, border-color .12s;
+  }
+  .tab-btn:hover { color: var(--text-2); }
+  .tab-btn.active { color: var(--teal-dark); border-bottom-color: var(--teal); }
+
+  /* ─── EMPTY STATE ────────────────────────────────────────── */
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--text-3); }
+  .empty-state .big-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* ─── SCROLLBAR ──────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+  .section-divider { height: 1px; background: var(--border); margin: 4px 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">K</div>
+    <div>
+      <div class="logo-name">KidWords Admin</div>
+      <div class="logo-sub">Review Portal</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Rounds</div>
+    <div class="sidebar-item active" data-filter="round" data-value="all" onclick="filterRound('all')">
+      <div class="sidebar-item-left"><span class="sidebar-icon">📋</span>All Rounds</div>
+    </div>
+    <div class="sidebar-item" data-filter="round" data-value="2026-03-03" onclick="filterRound('2026-03-03')">
+      <div class="sidebar-item-left"><span class="sidebar-icon">🗓</span>2026-03-03</div>
+      <span class="badge">4</span>
+    </div>
+    <div class="sidebar-item" data-filter="round" data-value="2026-03-01" onclick="filterRound('2026-03-01')">
+      <div class="sidebar-item-left"><span class="sidebar-icon">🗓</span>2026-03-01</div>
+      <span class="badge">2</span>
+    </div>
+  </div>
+
+  <div class="section-divider" style="margin: 0 12px;"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Status</div>
+    <div class="sidebar-item active" data-filter="status" data-value="all" onclick="filterStatus('all')">
+      <div class="sidebar-item-left"><span class="sidebar-icon">◉</span>All</div>
+      <span class="badge teal" id="count-all">6</span>
+    </div>
+    <div class="sidebar-item" data-filter="status" data-value="pending" onclick="filterStatus('pending')">
+      <div class="sidebar-item-left"><span class="sidebar-icon" style="color:#94a3b8">●</span>Pending</div>
+      <span class="badge" id="count-pending">2</span>
+    </div>
+    <div class="sidebar-item" data-filter="status" data-value="in_review" onclick="filterStatus('in_review')">
+      <div class="sidebar-item-left"><span class="sidebar-icon" style="color:#eab308">●</span>In Review</div>
+      <span class="badge yellow" id="count-in_review">2</span>
+    </div>
+    <div class="sidebar-item" data-filter="status" data-value="approved" onclick="filterStatus('approved')">
+      <div class="sidebar-item-left"><span class="sidebar-icon" style="color:#0d9488">●</span>Approved</div>
+      <span class="badge teal" id="count-approved">1</span>
+    </div>
+    <div class="sidebar-item" data-filter="status" data-value="needs_regen" onclick="filterStatus('needs_regen')">
+      <div class="sidebar-item-left"><span class="sidebar-icon" style="color:#ef4444">●</span>Needs Regen</div>
+      <span class="badge red" id="count-needs_regen">1</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <a href="#" onclick="return false"><span>❓</span> Help &amp; Documentation</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════ MAIN ═══════════════════════ -->
+<div id="main">
+
+  <!-- ── WORD LIST VIEW ───────────────────────────── -->
+  <div id="view-list">
+    <div class="topbar">
+      <div class="topbar-title">Word Candidates</div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search words…" id="search-input" oninput="filterTable()" />
+      </div>
+      <select class="sort-select" id="sort-select" onchange="sortTable()">
+        <option value="word">Sort: Word A–Z</option>
+        <option value="status">Sort: Status</option>
+        <option value="round">Sort: Round</option>
+        <option value="updated">Sort: Last Updated</option>
+      </select>
+    </div>
+
+    <div class="content-area">
+      <div class="card">
+        <table id="word-table">
+          <thead>
+            <tr>
+              <th>Word</th>
+              <th>Level</th>
+              <th>Status</th>
+              <th>Round</th>
+              <th>Images</th>
+              <th>Definitions</th>
+              <th>Last Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="word-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── WORD DETAIL VIEW ─────────────────────────── -->
+  <div id="view-detail" style="display:none;">
+    <div class="topbar">
+      <div class="topbar-title" id="detail-topbar-title">Word Detail</div>
+      <button class="btn btn-outline btn-sm" onclick="showList()">← Back to list</button>
+    </div>
+
+    <div class="content-area">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <span style="cursor:pointer;color:var(--teal-dark)" onclick="showList()">Rounds</span>
+        <span class="sep">/</span>
+        <span id="bc-round">2026-03-03</span>
+        <span class="sep">/</span>
+        <span class="current" id="bc-word">empathy</span>
+      </div>
+
+      <!-- Header card -->
+      <div class="detail-header">
+        <div class="detail-header-top">
+          <div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <div class="detail-word" id="detail-word-name">empathy</div>
+              <span class="status-pill pill-in_review" id="detail-status-pill">in review</span>
+            </div>
+            <div class="detail-meta" style="margin-top:10px;">
+              <span class="meta-chip">🏷 noun</span>
+              <span class="meta-chip">🔤 3 syllables</span>
+              <span class="meta-chip">📚 preK · K · G1</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
+              <span class="tag-chip">emotions</span>
+              <span class="tag-chip">social skills</span>
+              <span class="tag-chip">SEL</span>
+              <span class="round-chip" style="margin-left:4px;">round: 2026-03-03</span>
+            </div>
+          </div>
+          <div class="action-bar">
+            <div class="tooltip-wrap">
+              <button class="btn btn-outline" onclick="flashSave(this)">💾 Save Selections</button>
+              <span class="tooltip-tip">POST /api/admin/candidates/:wordId/select</span>
+            </div>
+            <div class="tooltip-wrap">
+              <button class="btn btn-teal" onclick="flashApprove(this)">✓ Approve</button>
+              <span class="tooltip-tip">POST /api/admin/candidates/:wordId/approve</span>
+            </div>
+            <div class="tooltip-wrap">
+              <button class="btn btn-orange" onclick="toggleRegenPanel()">↻ Regenerate ▾</button>
+              <span class="tooltip-tip">POST /api/admin/candidates/:wordId/regenerate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regeneration Panel (toggled by button above) -->
+      <div class="regen-panel" id="regen-panel">
+        <div class="regen-panel-header">
+          <div class="regen-panel-title">↻ What would you like to regenerate?</div>
+          <button class="regen-close" onclick="toggleRegenPanel()">✕</button>
+        </div>
+        <div class="regen-cards">
+
+          <!-- Card A: Image only -->
+          <div class="regen-card">
+            <div class="regen-card-title">🖼 Image only</div>
+            <div class="regen-card-desc">
+              Keep the current text definitions. Generate new image candidates
+              using either a replacement prompt or a sub-prompt added to the existing one.
+            </div>
+            <div class="regen-mode-row">
+              <div class="regen-mode-btn active" id="img-mode-replace" onclick="setImgMode('replace')">Replace prompt</div>
+              <div class="regen-mode-btn" id="img-mode-sub" onclick="setImgMode('sub')">Add sub-prompt</div>
+            </div>
+            <div id="img-mode-replace-area">
+              <textarea class="regen-textarea" rows="2" placeholder="e.g. 'Two children sharing an umbrella, warm pastel watercolor, age 4-6'"></textarea>
+            </div>
+            <div id="img-mode-sub-area" style="display:none;">
+              <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;font-style:italic;">
+                Will append to: "Two children sharing an umbrella in the rain…"
+              </div>
+              <textarea class="regen-textarea" rows="2" placeholder="e.g. 'warmer colors, more cheerful expressions'"></textarea>
+            </div>
+            <div class="regen-footer">
+              <div class="tooltip-wrap">
+                <button class="btn btn-orange-solid btn-sm" onclick="flashBtn(this,'Queued!')">↻ Queue image regen</button>
+                <span class="tooltip-tip">POST /api/admin/candidates/:wordId/regenerate {"type":"image"}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card B: Text + Image -->
+          <div class="regen-card">
+            <div class="regen-card-title">📝 Text definitions + Image</div>
+            <div class="regen-card-desc">
+              Regenerate all definition candidates (definition, example, try&nbsp;it)
+              for one or all levels. A new image will also be queued once the text
+              prompt is finalized.
+            </div>
+            <div class="regen-warn">
+              ⚠ This queues both a text generation job <em>and</em> an image generation job.
+              Existing candidates are kept until you approve new ones.
+            </div>
+            <div style="margin-bottom:8px;">
+              <div class="subprompt-label" style="font-size:11px;margin-bottom:5px;">Levels to regenerate</div>
+              <div style="display:flex;gap:6px;">
+                <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">
+                  <input type="checkbox" checked style="accent-color:var(--orange)"> preK
+                </label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">
+                  <input type="checkbox" checked style="accent-color:var(--orange)"> K
+                </label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">
+                  <input type="checkbox" checked style="accent-color:var(--orange)"> G1
+                </label>
+              </div>
+            </div>
+            <textarea class="regen-textarea" rows="2" placeholder="Optional: guidance for the text model (e.g. 'focus on classroom scenarios')"></textarea>
+            <div class="regen-footer">
+              <div class="tooltip-wrap">
+                <button class="btn btn-orange-solid btn-sm" onclick="flashBtn(this,'Queued!')">↻ Queue full regen</button>
+                <span class="tooltip-tip">POST /api/admin/candidates/:wordId/regenerate {"type":"full"}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Two column layout -->
+      <div class="two-col">
+
+        <!-- LEFT: Image Candidates -->
+        <div>
+          <div class="col-label">
+            🖼 Image Candidates
+            <span class="col-label-hint">select one</span>
+          </div>
+
+          <div class="img-card selected" id="img-card-1" onclick="selectImage(1)">
+            <div class="img-placeholder" style="background: linear-gradient(135deg,#a7f3d0 0%,#6ee7b7 50%,#34d399 100%);">
+              <span style="font-size:32px;">🤝</span>
+              <span class="img-id-overlay">img_xk72ms</span>
+            </div>
+            <div class="radio-row">
+              <input type="radio" name="img-select" id="img-r1" checked />
+              <label for="img-r1">Use this image</label>
+            </div>
+            <div class="img-card-body">
+              <div class="img-prompt">"Two children sharing an umbrella in the rain, one comforting the other, soft watercolor style"</div>
+              <div class="img-card-footer">
+                <span class="model-badge" style="background:#ede9fe;color:#6d28d9;">gemini</span>
+                <span class="card-date">Mar 3, 2026 · 09:14</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="img-card" id="img-card-2" onclick="selectImage(2)">
+            <div class="img-placeholder" style="background: linear-gradient(135deg,#ddd6fe 0%,#c4b5fd 50%,#a78bfa 100%);">
+              <span style="font-size:32px;">💛</span>
+              <span class="img-id-overlay">img_p9n3qa</span>
+            </div>
+            <div class="radio-row">
+              <input type="radio" name="img-select" id="img-r2" />
+              <label for="img-r2">Use this image</label>
+            </div>
+            <div class="img-card-body">
+              <div class="img-prompt">"A young girl placing her hand on a crying friend's shoulder in a sunny classroom, illustration style"</div>
+              <div class="img-card-footer">
+                <span class="model-badge" style="background:#ede9fe;color:#6d28d9;">gemini</span>
+                <span class="card-date">Mar 3, 2026 · 09:17</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="img-card" id="img-card-3" onclick="selectImage(3)">
+            <div class="img-placeholder" style="background: linear-gradient(135deg,#fed7aa 0%,#fdba74 50%,#fb923c 100%);">
+              <span style="font-size:32px;">🌸</span>
+              <span class="img-id-overlay">img_m4hv7z</span>
+            </div>
+            <div class="radio-row">
+              <input type="radio" name="img-select" id="img-r3" />
+              <label for="img-r3">Use this image</label>
+            </div>
+            <div class="img-card-body">
+              <div class="img-prompt">"Cartoon bear hugging a smaller bear who is crying, pastel colors, simple shapes for children"</div>
+              <div class="img-card-footer">
+                <span class="model-badge" style="background:#ede9fe;color:#6d28d9;">gemini</span>
+                <span class="card-date">Mar 3, 2026 · 09:22</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="subprompt-section">
+            <div class="subprompt-label">Image sub-prompt</div>
+            <textarea class="subprompt-input" rows="2" placeholder="e.g. 'warm colors, soft lighting, two children'"></textarea>
+            <div class="save-row">
+              <div class="tooltip-wrap">
+                <button class="btn btn-outline btn-sm" onclick="flashBtn(this,'Saved!')">Save sub-prompt</button>
+                <span class="tooltip-tip">POST /api/admin/candidates/:wordId/subprompt</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Level Definitions – field-by-field mix & match -->
+        <div>
+          <div class="col-label">
+            📖 Level Definitions
+            <span class="col-label-hint">mix &amp; match fields</span>
+          </div>
+
+          <div class="tabs">
+            <button class="tab-btn active" id="tab-preK" onclick="switchDefTab('preK')">preK</button>
+            <button class="tab-btn" id="tab-K" onclick="switchDefTab('K')">K</button>
+            <button class="tab-btn" id="tab-G1" onclick="switchDefTab('G1')">G1</button>
+          </div>
+
+          <!-- Rendered by JS -->
+          <div id="defs-container"></div>
+        </div>
+
+      </div><!-- /two-col -->
+    </div><!-- /content-area -->
+  </div><!-- /view-detail -->
+
+</div><!-- /main -->
+
+<script>
+// ─── WORD LIST DATA ────────────────────────────────────────────────────────────
+const WORDS = [
+  { id:'word_empathy',     word:'empathy',     level:'preK', status:'in_review',  round:'2026-03-03', images:3, defs:{preK:3,K:2,G1:3}, updated:'2026-03-03' },
+  { id:'word_resilience',  word:'resilience',  level:'K',    status:'pending',    round:'2026-03-03', images:2, defs:{preK:2,K:2,G1:1}, updated:'2026-03-03' },
+  { id:'word_curiosity',   word:'curiosity',   level:'G1',   status:'approved',   round:'2026-03-03', images:3, defs:{preK:2,K:3,G1:2}, updated:'2026-03-02' },
+  { id:'word_persevere',   word:'persevere',   level:'G1',   status:'needs_regen',round:'2026-03-01', images:1, defs:{preK:1,K:2,G1:2}, updated:'2026-03-01' },
+  { id:'word_gratitude',   word:'gratitude',   level:'K',    status:'in_review',  round:'2026-03-03', images:2, defs:{preK:2,K:2,G1:2}, updated:'2026-03-03' },
+  { id:'word_inspire',     word:'inspire',     level:'preK', status:'pending',    round:'2026-03-01', images:2, defs:{preK:2,K:2,G1:2}, updated:'2026-03-01' }
+];
+
+const STATUS_LABELS = { pending:'Pending', in_review:'In Review', approved:'Approved', needs_regen:'Needs Regen' };
+let currentRoundFilter = 'all', currentStatusFilter = 'all', currentSort = 'word';
+
+// ─── LEVEL CANDIDATE DATA ──────────────────────────────────────────────────────
+// Each entry is one model attempt. Fields (definition, example, tryIt) can be
+// selected independently from different attempts.
+const LEVEL_DATA = {
+  preK: [
+    {
+      model: 'gpt-4o', attempt: 1,
+      definition: "Empathy means you can feel what someone else feels — if they're sad, you feel a little sad too.",
+      example:    "Maya saw her friend crying and felt sad too, because she had empathy.",
+      tryIt:      "Show empathy by giving someone a hug when they're upset!"
+    },
+    {
+      model: 'claude-3-5', attempt: 1,
+      definition: "Empathy is when you notice how another person is feeling and care about it.",
+      example:    "He showed empathy when he shared his cookie with his friend who was hungry.",
+      tryIt:      "Ask a friend 'How are you feeling today?' — that's empathy in action!"
+    },
+    {
+      model: 'gpt-4o', attempt: 2,
+      definition: "Empathy means caring about how other people feel, even if you feel differently.",
+      example:    "Tina had empathy when she saw her baby brother fall and ran over to help.",
+      tryIt:      "Next time a friend is sad, try saying 'I'm here for you' and mean it."
+    }
+  ],
+  K: [
+    {
+      model: 'gpt-4o', attempt: 1,
+      definition: "Empathy is the ability to understand and share the feelings of another person.",
+      example:    "Sofia showed empathy by sitting with her friend who felt left out at recess.",
+      tryIt:      "Think about a time you felt left out — now imagine how others might feel that way too."
+    },
+    {
+      model: 'claude-3-5', attempt: 1,
+      definition: "Empathy means putting yourself in someone else's shoes to understand their feelings.",
+      example:    "Liam used empathy when he helped his sister find her teddy bear because he knew it made her feel safe.",
+      tryIt:      "Draw a face that shows how a friend might feel when something goes wrong."
+    }
+  ],
+  G1: [
+    {
+      model: 'gpt-4o', attempt: 1,
+      definition: "Empathy is recognizing and sharing in another person's emotional experience, even if you haven't had the same experience yourself.",
+      example:    "Even though Marcus had never broken his arm, he felt empathy for his friend and stayed to help.",
+      tryIt:      "Write two sentences about how a character in a story might be feeling and why."
+    },
+    {
+      model: 'claude-3-5', attempt: 1,
+      definition: "Empathy is the capacity to sense and understand the feelings of others as if they were your own.",
+      example:    "Priya showed empathy when she noticed her teammate was nervous before the presentation and encouraged her.",
+      tryIt:      "List three things you could do or say to show empathy to someone having a bad day."
+    },
+    {
+      model: 'gpt-4o', attempt: 2,
+      definition: "Empathy means truly understanding how someone else feels — not just knowing it, but feeling connected to their experience.",
+      example:    "Jordan had deep empathy for the new student who ate lunch alone, so he asked if he could join him.",
+      tryIt:      "Interview a family member about a challenge they faced. Practice listening with empathy."
+    }
+  ]
+};
+
+// Per-level, per-field selection state: index into LEVEL_DATA[level]
+const fieldSelections = {
+  preK: { definition: 0, example: 0, tryIt: 0 },
+  K:    { definition: 0, example: 0, tryIt: 0 },
+  G1:   { definition: 0, example: 0, tryIt: 0 }
+};
+
+const FIELD_DEFS = [
+  { key: 'definition', label: 'Definition',  icon: '📖' },
+  { key: 'example',    label: 'Example',     icon: '💬' },
+  { key: 'tryIt',      label: 'Try It',      icon: '⭐' }
+];
+
+const MODEL_STYLE = {
+  'gpt-4o':    'background:#f0fdf4;color:#166534;',
+  'claude-3-5':'background:#fef3c7;color:#92400e;'
+};
+
+let currentDefLevel = 'preK';
+
+// ─── RENDER FIELD-SELECTION TABS ──────────────────────────────────────────────
+function renderDefTab(level) {
+  const candidates = LEVEL_DATA[level];
+  const selections = fieldSelections[level];
+  let html = '';
+
+  FIELD_DEFS.forEach(field => {
+    html += `<div class="field-section">
+      <div class="field-section-label">
+        <span>${field.icon}</span>
+        <span class="field-section-label-text">${field.label}</span>
+      </div>`;
+
+    candidates.forEach((cand, idx) => {
+      const isSelected = selections[field.key] === idx;
+      const mStyle = MODEL_STYLE[cand.model] || '';
+      const attemptLabel = cand.attempt > 1 ? ` #${cand.attempt}` : '';
+      html += `<label class="field-option${isSelected ? ' selected' : ''}"
+                  onclick="selectField('${level}','${field.key}',${idx})">
+        <input type="radio" name="${level}-${field.key}" value="${idx}"
+               ${isSelected ? 'checked' : ''}
+               onclick="event.stopPropagation();selectField('${level}','${field.key}',${idx})">
+        <div class="field-option-body">
+          <div class="field-option-meta">
+            <span class="model-badge" style="${mStyle}">${cand.model}${attemptLabel}</span>
+          </div>
+          <div class="field-option-text">"${cand[field.key]}"</div>
+        </div>
+      </label>`;
+    });
+
+    html += `</div>`;
+  });
+
+  // Level sub-prompt
+  html += `<div class="subprompt-section" style="margin-top:8px;">
+    <div class="subprompt-label">Sub-prompt for ${level}</div>
+    <textarea class="subprompt-input" rows="2"
+      placeholder="e.g. 'use simpler words, focus on classroom scenarios'"></textarea>
+    <div class="save-row">
+      <div class="tooltip-wrap">
+        <button class="btn btn-outline btn-sm" onclick="flashBtn(this,'Saved!')">Save</button>
+        <span class="tooltip-tip">POST /api/admin/candidates/:wordId/subprompt</span>
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('defs-container').innerHTML = html;
+}
+
+function selectField(level, fieldKey, idx) {
+  fieldSelections[level][fieldKey] = idx;
+  renderDefTab(level);
+}
+
+function switchDefTab(level) {
+  currentDefLevel = level;
+  ['preK','K','G1'].forEach(l => {
+    document.getElementById('tab-' + l).classList.toggle('active', l === level);
+  });
+  renderDefTab(level);
+}
+
+// ─── REGEN PANEL ──────────────────────────────────────────────────────────────
+function toggleRegenPanel() {
+  const panel = document.getElementById('regen-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+let imgMode = 'replace';
+function setImgMode(mode) {
+  imgMode = mode;
+  document.getElementById('img-mode-replace').classList.toggle('active', mode === 'replace');
+  document.getElementById('img-mode-sub').classList.toggle('active', mode === 'sub');
+  document.getElementById('img-mode-replace-area').style.display = mode === 'replace' ? '' : 'none';
+  document.getElementById('img-mode-sub-area').style.display    = mode === 'sub'     ? '' : 'none';
+}
+
+// ─── IMAGE SELECTION ──────────────────────────────────────────────────────────
+function selectImage(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('img-card-' + i).classList.toggle('selected', i === n);
+    document.getElementById('img-r' + i).checked = (i === n);
+  });
+}
+
+// ─── WORD LIST TABLE ──────────────────────────────────────────────────────────
+function getFilteredWords() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  return WORDS.filter(w => {
+    const matchRound  = currentRoundFilter  === 'all' || w.round  === currentRoundFilter;
+    const matchStatus = currentStatusFilter === 'all' || w.status === currentStatusFilter;
+    const matchSearch = !q || w.word.includes(q);
+    return matchRound && matchStatus && matchSearch;
+  }).sort((a,b) => {
+    if (currentSort === 'word')    return a.word.localeCompare(b.word);
+    if (currentSort === 'status')  return a.status.localeCompare(b.status);
+    if (currentSort === 'round')   return b.round.localeCompare(a.round);
+    if (currentSort === 'updated') return b.updated.localeCompare(a.updated);
+    return 0;
+  });
+}
+
+function renderTable() {
+  const words = getFilteredWords();
+  const tbody = document.getElementById('word-tbody');
+  if (words.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="big-icon">🔍</div><div>No words match your filters</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = words.map(w => {
+    const defStr = Object.entries(w.defs).map(([lvl,n]) => `<span>${n} ${lvl}</span>`).join(' · ');
+    return `<tr>
+      <td class="word-cell"><a onclick="showDetail('${w.id}')">${w.word}</a></td>
+      <td><span class="level-chip">${w.level}</span></td>
+      <td><span class="status-pill pill-${w.status}">${STATUS_LABELS[w.status]}</span></td>
+      <td><span class="date-text" style="font-family:ui-monospace,monospace;font-size:12px;">${w.round}</span></td>
+      <td><span class="count-text">${w.images} candidate${w.images!==1?'s':''}</span></td>
+      <td><span class="def-levels">${defStr}</span></td>
+      <td><span class="date-text">${w.updated}</span></td>
+      <td>
+        <div class="action-group">
+          <div class="tooltip-wrap">
+            <button class="btn btn-sm btn-review" onclick="showDetail('${w.id}')">Review</button>
+            <span class="tooltip-tip">GET /api/admin/candidates/${w.id}</span>
+          </div>
+          <div style="position:relative;display:inline-block;" id="more-wrap-${w.id}">
+            <button class="btn-more" onclick="toggleMore('${w.id}')">⋯</button>
+            <div id="more-menu-${w.id}" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-md);z-index:50;min-width:160px;overflow:hidden;">
+              <div onclick="closeMore('${w.id}')" style="padding:9px 14px;font-size:13px;cursor:pointer;color:var(--teal-dark);display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#f0fdfa'" onmouseout="this.style.background=''">✓ Approve</div>
+              <div style="height:1px;background:var(--border);"></div>
+              <div onclick="closeMore('${w.id}')" style="padding:9px 14px;font-size:13px;cursor:pointer;color:var(--orange);display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='#fff7ed'" onmouseout="this.style.background=''">↻ Regenerate</div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('[id^="more-wrap-"]'))
+    document.querySelectorAll('[id^="more-menu-"]').forEach(m => m.style.display='none');
+});
+function toggleMore(id) {
+  const menu = document.getElementById('more-menu-'+id);
+  const isOpen = menu.style.display==='block';
+  document.querySelectorAll('[id^="more-menu-"]').forEach(m=>m.style.display='none');
+  menu.style.display = isOpen ? 'none' : 'block';
+}
+function closeMore(id) { document.getElementById('more-menu-'+id).style.display='none'; }
+
+// ─── FILTERS ──────────────────────────────────────────────────────────────────
+function filterRound(value) {
+  currentRoundFilter = value;
+  document.querySelectorAll('[data-filter="round"]').forEach(el =>
+    el.classList.toggle('active', el.dataset.value===value));
+  renderTable();
+}
+function filterStatus(value) {
+  currentStatusFilter = value;
+  document.querySelectorAll('[data-filter="status"]').forEach(el =>
+    el.classList.toggle('active', el.dataset.value===value));
+  renderTable();
+}
+function filterTable() { renderTable(); }
+function sortTable() { currentSort=document.getElementById('sort-select').value; renderTable(); }
+
+// ─── VIEW SWITCHING ────────────────────────────────────────────────────────────
+function showList() {
+  document.getElementById('view-list').style.display='';
+  document.getElementById('view-detail').style.display='none';
+}
+function showDetail(wordId) {
+  const w = WORDS.find(x=>x.id===wordId);
+  if (!w) return;
+  document.getElementById('view-list').style.display='none';
+  document.getElementById('view-detail').style.display='';
+  document.getElementById('detail-topbar-title').textContent=w.word;
+  document.getElementById('bc-round').textContent=w.round;
+  document.getElementById('bc-word').textContent=w.word;
+  document.getElementById('detail-word-name').textContent=w.word;
+  const pill = document.getElementById('detail-status-pill');
+  pill.className='status-pill pill-'+w.status;
+  pill.textContent=STATUS_LABELS[w.status];
+  // Close regen panel & reset to preK tab
+  document.getElementById('regen-panel').classList.remove('open');
+  currentDefLevel='preK';
+  ['preK','K','G1'].forEach(l=>document.getElementById('tab-'+l).classList.toggle('active',l==='preK'));
+  renderDefTab('preK');
+  document.getElementById('main').scrollTop=0;
+}
+
+// ─── FLASH FEEDBACK ────────────────────────────────────────────────────────────
+function flashBtn(el, label) {
+  const orig=el.innerHTML;
+  el.innerHTML='✓ '+label;
+  el.style.borderColor='var(--teal)'; el.style.color='var(--teal-dark)';
+  setTimeout(()=>{ el.innerHTML=orig; el.style.borderColor=''; el.style.color=''; },1500);
+}
+function flashSave(el) {
+  const orig=el.innerHTML; el.innerHTML='✓ Saved!';
+  el.style.borderColor='var(--teal)'; el.style.color='var(--teal-dark)';
+  setTimeout(()=>{ el.innerHTML=orig; el.style.borderColor=''; el.style.color=''; },1500);
+}
+function flashApprove(el) {
+  const orig=el.innerHTML; el.innerHTML='✓ Approved!'; el.style.background='#059669';
+  setTimeout(()=>{ el.innerHTML=orig; el.style.background=''; },1500);
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+renderTable();
+renderDefTab('preK');
+</script>
+</body>
+</html>
