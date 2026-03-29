@@ -1,0 +1,8 @@
+{
+  "roundId": "2026-03-29",
+  "words": [
+    {"word": "inspire", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "verb", "syllables": 2, "tags": ["thinking"]},
+    {"word": "succeed", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "verb", "syllables": 2, "tags": ["thinking"]},
+    {"word": "fail", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "verb", "syllables": 1, "tags": ["thinking"]}
+  ]
+}
