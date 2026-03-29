@@ -41,6 +41,17 @@ class GenerateImagesTests(unittest.TestCase):
             ["preschooler", "kindergartener", "first grader"], "x"
         )
 
+    def _fake_run_cartoon_pipeline(self, word, level, output_path):
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_bytes(b"PNG")
+        image_prompt = f"Create a cartoon: {word} ({level})"
+        level_content = {
+            "definition": f"{word} means something.",
+            "example": f"The {word} is great.",
+            "tryIt": f"Can you use {word} in a sentence?",
+        }
+        return output_path, image_prompt, level_content
+
     def test_process_round_creates_candidates_and_images(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -66,16 +77,14 @@ class GenerateImagesTests(unittest.TestCase):
             )
 
             fake_ids = [FakeUUID("abc123def4"), FakeUUID("zzz999yyy8")]
-            mock_cartoon_gen = MagicMock()
             with patch.object(generate_images.uuid, "uuid4", side_effect=fake_ids), patch.object(
-                generate_images, "_get_cartoon_gen", return_value=mock_cartoon_gen
+                generate_images, "run_cartoon_pipeline", side_effect=self._fake_run_cartoon_pipeline
             ):
                 created = generate_images.process_round(
                     "2026-02-08", candidates_repo
                 )
 
-            self.assertEqual(created, 2)  # created for each level
-            self.assertEqual(mock_cartoon_gen.run_pipeline.call_count, 2)  # once per level
+            self.assertEqual(created, 2)
 
             candidate_path = (
                 candidates_repo
@@ -93,6 +102,19 @@ class GenerateImagesTests(unittest.TestCase):
             self.assertEqual(len(payload["images"]), 2)
             asset_paths = {img["assetPath"] for img in payload["images"]}
             self.assertEqual(len(asset_paths), 2)
+
+            levels = payload["levels"]
+            self.assertIn("K", levels)
+            self.assertIn("G1", levels)
+            self.assertNotIn("kindergartener", levels)
+            self.assertNotIn("first grader", levels)
+            for level_id in ("K", "G1"):
+                self.assertEqual(len(levels[level_id]), 1)
+                entry = levels[level_id][0]
+                self.assertIn("definition", entry)
+                self.assertIn("example", entry)
+                self.assertIn("tryIt", entry)
+                self.assertEqual(entry["model"], "gemini")
 
 
 if __name__ == "__main__":

@@ -15,15 +15,22 @@ from typing import Iterable, List
 from google import genai
 
 ALLOWED_LEVELS = frozenset(["preschooler", "kindergartener", "first grader"])
+LEVEL_ID_MAP = {
+    "preschooler": "preK",
+    "kindergartener": "K",
+    "first grader": "G1",
+}
 
 # ---- Cartoon pipeline (Gemini text + image generation) ----
 
-TEXT_PROMPT_RESPONSE_TEMPLATE = {
-    "prompts": [{"first": ""}, {"second": ""}, {"third": ""}],
-}
+TEXT_PROMPT_RESPONSE_TEMPLATE = {"definition": "", "example": "", "tryIt": ""}
 TEXT_PROMPT_TEMPLATE = (
-    "Generate three written examples of {word} that a {level} would understand. "
-    "Return them in JSON format like so: {text_prompt_response_template}."
+    "For the word '{word}', generate content appropriate for a {level}. "
+    "Return a JSON object with exactly these three fields: "
+    "'definition' (a simple, child-friendly definition of the word), "
+    "'example' (one sentence showing the word used in context), "
+    "'tryIt' (a short prompt encouraging the child to use or think about the word). "
+    "Return them in JSON format like so: {text_prompt_response_template}. "
     "Do not format the response in a code block or include any other text or formatting."
 )
 CARTOON_PROMPT_TEMPLATE = (
@@ -80,28 +87,25 @@ def _extract_text_from_response(response) -> str:
     return "\n".join(text_chunks).strip()
 
 
-def _parse_text_response(response_text: str) -> List[str]:
+def _parse_text_response(response_text: str) -> dict:
     try:
         payload = json.loads(response_text)
     except json.JSONDecodeError as exc:
         raise InvalidResponseError("Text response is not valid JSON.") from exc
-    prompts = payload.get("prompts")
-    if not isinstance(prompts, list):
-        raise InvalidResponseError("Text response JSON missing 'prompts' list.")
-    values: List[str] = []
-    for item in prompts:
-        if not isinstance(item, dict) or len(item) != 1:
-            raise InvalidResponseError("Each prompt entry must be a single-key object.")
-        value = next(iter(item.values()))
+    if not isinstance(payload, dict):
+        raise InvalidResponseError("Text response JSON must be an object.")
+    for key in ("definition", "example", "tryIt"):
+        value = payload.get(key)
         if not isinstance(value, str) or not value.strip():
-            raise InvalidResponseError("Prompt entries must be non-empty strings.")
-        values.append(value.strip())
-    if not values:
-        raise InvalidResponseError("No prompts found in text response JSON.")
-    return values
+            raise InvalidResponseError(f"Text response JSON missing or empty field: '{key}'.")
+    return {
+        "definition": payload["definition"].strip(),
+        "example": payload["example"].strip(),
+        "tryIt": payload["tryIt"].strip(),
+    }
 
 
-def _generate_text_examples(client: genai.Client, word: str, level: str, model: str = TEXT_MODEL) -> List[str]:
+def _generate_level_content(client: genai.Client, word: str, level: str, model: str = TEXT_MODEL) -> dict:
     prompt = _build_text_prompt(word, level)
     print(f"[cartoon] API text request model={model} word={word!r} level={level!r}", flush=True)
     try:
@@ -109,12 +113,11 @@ def _generate_text_examples(client: genai.Client, word: str, level: str, model: 
     except Exception as exc:
         if _is_budget_error(exc):
             raise BudgetLimitError("Budget or quota limit reached.") from exc
-        raise TextGenerationError("Failed to generate text prompt.") from exc
+        raise TextGenerationError("Failed to generate level content.") from exc
     if response is None:
         raise TextGenerationError("API returned no response.")
     response_text = _extract_text_from_response(response)
-    parsed = _parse_text_response(response_text)
-    return parsed
+    return _parse_text_response(response_text)
 
 
 def _extract_image_from_response(response):
@@ -144,23 +147,23 @@ def _generate_cartoon_image(
     return output_path
 
 
-def run_cartoon_pipeline(word: str, level: str, output_path: Path) -> tuple[Path, str]:
-    """Run text + image generation. Returns (output_path, image_prompt)."""
+def run_cartoon_pipeline(word: str, level: str, output_path: Path) -> tuple[Path, str, dict]:
+    """Run text + image generation. Returns (output_path, image_prompt, level_content)."""
     print(f"[cartoon] start word={word!r} level={level!r} output={output_path}", flush=True)
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ConfigurationError("GEMINI_API_KEY is missing from the environment.")
     client = genai.Client(api_key=api_key)
-    print(f"[cartoon] client ready, generating text examples...", flush=True)
-    prompts = _generate_text_examples(client, word, level)
-    phrase = prompts[0]
-    print(f"[cartoon] chosen prompt 1: {phrase!r}", flush=True)
-    for i, alt in enumerate(prompts[1:], start=2):
-        print(f"[cartoon] alternate prompt {i}: {alt!r}", flush=True)
+    print(f"[cartoon] client ready, generating level content...", flush=True)
+    level_content = _generate_level_content(client, word, level)
+    phrase = level_content["example"]
+    print(f"[cartoon] definition: {level_content['definition']!r}", flush=True)
+    print(f"[cartoon] example (image phrase): {phrase!r}", flush=True)
+    print(f"[cartoon] tryIt: {level_content['tryIt']!r}", flush=True)
     image_prompt = _build_cartoon_prompt(phrase)
     out = _generate_cartoon_image(client, phrase, output_path)
     print(f"[cartoon] done -> {out}", flush=True)
-    return out, image_prompt
+    return out, image_prompt, level_content
 
 
 # ---- Batch / candidate logic ----
@@ -244,7 +247,7 @@ def generate_images_for_entry(
             print(f"[word] {word!r} {level!r} skip (already exists)", flush=True)
             continue
         print(f"[word] {word!r} {level!r} generating -> {output_path}", flush=True)
-        _out_path, image_prompt = run_cartoon_pipeline(word, level, output_path)
+        _out_path, image_prompt, level_content = run_cartoon_pipeline(word, level, output_path)
         print(f"[word] {word!r} {level!r} saved", flush=True)
         images.append(
             {
@@ -253,6 +256,15 @@ def generate_images_for_entry(
                 "model": "gemini",
                 "assetPath": rel_path,
                 "createdAt": now,
+            }
+        )
+        level_id = LEVEL_ID_MAP[level]
+        candidate["levels"].setdefault(level_id, []).append(
+            {
+                "definition": level_content["definition"],
+                "example": level_content["example"],
+                "tryIt": level_content["tryIt"],
+                "model": "gemini",
             }
         )
         created += 1
@@ -324,9 +336,12 @@ def main(argv: Iterable[str]) -> int:
     # Single-word mode: generate one cartoon and exit
     if args.word and args.level:
         try:
-            out, image_prompt = run_cartoon_pipeline(args.word, args.level, Path(args.output))
+            out, image_prompt, level_content = run_cartoon_pipeline(args.word, args.level, Path(args.output))
             print(f"Saved cartoon image to {out}")
             print(f"Image prompt: {image_prompt}")
+            print(f"Definition: {level_content['definition']}")
+            print(f"Example: {level_content['example']}")
+            print(f"Try it: {level_content['tryIt']}")
             return 0
         except BudgetLimitError as exc:
             print(f"Error: {exc}", file=sys.stderr)
