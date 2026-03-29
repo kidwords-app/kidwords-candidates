@@ -1,0 +1,67 @@
+name: publish-word
+
+on:
+  workflow_dispatch:
+    inputs:
+      wordId:
+        description: "Word ID to publish (e.g. empathy)"
+        required: true
+      roundId:
+        description: "Round ID the word belongs to (YYYY-MM-DD)"
+        required: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout candidates repo
+        uses: actions/checkout@v4
+        with:
+          repository: kidwords-app/kidwords-candidates
+          token: ${{ secrets.CANDIDATES_REPO_TOKEN }}
+          path: candidates-repo
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+        working-directory: candidates-repo
+
+      - name: Publish word
+        working-directory: candidates-repo
+        env:
+          CANDIDATES_REPO_PATH: .
+          PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
+          PUBLIC_REPO_OWNER: kidwords-app
+          PUBLIC_REPO_NAME: kidwords.github.io
+          PR_BASE_BRANCH: main
+        run: |
+          set -euo pipefail
+          python scripts/publish.py \
+            --round-id "${{ github.event.inputs.roundId }}" \
+            --word-id  "${{ github.event.inputs.wordId }}"
+
+      - name: Email notification
+        if: always()
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "publish-word ${{ github.event.inputs.wordId }} (${{ github.event.inputs.roundId }}): ${{ job.status }}"
+          to: ${{ secrets.NOTIFY_EMAIL_TO }}
+          from: ${{ secrets.NOTIFY_EMAIL_FROM || 'github-actions[bot]@users.noreply.github.com' }}
+          body: |
+            Workflow: ${{ github.workflow }}
+            Status:   ${{ job.status }}
+            Word:     ${{ github.event.inputs.wordId }}
+            Round:    ${{ github.event.inputs.roundId }}
+            Run:      ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

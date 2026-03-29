@@ -174,21 +174,5 @@ describe('GitHubCandidateRepository', () => {
     });
   });
 
-  // ── write stubs ─────────────────────────────────────────────────────────────
-
-  describe('write methods', () => {
-    it('saveSelections throws not-implemented', async () => {
-      await expect(repo.saveSelections('2026-03-03', 'empathy', {})).rejects.toThrow('not yet implemented');
-    });
-
-    it('saveSubprompt throws not-implemented', async () => {
-      await expect(
-        repo.saveSubprompt('2026-03-03', 'empathy', { field: 'image', text: 'warmer' }),
-      ).rejects.toThrow('not yet implemented');
-    });
-
-    it('setStatus throws not-implemented', async () => {
-      await expect(repo.setStatus('2026-03-03', 'empathy', 'approved')).rejects.toThrow('not yet implemented');
-    });
-  });
+  // Write method behaviour is covered in GitHubCandidateRepository.write.test.ts
 });

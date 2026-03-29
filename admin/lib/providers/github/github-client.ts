@@ -60,7 +60,67 @@ export function makeGitHubClient(config: GitHubConfig) {
     return JSON.parse(decoded) as T;
   }
 
-  return { listDirectory, fetchJson };
+  /**
+   * Fetch a JSON file and return both the parsed data and the file's SHA.
+   * The SHA is required by the GitHub API when updating an existing file.
+   */
+  async function fetchJsonWithSha<T>(path: string): Promise<{ data: T; sha: string }> {
+    const file = await get<GitHubFileContent>(path);
+    const decoded = Buffer.from(file.content, 'base64').toString('utf-8');
+    return { data: JSON.parse(decoded) as T, sha: file.sha };
+  }
+
+  /**
+   * Create or update a JSON file in the repo.
+   * sha must be provided (from fetchJsonWithSha) when updating an existing file.
+   */
+  async function putJson(path: string, data: unknown, sha: string, message: string): Promise<void> {
+    const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
+    const url     = `${baseUrl}/contents/${path}`;
+    const res     = await fetch(url, {
+      method:  'PUT',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ message, content, sha }),
+    });
+    if (!res.ok) {
+      throw new ProviderError(res.status, `GitHub API error ${res.status} updating: ${path}`);
+    }
+  }
+
+  /**
+   * Fetch a raw binary asset (e.g. an image).
+   * Uses download_url to bypass base64 encoding for large files.
+   */
+  async function fetchBinary(path: string): Promise<Buffer> {
+    // First get the file metadata to retrieve download_url
+    const meta = await get<GitHubFileContent>(path);
+    // For private repos, fall back to decoding the base64 content
+    const decoded = Buffer.from(meta.content.replace(/\n/g, ''), 'base64');
+    return decoded;
+  }
+
+  /**
+   * Trigger a GitHub Actions workflow_dispatch event.
+   * inputs values must all be strings (GitHub Actions limitation).
+   */
+  async function dispatchWorkflow(
+    workflowFile: string,
+    ref:          string,
+    inputs:       Record<string, string>,
+  ): Promise<void> {
+    const url = `${baseUrl}/actions/workflows/${workflowFile}/dispatches`;
+    const res = await fetch(url, {
+      method:  'POST',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ ref, inputs }),
+    });
+    // GitHub returns 204 No Content on success
+    if (!res.ok && res.status !== 204) {
+      throw new ProviderError(res.status, `workflow_dispatch failed for: ${workflowFile}`);
+    }
+  }
+
+  return { listDirectory, fetchJson, fetchJsonWithSha, putJson, fetchBinary, dispatchWorkflow };
 }
 
 export type GitHubClient = ReturnType<typeof makeGitHubClient>;

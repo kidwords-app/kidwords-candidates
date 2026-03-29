@@ -1,5 +1,7 @@
 import type {
   CandidateRepository,
+  FieldSelection,
+  LevelId,
   Selections,
   SubpromptInput,
   WordCandidate,
@@ -45,18 +47,59 @@ export class GitHubCandidateRepository implements CandidateRepository {
     }
   }
 
-  // ── Write (stubbed — will be implemented with POST endpoints) ─────────────────
+  // ── Write ────────────────────────────────────────────────────────────────────
 
-  async saveSelections(_roundId: string, _wordId: string, _selections: Selections): Promise<void> {
-    throw new Error('GitHubCandidateRepository.saveSelections: not yet implemented');
+  async saveSelections(roundId: string, wordId: string, selections: Selections): Promise<void> {
+    await this.patchWord(roundId, wordId, (word) => {
+      if (selections.imageId !== undefined) {
+        word.selected.imageId = selections.imageId;
+      }
+      if (selections.levels) {
+        word.selected.levels ??= {};
+        for (const [level, fields] of Object.entries(selections.levels) as [LevelId, FieldSelection][]) {
+          word.selected.levels[level] = { ...word.selected.levels[level], ...fields };
+        }
+      }
+    }, `admin: update selections for ${wordId}`);
   }
 
-  async saveSubprompt(_roundId: string, _wordId: string, _input: SubpromptInput): Promise<void> {
-    throw new Error('GitHubCandidateRepository.saveSubprompt: not yet implemented');
+  async saveSubprompt(roundId: string, wordId: string, input: SubpromptInput): Promise<void> {
+    await this.patchWord(roundId, wordId, (word) => {
+      if (input.field === 'image') {
+        word.subPrompts.image = input.text;
+      } else {
+        word.subPrompts.levels ??= {};
+        word.subPrompts.levels[input.levelId] = input.text;
+      }
+    }, `admin: update subprompt for ${wordId}`);
   }
 
-  async setStatus(_roundId: string, _wordId: string, _status: WordStatus): Promise<void> {
-    throw new Error('GitHubCandidateRepository.setStatus: not yet implemented');
+  async setStatus(roundId: string, wordId: string, status: WordStatus): Promise<void> {
+    await this.patchWord(
+      roundId, wordId,
+      (word) => { word.status = status; },
+      `admin: set status to ${status} for ${wordId}`,
+    );
+  }
+
+  // ── Private write helper ───────────────────────────────────────────────────
+
+  /**
+   * Read-modify-write a word JSON file atomically (within a single request).
+   * The mutator receives the current WordCandidate and modifies it in place.
+   * updatedAt is always set before writing back.
+   */
+  private async patchWord(
+    roundId:  string,
+    wordId:   string,
+    mutate:   (word: WordCandidate) => void,
+    message:  string,
+  ): Promise<void> {
+    const path = `${ROUNDS_PATH}/${roundId}/${WORDS_SUBDIR}/${wordId}.json`;
+    const { data: word, sha } = await this.gh.fetchJsonWithSha<WordCandidate>(path);
+    mutate(word);
+    word.updatedAt = new Date().toISOString();
+    await this.gh.putJson(path, word, sha, message);
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────────

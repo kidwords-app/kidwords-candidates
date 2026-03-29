@@ -1,7 +1,7 @@
 # Publish to Kidwords (Public)
 
 ## Goal
-Move approved content from private candidate storage to the public Kidwords app.
+Move approved content from private candidate storage to the public KidWords app repo.
 
 ## Publish Workflow
 
@@ -13,32 +13,95 @@ approved content to the public repo, either per-word or for an entire round.
 - `POST /api/admin/candidates/:wordId/publish` — publish a single approved word.
 - `POST /api/admin/rounds/:roundId/publish` — publish all `approved` words in a round.
 
-Both endpoints delegate to `WorkflowClient.triggerPublish()` or
+Both endpoints call `WorkflowClient.triggerPublish()` or
 `WorkflowClient.triggerRoundPublish()`. See `pipeline-04b-backend-architecture.md`
-for the interface and provider implementations.
+for the interface. The GitHub implementation dispatches:
+
+| Action | Workflow |
+|---|---|
+| Single word | `.github/workflows/publish-word.yaml` |
+| Entire round | `.github/workflows/publish-round.yaml` |
 
 ### What the workflow does
-- Validates that each word has a selected image and a selected definition,
-  example, and try-it for all three levels (preK / K / G1).
-- Converts each approved `WordCandidate` to `WordEntry` format for `src/core/words.ts`.
-- Copies the selected image asset to the public repo at `public/cartoons/{wordId}.png`.
-  In the GitHub implementation this is a direct file write via the GitHub API.
-  In the AWS implementation this is an S3 copy from `kidwords-candidates` to
-  `kidwords-public`.
-- Opens a PR in the public repo for final review and merge.
+
+Both workflows call `scripts/publish.py`, which:
+
+1. **Validates** the `WordCandidate` — status must be `approved`, image and per-level
+   field selections must be complete (all three levels: preK / K / G1).
+2. **Maps** the candidate to a `WordEntry` (see [WordEntry shape](#wordentry-shape)),
+   respecting the mix-and-match field selections.
+3. **Copies the selected image** from `candidates/rounds/{roundId}/assets/{wordId}/{imageId}.png`
+   to `public/cartoons/{wordId}.png` in the public repo (via GitHub Contents API).
+4. **Upserts** the word into `src/core/words-data.json` in the public repo
+   (sorted alphabetically by `wordId`).
+5. **Pushes directly to `main`** — no PR is opened. The approval step in the admin
+   UI is the human review gate; a second PR would be redundant. Vercel deploys
+   automatically on push to `main`.
+
+### WordEntry shape
+
+```json
+{
+  "wordId":       "empathy",
+  "word":         "empathy",
+  "partOfSpeech": "noun",
+  "syllables":    3,
+  "tags":         ["emotions"],
+  "imageUrl":     "/cartoons/empathy.png",
+  "roundId":      "2026-03-03",
+  "publishedAt":  "2026-03-03T10:00:00+00:00",
+  "levels": {
+    "preK": { "definition": "...", "example": "...", "tryIt": "..." },
+    "K":    { "definition": "...", "example": "...", "tryIt": "..." },
+    "G1":   { "definition": "...", "example": "...", "tryIt": "..." }
+  }
+}
+```
+
+The public app imports `src/core/words-data.json` in `src/core/words.ts`.
+
+### GitHub secrets required
+
+| Secret | Used by |
+|---|---|
+| `CANDIDATES_REPO_TOKEN` | Checkout the private candidates repo |
+| `PUBLIC_REPO_TOKEN` | Write images + words-data.json to the public repo |
+| `SMTP_*` / `NOTIFY_EMAIL_*` | Email notification on completion / failure |
 
 ## Validation
-- Ensure each word has:
-  - Selected image
-  - Selected definition for each level ("preK", "K", "G1")
-- Validate word uniqueness against `WORDS`.
-- Run `npm run ci` in the PR for typecheck, tests, build.
+
+`validate_word_candidate()` in `scripts/publish.py` raises before touching the
+public repo if any of the following are true:
+
+- `status != "approved"`
+- `selected.imageId` is missing or not present in the `images` array
+- Any of preK / K / G1 missing from `selected.levels`
+- Any level missing a `definition`, `example`, or `tryIt` index
+- A selected index is out of range for its candidate list
+
+## Testing
+
+Unit and integration tests live in `scripts/tests/test_publish.py` (pytest).
+
+```
+pytest scripts/tests/test_publish.py -v
+```
+
+Coverage:
+- `validate_word_candidate` — 7 cases including all error branches
+- `map_to_word_entry` — verifies mix-and-match resolution and field structure
+- `load_word_candidate` / `load_approved_words_in_round` — fs and error paths
+- `load_image_bytes` — missing candidate and missing file errors
+- `publish_word` — GitHub API calls, branch passing, upsert logic, no-duplicate
 
 ## Deploy
-- On PR merge, Vercel deploys automatically.
-- Rollback by reverting the PR if issues are found.
+
+- Vercel deploys automatically on push to `main` in the public repo.
+- Rollback by reverting the commit (or re-publishing a corrected candidate).
 
 ## Acceptance Criteria
-- Approved candidates can be published in a single workflow.
-- New words appear in the public app after merge/deploy.
-
+- `POST /publish` triggers the correct workflow with `wordId` and `roundId`.
+- Workflow validates the word before writing anything to the public repo.
+- The PR contains the updated `words-data.json` and the image asset.
+- Validation errors surface in the GitHub Actions log with a clear message.
+- New words appear in the public app after merge and deploy.
