@@ -1,13 +1,15 @@
 import { candidateRepo } from '@/lib/providers';
+import { auth, signOut } from '@/auth';
 import Sidebar from '@/components/Sidebar';
-import type { WordStatus } from '@/lib/types';
+import type { WordCandidate, WordStatus } from '@/lib/types';
 
 export default async function CandidatesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const words = await candidateRepo.listWords();
+  const words: WordCandidate[] = await candidateRepo.listWords();
+  const session = await auth();
 
   const rounds = [...new Set(words.map((w) => w.roundId))].sort().reverse();
 
@@ -28,6 +30,12 @@ export default async function CandidatesLayout({
         roundCounts={roundCounts}
         totalCount={words.length}
         statusCounts={statusCounts}
+        userImage={session?.user?.image ?? undefined}
+        userName={session?.user?.name ?? undefined}
+        signOutAction={async () => {
+          'use server';
+          await signOut({ redirectTo: '/login' });
+        }}
       />
       <main className="app-main">{children}</main>
     </div>

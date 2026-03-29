@@ -1,0 +1,58 @@
+name: ci – admin
+
+# Runs on every push to main that touches the admin app.
+# Vercel picks up the same push and deploys — this workflow gates it:
+# if typecheck, tests, or build fail the problem is visible before users hit it.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "admin/**"
+      - ".github/workflows/ci-admin.yaml"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run CI checks (typecheck + tests + build)
+        run: npm run ci
+        env:
+          # Build with mock provider — no GitHub token required in CI.
+          # Runtime GitHub calls happen only in the deployed app.
+          PROVIDER: mock
+          # next build requires a non-empty AUTH_SECRET even with mock provider
+          AUTH_SECRET: ci-placeholder
+
+      - name: Email notification
+        if: always()
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "ci-admin ${{ job.status }}: ${{ github.event.head_commit.message }}"
+          to: ${{ secrets.NOTIFY_EMAIL_TO }}
+          from: ${{ secrets.NOTIFY_EMAIL_FROM || 'github-actions[bot]@users.noreply.github.com' }}
+          body: |
+            Status:  ${{ job.status }}
+            Commit:  ${{ github.sha }}
+            Message: ${{ github.event.head_commit.message }}
+            Run:     ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

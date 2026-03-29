@@ -4,10 +4,13 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import type { WordStatus } from '@/lib/types';
 
 interface Props {
-  rounds:       string[];
-  roundCounts:  Record<string, number>;
-  totalCount:   number;
-  statusCounts: Record<WordStatus, number>;
+  rounds:         string[];
+  roundCounts:    Record<string, number>;
+  totalCount:     number;
+  statusCounts:   Record<WordStatus, number>;
+  userImage?:     string;
+  userName?:      string;
+  signOutAction?: () => Promise<void>;
 }
 
 const STATUS_CONFIG: { value: WordStatus | 'all'; label: string; color: string; badgeClass: string }[] = [
@@ -18,7 +21,10 @@ const STATUS_CONFIG: { value: WordStatus | 'all'; label: string; color: string; 
   { value: 'needs_regen', label: 'Needs Regen', color: '#ef4444',        badgeClass: 'badge red'    },
 ];
 
-export default function Sidebar({ rounds, roundCounts, totalCount, statusCounts }: Props) {
+export default function Sidebar({
+  rounds, roundCounts, totalCount, statusCounts,
+  userImage, userName, signOutAction,
+}: Props) {
   const router      = useRouter();
   const pathname    = usePathname();
   const searchParams = useSearchParams();
@@ -97,9 +103,20 @@ export default function Sidebar({ rounds, roundCounts, totalCount, statusCounts 
       </div>
 
       <div className="sidebar-footer">
-        <a href="#" onClick={(e) => e.preventDefault()}>
-          <span>❓</span> Help &amp; Documentation
-        </a>
+        {(userImage || userName) && (
+          <div className="sidebar-user">
+            {userImage && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={userImage} alt={userName ?? 'user'} className="sidebar-avatar" />
+            )}
+            <span className="sidebar-username">{userName}</span>
+            {signOutAction && (
+              <form action={signOutAction} style={{ marginLeft: 'auto' }}>
+                <button type="submit" className="sidebar-signout" title="Sign out">↩</button>
+              </form>
+            )}
+          </div>
+        )}
       </div>
     </nav>
   );
