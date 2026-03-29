@@ -3,8 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { WordCandidate, LevelId, FieldSelection, WordStatus } from '@/lib/types';
-import ImagePanel from './ImagePanel';
-import DefinitionPanel from './DefinitionPanel';
+import LevelTabs from './LevelTabs';
 import RegenPanel from './RegenPanel';
 
 const STATUS_LABELS: Record<WordStatus, string> = {
@@ -230,27 +229,21 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
           />
         )}
 
-        {/* Two-column layout */}
-        <div className="two-col">
-          <ImagePanel
-            wordId={word.wordId}
-            roundId={word.roundId}
-            images={word.images ?? []}
-            selectedImageId={selectedImageId}
-            onSelect={handleImageSelect}
-            onSubpromptSave={handleImageSubpromptSave}
-            initialSubprompt={word.subPrompts.image ?? ''}
-          />
-          <DefinitionPanel
-            wordId={word.wordId}
-            roundId={word.roundId}
-            levels={word.levels}
-            selectedLevels={selectedLevels}
-            subpromptLevels={word.subPrompts.levels ?? {}}
-            onFieldSelect={handleFieldSelect}
-            onSubpromptSave={handleLevelSubpromptSave}
-          />
-        </div>
+        {/* Level-first two-column layout */}
+        <LevelTabs
+          wordId={word.wordId}
+          roundId={word.roundId}
+          images={word.images ?? []}
+          levels={word.levels}
+          selectedImageId={selectedImageId}
+          selectedLevels={selectedLevels}
+          subpromptLevels={word.subPrompts.levels ?? {}}
+          initialImageSubprompt={word.subPrompts.image ?? ''}
+          onImageSelect={handleImageSelect}
+          onFieldSelect={handleFieldSelect}
+          onImageSubpromptSave={handleImageSubpromptSave}
+          onLevelSubpromptSave={handleLevelSubpromptSave}
+        />
       </div>
 
       {/* Toast container */}

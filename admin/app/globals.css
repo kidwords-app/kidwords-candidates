@@ -505,7 +505,7 @@ tbody td { padding: 11px 14px; vertical-align: middle; font-size: 13px; }
 .img-card.selected { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
 .img-card:hover { box-shadow: var(--shadow-md); }
 .img-placeholder {
-  height: 120px;
+  height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -514,9 +514,11 @@ tbody td { padding: 11px 14px; vertical-align: middle; font-size: 13px; }
   background: #f1f5f9;
 }
 .img-placeholder img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 .img-placeholder .img-fallback {
   font-size: 32px;
@@ -619,6 +621,55 @@ tbody td { padding: 11px 14px; vertical-align: middle; font-size: 13px; }
 }
 .tab-btn:hover { color: var(--text-2); }
 .tab-btn.active { color: var(--teal-dark); border-bottom-color: var(--teal); }
+
+/* ── Level tabs (top-level control for detail view) ─────────── */
+.level-tabs-bar {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.level-tabs-header {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: #f8fafc;
+}
+.level-tab {
+  flex: 1;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--text-3);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: color .12s, background .12s, border-color .12s;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.level-tab:hover { color: var(--text-2); background: #f1f5f9; }
+.level-tab.active { color: var(--teal-dark); border-bottom-color: var(--teal); background: #fff; }
+.level-tab-sublabel { font-size: 11px; font-weight: 400; color: var(--text-3); }
+.level-tab.active .level-tab-sublabel { color: var(--teal); }
+
+.level-panel { padding: 20px 24px; }
+
+.level-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.level-defs-col {
+  border-left: 1px solid var(--border);
+  padding-left: 24px;
+}
 
 /* ── Empty state ────────────────────────────────────────── */
 .empty-state { text-align: center; padding: 48px 24px; color: var(--text-3); }

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>KidWords Admin – Detail Layout Mockup (level-first)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --teal: #0d9488; --teal-light: #ccfbf1; --teal-dark: #0f766e;
+    --orange: #f97316; --orange-light: #fff7ed;
+    --bg: #f8fafc; --card-bg: #fff; --border: #e2e8f0;
+    --text: #0f172a; --text-2: #475569; --text-3: #94a3b8;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,.08);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); font-size: 14px; }
+
+  /* ── top bar ── */
+  .topbar {
+    background: #fff; border-bottom: 1px solid var(--border);
+    padding: 12px 24px; display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-title { font-size: 16px; font-weight: 600; flex: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; transition: all .15s; white-space: nowrap;
+  }
+  .btn-outline { background: #fff; color: var(--text-2); border: 1px solid var(--border); }
+  .btn-outline:hover { background: #f1f5f9; }
+  .btn-teal    { background: var(--teal); color: #fff; }
+  .btn-teal:hover { background: var(--teal-dark); }
+  .btn-orange  { background: #fff; color: var(--orange); border: 1px solid var(--orange); }
+  .btn-orange:hover { background: var(--orange-light); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* ── tooltip ── */
+  .tooltip-wrap { position: relative; display: inline-flex; }
+  .tooltip-tip {
+    position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    background: #1e293b; color: #fff; font-family: ui-monospace, monospace;
+    font-size: 11px; padding: 5px 9px; border-radius: 6px; white-space: nowrap;
+    pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+  }
+  .tooltip-tip::after {
+    content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: #1e293b;
+  }
+  .tooltip-wrap:hover .tooltip-tip { opacity: 1; }
+
+  /* ── content ── */
+  .content-area { padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .breadcrumb {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--text-3); margin-bottom: 20px;
+  }
+  .bc-link { color: var(--teal-dark); cursor: pointer; text-decoration: none; }
+  .bc-link:hover { text-decoration: underline; }
+  .sep { color: var(--text-3); }
+  .current { color: var(--text); font-weight: 600; }
+
+  /* ── detail header card ── */
+  .detail-header {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow);
+  }
+  .detail-header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .detail-word { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .detail-meta { display: flex; align-items: center; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+  .meta-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-2); background: #f1f5f9; padding: 3px 9px; border-radius: 99px; }
+  .tag-chip  { display: inline-flex; font-size: 11px; color: var(--teal-dark); background: var(--teal-light); padding: 3px 9px; border-radius: 99px; font-weight: 600; }
+  .round-chip { font-size: 11px; color: var(--text-3); font-family: ui-monospace, monospace; }
+  .action-bar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600;
+  }
+  .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .pill-in_review { background: #fef9c3; color: #854d0e; }
+  .pill-in_review::before { background: #eab308; }
+
+  /* ── LEVEL TABS (full-width, top-level control) ── */
+  .level-tabs-bar {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .level-tabs-header {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: #f8fafc;
+  }
+  .level-tab {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--text-3);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px;
+    transition: color .12s, background .12s, border-color .12s;
+    text-align: center;
+  }
+  .level-tab:hover { color: var(--text-2); background: #f1f5f9; }
+  .level-tab.active { color: var(--teal-dark); border-bottom-color: var(--teal); background: #fff; }
+  .level-tab-label { font-size: 11px; font-weight: 500; color: var(--text-3); display: block; margin-top: 1px; }
+  .level-tab.active .level-tab-label { color: var(--teal); }
+
+  .level-panel { padding: 20px 24px; display: none; }
+  .level-panel.active { display: block; }
+
+  /* ── two col inside level panel ── */
+  .level-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .col-label {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .col-label-hint {
+    font-size: 11px; font-weight: 500; color: var(--text-3);
+    background: #f1f5f9; padding: 2px 7px; border-radius: 99px;
+  }
+
+  /* column divider */
+  .col-divider {
+    width: 1px;
+    background: var(--border);
+    margin: 0 -12px;
+  }
+
+  /* ── image card ── */
+  .img-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow);
+    cursor: pointer; transition: box-shadow .15s, border-color .15s;
+  }
+  .img-card.selected { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
+  .img-card:hover { box-shadow: var(--shadow-md); }
+  .img-placeholder {
+    height: 160px; display: flex; align-items: center; justify-content: center;
+    position: relative; font-size: 48px;
+  }
+  .img-id-overlay {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(0,0,0,.45); color: #fff; font-size: 10px;
+    font-family: ui-monospace, monospace; padding: 2px 7px; border-radius: 4px;
+  }
+  .img-card-body { padding: 10px 12px 4px; }
+  .img-prompt { font-size: 12px; color: var(--text-2); line-height: 1.4; margin-bottom: 8px; }
+  .img-card-footer { display: flex; align-items: center; justify-content: space-between; padding-bottom: 4px; }
+  .model-badge { font-size: 10px; font-family: ui-monospace, monospace; background: #f1f5f9; color: var(--text-2); padding: 2px 7px; border-radius: 4px; }
+  .card-date { font-size: 10px; color: var(--text-3); }
+  .radio-row { display: flex; align-items: center; gap: 8px; padding: 7px 12px 10px; border-top: 1px solid var(--border); background: #fafafa; }
+  .radio-row input[type=radio] { accent-color: var(--teal); width: 14px; height: 14px; }
+  .radio-row label { font-size: 12px; color: var(--text-2); cursor: pointer; }
+
+  /* ── field selection ── */
+  .field-section { margin-bottom: 18px; }
+  .field-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--text-3); margin-bottom: 7px; padding: 0 2px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .field-section-label-text { color: var(--text-2); }
+  .field-option {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 9px 11px; border-radius: 8px; border: 1px solid var(--border);
+    margin-bottom: 6px; cursor: pointer; background: #fff;
+    transition: border-color .12s, background .12s;
+  }
+  .field-option:hover { border-color: #cbd5e1; background: #f8fafc; }
+  .field-option.selected { border-color: var(--teal); background: #f0fdfa; }
+  .field-option input[type=radio] { accent-color: var(--teal); margin-top: 3px; flex-shrink: 0; }
+  .field-option-body { flex: 1; min-width: 0; }
+  .field-option-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .field-option-text { font-size: 12px; color: var(--text); line-height: 1.5; }
+  .attempt-num { font-size: 10px; color: var(--text-3); font-family: ui-monospace, monospace; }
+
+  /* ── sub-prompt ── */
+  .subprompt-section { margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .subprompt-label { font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; }
+  .subprompt-input {
+    width: 100%; padding: 8px 10px; border-radius: 7px; border: 1px solid var(--border);
+    font-size: 12px; color: var(--text); background: var(--bg); outline: none;
+    resize: none; font-family: inherit; transition: border-color .15s, box-shadow .15s;
+  }
+  .subprompt-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
+  .save-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+  /* ── scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">empathy</div>
+  <button class="btn btn-outline btn-sm">← Back to list</button>
+</div>
+
+<div class="content-area">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a class="bc-link">Rounds</a>
+    <span class="sep">/</span>
+    <span>2026-03-03</span>
+    <span class="sep">/</span>
+    <span class="current">empathy</span>
+  </div>
+
+  <!-- Header card -->
+  <div class="detail-header">
+    <div class="detail-header-top">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div class="detail-word">empathy</div>
+          <span class="status-pill pill-in_review">in review</span>
+        </div>
+        <div class="detail-meta" style="margin-top:10px;">
+          <span class="meta-chip">🏷 noun</span>
+          <span class="meta-chip">🔤 3 syllables</span>
+          <span class="meta-chip">📚 preK · K · G1</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <span class="tag-chip">emotions</span>
+          <span class="tag-chip">social skills</span>
+          <span class="round-chip" style="margin-left:4px;">round: 2026-03-03</span>
+        </div>
+      </div>
+      <div class="action-bar">
+        <div class="tooltip-wrap">
+          <button class="btn btn-outline" onclick="flash(this,'Saved!')">💾 Save Selections</button>
+          <span class="tooltip-tip">POST /api/admin/candidates/:wordId/select</span>
+        </div>
+        <div class="tooltip-wrap">
+          <button class="btn btn-teal" onclick="flash(this,'Approved!')">✓ Approve</button>
+          <span class="tooltip-tip">POST /api/admin/candidates/:wordId/approve</span>
+        </div>
+        <div class="tooltip-wrap">
+          <button class="btn btn-orange">↻ Regenerate ▾</button>
+          <span class="tooltip-tip">POST /api/admin/candidates/:wordId/regenerate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ LEVEL TABS (top-level control) ══════════════ -->
+  <div class="level-tabs-bar">
+
+    <div class="level-tabs-header">
+      <button class="level-tab active" onclick="switchLevel('preK', this)">
+        Pre-K
+        <span class="level-tab-label">preschooler</span>
+      </button>
+      <button class="level-tab" onclick="switchLevel('K', this)">
+        K
+        <span class="level-tab-label">kindergarten</span>
+      </button>
+      <button class="level-tab" onclick="switchLevel('G1', this)">
+        G1
+        <span class="level-tab-label">1st grade</span>
+      </button>
+    </div>
+
+    <!-- ── preK panel ── -->
+    <div class="level-panel active" id="panel-preK">
+      <div class="level-two-col">
+
+        <!-- Image column -->
+        <div>
+          <div class="col-label">🖼 Image</div>
+
+          <div class="img-card selected" id="img-preK-1" onclick="selectImg('preK',1)">
+            <div class="img-placeholder" style="background:linear-gradient(135deg,#a7f3d0,#6ee7b7);">
+              🧒
+              <span class="img-id-overlay">preschooler-img1</span>
+            </div>
+            <div class="img-card-body">
+              <div class="img-prompt">"Two small children comforting each other in a sunny playground, soft watercolor style"</div>
+              <div class="img-card-footer">
+                <span class="model-badge">gemini</span>
+                <span class="card-date">Mar 3, 2026</span>
+              </div>
+            </div>
+            <div class="radio-row">
+              <input type="radio" name="img-preK" id="r-preK-1" checked />
+              <label for="r-preK-1">✓ Selected</label>
+            </div>
+          </div>
+
+          <div class="img-card" id="img-preK-2" onclick="selectImg('preK',2)">
+            <div class="img-placeholder" style="background:linear-gradient(135deg,#ddd6fe,#c4b5fd);">
+              🌸
+              <span class="img-id-overlay">preschooler-img2</span>
+            </div>
+            <div class="img-card-body">
+              <div class="img-prompt">"Bear hugging smaller bear who is crying, pastel colors, simple shapes"</div>
+              <div class="img-card-footer">
+                <span class="model-badge">gemini</span>
+                <span class="card-date">Mar 3, 2026</span>
+              </div>
+            </div>
+            <div class="radio-row">
+              <input type="radio" name="img-preK" id="r-preK-2" />
+              <label for="r-preK-2">Select this image</label>
+            </div>
+          </div>
+
+          <div class="subprompt-section">
+            <div class="subprompt-label">🎨 Image sub-prompt</div>
+            <textarea class="subprompt-input" rows="2" placeholder="e.g. 'warmer colors, outdoor setting'"></textarea>
+            <div class="save-row">
+              <div class="tooltip-wrap">
+                <button class="btn btn-outline btn-sm" onclick="flash(this,'Saved!')">💾 Save</button>
+                <span class="tooltip-tip">POST /api/admin/candidates/:wordId/subprompt {"field":"image"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Definition column -->
+        <div style="border-left:1px solid var(--border); padding-left:24px;">
+          <div class="col-label">📖 Definition <span class="col-label-hint">mix &amp; match</span></div>
+
+          <div class="field-section">
+            <div class="field-section-label"><span class="field-section-label-text">Definition</span></div>
+            <div class="field-option selected" onclick="toggleField(this)">
+              <input type="radio" name="preK-def" checked />
+              <div class="field-option-body">
+                <div class="field-option-meta"><span class="attempt-num">#1</span><span class="model-badge" style="background:#f0fdf4;color:#166534;">gpt-4o</span></div>
+                <div class="field-option-text">"Empathy means you can feel what someone else feels — if they're sad, you feel a little sad too."</div>
+              </div>
+            </div>
+            <div class="field-option" onclick="toggleField(this)">
+              <input type="radio" name="preK-def" />
+              <div class="field-option-body">
+                <div class="field-option-meta"><span class="attempt-num">#2</span><span class="model-badge" style="background:#fef3c7;color:#92400e;">claude-3-5</span></div>
+                <div class="field-option-text">"Empathy is when you notice how another person is feeling and care about it."</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-section">
+            <div class="field-section-label"><span class="field-section-label-text">Example</span></div>
+            <div class="field-option selected" onclick="toggleField(this)">
+              <input type="radio" name="preK-ex" checked />
+              <div class="field-option-body">
+                <div class="field-option-meta"><span class="attempt-num">#1</span><span class="model-badge" style="background:#f0fdf4;color:#166534;">gpt-4o</span></div>
+                <div class="field-option-text">"Maya saw her friend crying and felt sad too, because she had empathy."</div>
+              </div>
+            </div>
+            <div class="field-option" onclick="toggleField(this)">
+              <input type="radio" name="preK-ex" />
+              <div class="field-option-body">
+                <div class="field-option-meta"><span class="attempt-num">#2</span><span class="model-badge" style="background:#fef3c7;color:#92400e;">claude-3-5</span></div>
+                <div class="field-option-text">"He showed empathy when he shared his cookie with his friend who was hungry."</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-section">
+            <div class="field-section-label"><span class="field-section-label-text">Try It</span></div>
+            <div class="field-option selected" onclick="toggleField(this)">
+              <input type="radio" name="preK-try" checked />
+              <div class="field-option-body">
+                <div class="field-option-meta"><span class="attempt-num">#1</span><span class="model-badge" style="background:#f0fdf4;color:#166534;">gpt-4o</span></div>
+                <div class="field-option-text">"Show empathy by giving someone a hug when they're upset!"</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subprompt-section">
+            <div class="subprompt-label">✏️ preK text sub-prompt</div>
+            <textarea class="subprompt-input" rows="2" placeholder="e.g. 'use simpler words, focus on playground scenarios'"></textarea>
+            <div class="save-row">
+              <div class="tooltip-wrap">
+                <button class="btn btn-outline btn-sm" onclick="flash(this,'Saved!')">💾 Save</button>
+                <span class="tooltip-tip">POST /api/admin/candidates/:wordId/subprompt {"field":"level","levelId":"preK"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── K panel (placeholder) ── -->
+    <div class="level-panel" id="panel-K">
+      <div style="text-align:center;padding:48px 24px;color:var(--text-3);">
+        <div style="font-size:32px;margin-bottom:12px;">📚</div>
+        <div>Kindergarten image and definitions would appear here</div>
+        <div style="font-size:12px;margin-top:6px;">Same two-column layout: image left · definitions right</div>
+      </div>
+    </div>
+
+    <!-- ── G1 panel (placeholder) ── -->
+    <div class="level-panel" id="panel-G1">
+      <div style="text-align:center;padding:48px 24px;color:var(--text-3);">
+        <div style="font-size:32px;margin-bottom:12px;">📚</div>
+        <div>1st Grade image and definitions would appear here</div>
+        <div style="font-size:12px;margin-top:6px;">Same two-column layout: image left · definitions right</div>
+      </div>
+    </div>
+
+  </div><!-- /level-tabs-bar -->
+
+</div><!-- /content-area -->
+
+<script>
+  function switchLevel(level, btn) {
+    document.querySelectorAll('.level-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.level-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + level).classList.add('active');
+  }
+
+  function selectImg(level, n) {
+    document.querySelectorAll(`[id^="img-${level}-"]`).forEach((card, i) => {
+      card.classList.toggle('selected', i + 1 === n);
+      card.querySelector('input[type=radio]').checked = (i + 1 === n);
+      card.querySelector('label').textContent = (i + 1 === n) ? '✓ Selected' : 'Select this image';
+    });
+  }
+
+  function toggleField(el) {
+    const section = el.closest('.field-section');
+    section.querySelectorAll('.field-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input[type=radio]').checked = true;
+  }
+
+  function flash(el, label) {
+    const orig = el.innerHTML;
+    el.innerHTML = '✓ ' + label;
+    el.style.color = 'var(--teal-dark)';
+    setTimeout(() => { el.innerHTML = orig; el.style.color = ''; }, 1500);
+  }
+</script>
+</body>
+</html>

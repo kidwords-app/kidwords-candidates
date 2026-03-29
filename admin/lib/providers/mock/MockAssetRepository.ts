@@ -7,12 +7,11 @@ import { NotFoundError } from '@/lib/types';
  * without real image files or S3/GitHub access.
  */
 export class MockAssetRepository implements AssetRepository {
-  async getImageAsset(roundId: string, wordId: string, imageId: string): Promise<Buffer> {
-    if (!roundId || !wordId || !imageId) {
-      throw new NotFoundError(`Asset not found: ${roundId}/${wordId}/${imageId}`);
+  async getImageAsset(assetPath: string): Promise<Buffer> {
+    if (!assetPath) {
+      throw new NotFoundError(`Asset not found: ${assetPath}`);
     }
-    // Synthetic PNG-ish buffer — enough to verify it round-trips
-    return Buffer.from(`mock-image:${imageId}`);
+    return Buffer.from(`mock-image:${assetPath}`);
   }
 
   async putPublishedAsset(wordId: string, imageId: string, _data: Buffer): Promise<string> {

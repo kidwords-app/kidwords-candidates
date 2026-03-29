@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { assetRepo } from '@/lib/providers';
+import { assetRepo, candidateRepo } from '@/lib/providers';
+import { NotFoundError } from '@/lib/types';
 
 export async function GET(
   req: NextRequest,
@@ -13,14 +14,25 @@ export async function GET(
   }
 
   try {
-    const data = await assetRepo.getImageAsset(roundId, wordId, imageId);
+    // Look up the assetPath from the candidate JSON — the imageId alone is not
+    // enough to reconstruct the filename (it has a level-prefix in the real data).
+    const word = await candidateRepo.getWord(roundId, wordId);
+    const candidate = word.images?.find((img) => img.imageId === imageId);
+    if (!candidate) {
+      return NextResponse.json({ error: 'image not found' }, { status: 404 });
+    }
+
+    const data = await assetRepo.getImageAsset(candidate.assetPath);
     return new NextResponse(data as unknown as BodyInit, {
       headers: {
         'Content-Type':  'image/png',
         'Cache-Control': 'public, max-age=3600',
       },
     });
-  } catch {
-    return NextResponse.json({ error: 'image not found' }, { status: 404 });
+  } catch (e) {
+    if (e instanceof NotFoundError) {
+      return NextResponse.json({ error: 'not found' }, { status: 404 });
+    }
+    throw e;
   }
 }

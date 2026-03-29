@@ -89,14 +89,23 @@ export function makeGitHubClient(config: GitHubConfig) {
 
   /**
    * Fetch a raw binary asset (e.g. an image).
-   * Uses download_url to bypass base64 encoding for large files.
+   * Uses the vnd.github.v3.raw media type to get bytes directly,
+   * avoiding the base64-encoded Contents API response (which is unreliable
+   * for large files and adds unnecessary encoding overhead).
    */
   async function fetchBinary(path: string): Promise<Buffer> {
-    // First get the file metadata to retrieve download_url
-    const meta = await get<GitHubFileContent>(path);
-    // For private repos, fall back to decoding the base64 content
-    const decoded = Buffer.from(meta.content.replace(/\n/g, ''), 'base64');
-    return decoded;
+    const url = `${baseUrl}/contents/${path}`;
+    const res = await fetch(url, {
+      headers: { ...headers, Accept: 'application/vnd.github.v3.raw' },
+    });
+    if (res.status === 404) {
+      const { NotFoundError } = await import('@/lib/types');
+      throw new NotFoundError(`Not found in repo: ${path}`);
+    }
+    if (!res.ok) {
+      throw new ProviderError(res.status, `GitHub API error ${res.status} for path: ${path}`);
+    }
+    return Buffer.from(await res.arrayBuffer());
   }
 
   /**

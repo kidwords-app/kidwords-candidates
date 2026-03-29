@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { ImageCandidate } from '@/lib/types';
+import type { ImageCandidate, LevelId } from '@/lib/types';
+import { imageLevelId, LEVEL_LABELS } from '@/lib/imageLevel';
 
 interface Props {
   wordId:          string;
@@ -13,8 +14,73 @@ interface Props {
   initialSubprompt?: string;
 }
 
+const LEVEL_ORDER: LevelId[] = ['preK', 'K', 'G1'];
+
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function ImageCard({
+  img,
+  wordId,
+  roundId,
+  selected,
+  onSelect,
+}: {
+  img:     ImageCandidate;
+  wordId:  string;
+  roundId: string;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <div
+      className={`img-card ${selected ? 'selected' : ''}`}
+      onClick={onSelect}
+    >
+      <div className="img-placeholder">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/api/admin/candidates/${wordId}/image/${img.imageId}?roundId=${roundId}`}
+          alt={img.prompt}
+          onError={(e) => {
+            const t = e.currentTarget;
+            t.style.display = 'none';
+            const fallback = t.parentElement?.querySelector<HTMLElement>('.img-fallback');
+            if (fallback) fallback.style.display = 'flex';
+          }}
+        />
+        <span
+          className="img-fallback"
+          style={{ display: 'none', position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center', fontSize: 32, color: 'var(--text-3)' }}
+        >
+          🖼
+        </span>
+        <span className="img-id-overlay">{img.imageId}</span>
+      </div>
+
+      <div className="img-card-body">
+        <div className="img-prompt">{img.prompt}</div>
+        <div className="img-card-footer">
+          <span className="model-badge">{img.model}</span>
+          <span className="card-date">{fmtDate(img.createdAt)}</span>
+        </div>
+      </div>
+
+      <div className="radio-row" onClick={(e) => e.stopPropagation()}>
+        <input
+          type="radio"
+          id={`img-${img.imageId}`}
+          name="selected-image"
+          checked={selected}
+          onChange={onSelect}
+        />
+        <label htmlFor={`img-${img.imageId}`}>
+          {selected ? '✓ Selected' : 'Select this image'}
+        </label>
+      </div>
+    </div>
+  );
 }
 
 export default function ImagePanel({
@@ -47,58 +113,60 @@ export default function ImagePanel({
     );
   }
 
+  // Group images by their derived level; ungrouped images land in a fallback bucket
+  const grouped = new Map<LevelId | 'other', ImageCandidate[]>();
+  for (const img of images) {
+    const key = imageLevelId(img) ?? 'other';
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key)!.push(img);
+  }
+
+  const orderedKeys: (LevelId | 'other')[] = [
+    ...LEVEL_ORDER.filter((l) => grouped.has(l)),
+    ...(grouped.has('other') ? (['other'] as const) : []),
+  ];
+
   return (
     <div>
       <div className="col-label">🖼 Image Candidates</div>
 
-      {images.map((img, i) => (
-        <div
-          key={img.imageId}
-          className={`img-card ${selectedImageId === img.imageId ? 'selected' : ''}`}
-          onClick={() => onSelect(img.imageId)}
-        >
-          <div className="img-placeholder">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`/api/admin/candidates/${wordId}/image/${img.imageId}?roundId=${roundId}`}
-              alt={img.prompt}
-              onError={(e) => {
-                const t = e.currentTarget;
-                t.style.display = 'none';
-                t.parentElement!.querySelector<HTMLElement>('.img-fallback')!.style.display = 'flex';
-              }}
-            />
-            <span className="img-fallback" style={{ display: 'none', fontSize: 32, color: 'var(--text-3)' }}>
-              🖼
+      {orderedKeys.map((key) => (
+        <div key={key} style={{ marginBottom: 20 }}>
+          {/* Level header */}
+          <div style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '.07em',
+            textTransform: 'uppercase',
+            color: 'var(--text-3)',
+            marginBottom: 8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}>
+            <span style={{ color: 'var(--text-2)' }}>
+              {key === 'other' ? 'Untagged' : LEVEL_LABELS[key]}
             </span>
-            <span className="img-id-overlay">{img.imageId}</span>
+            <span style={{ fontSize: 10, background: '#f1f5f9', padding: '1px 6px', borderRadius: 99, color: 'var(--text-3)' }}>
+              {key === 'other' ? key : key}
+            </span>
           </div>
 
-          <div className="img-card-body">
-            <div className="img-prompt">{img.prompt}</div>
-            <div className="img-card-footer">
-              <span className="model-badge">{img.model}</span>
-              <span className="card-date">{fmtDate(img.createdAt)}</span>
-            </div>
-          </div>
-
-          <div className="radio-row" onClick={(e) => e.stopPropagation()}>
-            <input
-              type="radio"
-              id={`img-${img.imageId}`}
-              name="selected-image"
-              checked={selectedImageId === img.imageId}
-              onChange={() => onSelect(img.imageId)}
+          {grouped.get(key)!.map((img) => (
+            <ImageCard
+              key={img.imageId}
+              img={img}
+              wordId={wordId}
+              roundId={roundId}
+              selected={selectedImageId === img.imageId}
+              onSelect={() => onSelect(img.imageId)}
             />
-            <label htmlFor={`img-${img.imageId}`}>
-              {selectedImageId === img.imageId ? '✓ Selected' : `Select image ${i + 1}`}
-            </label>
-          </div>
+          ))}
         </div>
       ))}
 
       {/* Image sub-prompt */}
-      <div className="subprompt-section" style={{ marginTop: 16 }}>
+      <div className="subprompt-section" style={{ marginTop: 4, borderTop: '1px solid var(--border)', paddingTop: 14 }}>
         <div className="subprompt-label">🎨 Image sub-prompt</div>
         <textarea
           className="subprompt-input"

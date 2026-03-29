@@ -19,6 +19,8 @@ export interface ImageCandidate {
   model:     'gemini';
   assetPath: string;
   createdAt: string;
+  /** Optional explicit level. When absent, derived from the assetPath prefix. */
+  level?:    LevelId;
 }
 
 /** Per-level field selections: each field independently points to a candidate index. */
@@ -74,7 +76,9 @@ export interface CandidateRepository {
 }
 
 export interface AssetRepository {
-  getImageAsset(roundId: string, wordId: string, imageId: string): Promise<Buffer>;
+  /** assetPath is the full relative path from the candidate JSON, e.g.
+   *  candidates/rounds/2026-03-03/assets/prioritize/preschooler-64fd2fd536.png */
+  getImageAsset(assetPath: string): Promise<Buffer>;
   putPublishedAsset(wordId: string, imageId: string, data: Buffer): Promise<string>;
 }
 

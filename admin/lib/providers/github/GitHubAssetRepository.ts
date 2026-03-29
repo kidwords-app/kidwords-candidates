@@ -26,10 +26,9 @@ export class GitHubAssetRepository implements AssetRepository {
     });
   }
 
-  /** Read a raw image from candidates/rounds/{roundId}/assets/{wordId}/{imageId}.png */
-  async getImageAsset(roundId: string, wordId: string, imageId: string): Promise<Buffer> {
-    const path = `candidates/rounds/${roundId}/assets/${wordId}/${imageId}.png`;
-    return this.candidatesGh.fetchBinary(path);
+  /** Fetch a raw image using the assetPath stored in the ImageCandidate JSON. */
+  async getImageAsset(assetPath: string): Promise<Buffer> {
+    return this.candidatesGh.fetchBinary(assetPath);
   }
 
   /**
