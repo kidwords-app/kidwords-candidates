@@ -1,3 +1,4 @@
+
 import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
 
@@ -16,9 +17,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    signIn({ profile }: { profile?: { login?: string } }) {
+    signIn({ profile }) {
       if (ALLOWED.length === 0) return true; // no allowlist → any GitHub user can sign in
-      return ALLOWED.includes(profile?.login ?? '');
+      return ALLOWED.includes((profile as { login?: string } | undefined)?.login ?? '');
     },
   },
   pages: {
