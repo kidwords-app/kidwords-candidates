@@ -52,13 +52,13 @@
   "partOfSpeech": "noun",
   "roundId": "2026-04-01",
   "selected": {},
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 1,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-01T18:42:14.004199+00:00",
+  "updatedAt": "2026-04-01T21:43:18.648Z",
   "word": "clue",
   "wordId": "clue"
 }
