@@ -25,17 +25,19 @@ LEVEL_ID_MAP = {
 
 TEXT_PROMPT_RESPONSE_TEMPLATE = {"definition": "", "example": "", "tryIt": ""}
 TEXT_PROMPT_TEMPLATE = (
-    "For the word '{word}', generate content appropriate for a {level}. "
+    "For the word '{word}', generate the following content appropriate for a {level}. "
     "Return a JSON object with exactly these three fields: "
-    "'definition' (a simple, child-friendly definition of the word), "
+    "'definition' (a simple, level-friendly definition of the word), "
     "'example' (one sentence showing the word used in context), "
     "'tryIt' (a short prompt encouraging the child to use or think about the word). "
     "Return them in JSON format like so: {text_prompt_response_template}. "
     "Do not format the response in a code block or include any other text or formatting."
 )
 CARTOON_PROMPT_TEMPLATE = (
-    "Create a cartoon with a single frame or image, describing the following: {phrase}. "
-    "Do not include any words in the cartoon."
+    "Create a single-frame cartoon illustration in flat vector style with clean outlines, "
+    "bright saturated colors, simple friendly shapes, and a white background. "
+    "The scene depicts: {phrase}. "
+    "Do not include any text, letters, or words in the image."
 )
 TEXT_MODEL = "gemini-2.5-flash"
 IMAGE_MODEL = "gemini-2.5-flash-image"

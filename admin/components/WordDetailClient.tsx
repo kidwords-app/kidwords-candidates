@@ -139,7 +139,7 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
         <div className="breadcrumb">
           <a className="bc-link" onClick={() => router.push('/candidates')}>Rounds</a>
           <span className="sep">/</span>
-          <span>{word.roundId}</span>
+          <a className="bc-link" onClick={() => router.push(`/candidates?roundId=${word.roundId}`)}>{word.roundId}</a>
           <span className="sep">/</span>
           <span className="current">{word.word}</span>
         </div>
