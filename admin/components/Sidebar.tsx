@@ -103,20 +103,18 @@ export default function Sidebar({
       </div>
 
       <div className="sidebar-footer">
-        {(userImage || userName) && (
-          <div className="sidebar-user">
-            {userImage && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={userImage} alt={userName ?? 'user'} className="sidebar-avatar" />
-            )}
-            <span className="sidebar-username">{userName}</span>
-            {signOutAction && (
-              <form action={signOutAction} style={{ marginLeft: 'auto' }}>
-                <button type="submit" className="sidebar-signout" title="Sign out">↩</button>
-              </form>
-            )}
-          </div>
-        )}
+        <div className="sidebar-user">
+          {userImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={userImage} alt={userName ?? 'user'} className="sidebar-avatar" />
+          )}
+          {userName && <span className="sidebar-username">{userName}</span>}
+          {signOutAction && (
+            <form action={signOutAction} style={{ marginLeft: 'auto' }}>
+              <button type="submit" className="sidebar-signout" title="Sign out">↩</button>
+            </form>
+          )}
+        </div>
       </div>
     </nav>
   );

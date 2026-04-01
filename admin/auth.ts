@@ -17,6 +17,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+    authorized({ auth }) {
+      return !!auth?.user;
+    },
     signIn({ profile }) {
       if (ALLOWED.length === 0) return true; // no allowlist → any GitHub user can sign in
       return ALLOWED.includes((profile as { login?: string } | undefined)?.login ?? '');
