@@ -1,0 +1,64 @@
+{
+  "createdAt": "2026-04-01T18:42:14.004199+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-04-01/assets/invent/preschooler-11cbd389c0.png",
+      "createdAt": "2026-04-01T18:42:14.004199+00:00",
+      "imageId": "11cbd389c0",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: Let's invent a new silly song to sing together!. Do not include any words in the cartoon."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-01/assets/invent/kindergartener-bfa6e7fab1.png",
+      "createdAt": "2026-04-01T18:42:14.004199+00:00",
+      "imageId": "bfa6e7fab1",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: My friend wants to invent a machine that makes endless cookies!. Do not include any words in the cartoon."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-01/assets/invent/first grader-b066e8c7d1.png",
+      "createdAt": "2026-04-01T18:42:14.004199+00:00",
+      "imageId": "b066e8c7d1",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: Maybe one day you will invent a super-fast way to travel to the moon!. Do not include any words in the cartoon."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "To make something new that no one has ever made before.",
+        "example": "Maybe one day you will invent a super-fast way to travel to the moon!",
+        "model": "gemini",
+        "tryIt": "What is one new thing you would like to invent to make playtime even more fun?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "To make something brand new that no one has ever thought of before!",
+        "example": "My friend wants to invent a machine that makes endless cookies!",
+        "model": "gemini",
+        "tryIt": "If you could invent anything in the whole wide world, what would it be?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "To invent means to make something brand new that no one else has ever thought of before!",
+        "example": "Let's invent a new silly song to sing together!",
+        "model": "gemini",
+        "tryIt": "What new game could you invent if you had all your toys?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-04-01",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-04-01T18:42:14.004199+00:00",
+  "word": "invent",
+  "wordId": "invent"
+}

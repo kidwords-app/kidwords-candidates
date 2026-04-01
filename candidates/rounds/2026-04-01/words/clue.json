@@ -1,0 +1,64 @@
+{
+  "createdAt": "2026-04-01T18:42:14.004199+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-04-01/assets/clue/preschooler-59e224c374.png",
+      "createdAt": "2026-04-01T18:42:14.004199+00:00",
+      "imageId": "59e224c374",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: We found a red ribbon, and that was a clue to find the hidden treasure!. Do not include any words in the cartoon."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-01/assets/clue/kindergartener-1451e4b4a3.png",
+      "createdAt": "2026-04-01T18:42:14.004199+00:00",
+      "imageId": "1451e4b4a3",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: The muddy paw prints were a clue that our dog had been playing in the garden.. Do not include any words in the cartoon."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-01/assets/clue/first grader-f8cbec5381.png",
+      "createdAt": "2026-04-01T18:42:14.004199+00:00",
+      "imageId": "f8cbec5381",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: The missing cookie crumbs were a big clue about who ate the snack.. Do not include any words in the cartoon."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "A clue is a little hint or a piece of information that helps you figure something out, like a mystery or a puzzle!",
+        "example": "The missing cookie crumbs were a big clue about who ate the snack.",
+        "model": "gemini",
+        "tryIt": "Next time you are playing a game like hide-and-seek, what clue could help you find your friend?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "A clue is a little hint or a piece of information that helps you find something or figure out a secret!",
+        "example": "The muddy paw prints were a clue that our dog had been playing in the garden.",
+        "model": "gemini",
+        "tryIt": "Next time you can't find your favorite toy, what kind of clue could you look for to help you find it?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "A clue is a little sign that helps you find something or guess what's happening.",
+        "example": "We found a red ribbon, and that was a clue to find the hidden treasure!",
+        "model": "gemini",
+        "tryIt": "When we play hide-and-seek, I can give you a clue to help you find me!"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-04-01",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 1,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-04-01T18:42:14.004199+00:00",
+  "word": "clue",
+  "wordId": "clue"
+}

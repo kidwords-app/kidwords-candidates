@@ -1,0 +1,64 @@
+{
+  "createdAt": "2026-04-01T18:42:14.004199+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-04-01/assets/solve/preschooler-5fd3b0c6a8.png",
+      "createdAt": "2026-04-01T18:42:14.004199+00:00",
+      "imageId": "5fd3b0c6a8",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: We can solve the puzzle by putting all the pieces in the right spot!. Do not include any words in the cartoon."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-01/assets/solve/kindergartener-981424ebaa.png",
+      "createdAt": "2026-04-01T18:42:14.004199+00:00",
+      "imageId": "981424ebaa",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: We can solve the puzzle by putting all the pieces together.. Do not include any words in the cartoon."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-01/assets/solve/first grader-cc902bc7b6.png",
+      "createdAt": "2026-04-01T18:42:14.004199+00:00",
+      "imageId": "cc902bc7b6",
+      "model": "gemini",
+      "prompt": "Create a cartoon with a single frame or image, describing the following: I can solve the puzzle by putting all the pieces in the right spot.. Do not include any words in the cartoon."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "To find the answer to a problem or a question.",
+        "example": "I can solve the puzzle by putting all the pieces in the right spot.",
+        "model": "gemini",
+        "tryIt": "Next time you see a puzzle or a math problem, try to solve it!"
+      }
+    ],
+    "K": [
+      {
+        "definition": "To find the answer to a problem or puzzle!",
+        "example": "We can solve the puzzle by putting all the pieces together.",
+        "model": "gemini",
+        "tryIt": "What is something you can try to solve today, like a puzzle or a math problem?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "To find the answer to a question or fix something tricky.",
+        "example": "We can solve the puzzle by putting all the pieces in the right spot!",
+        "model": "gemini",
+        "tryIt": "What's a little problem you could try to solve today, like finding a lost toy?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-04-01",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 1,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-04-01T18:42:14.004199+00:00",
+  "word": "solve",
+  "wordId": "solve"
+}
