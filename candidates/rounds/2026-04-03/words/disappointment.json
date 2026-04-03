@@ -1,0 +1,64 @@
+{
+  "createdAt": "2026-04-03T06:59:06.146778+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-04-03/assets/disappointment/preschooler-c7655b5052.png",
+      "createdAt": "2026-04-03T06:59:06.146778+00:00",
+      "imageId": "c7655b5052",
+      "model": "gemini",
+      "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: I felt a little disappointment when my friend couldn't come over to play today.. Do not include any text, letters, or words in the image."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-03/assets/disappointment/kindergartener-911ea7e550.png",
+      "createdAt": "2026-04-03T06:59:06.146778+00:00",
+      "imageId": "911ea7e550",
+      "model": "gemini",
+      "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: Lily felt **disappointment** when her balloon popped before she could show it to her friends.. Do not include any text, letters, or words in the image."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-03/assets/disappointment/first grader-c2f1ae5dad.png",
+      "createdAt": "2026-04-03T06:59:06.146778+00:00",
+      "imageId": "c2f1ae5dad",
+      "model": "gemini",
+      "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: I felt disappointment when it started to rain and we couldn't go to the park.. Do not include any text, letters, or words in the image."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "It's a sad feeling you get when something you hoped for or really wanted to happen doesn't happen.",
+        "example": "I felt disappointment when it started to rain and we couldn't go to the park.",
+        "model": "gemini",
+        "tryIt": "What would make you feel disappointment? Maybe if your friend couldn't come over to play?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "It's when you feel a little sad because something you really hoped for didn't happen the way you wanted.",
+        "example": "Lily felt **disappointment** when her balloon popped before she could show it to her friends.",
+        "model": "gemini",
+        "tryIt": "Think of a time you were really hoping for a sunny day to play outside, but it rained instead. That's a feeling of disappointment!"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "It's a little sad feeling you get when something you hoped for doesn't happen.",
+        "example": "I felt a little disappointment when my friend couldn't come over to play today.",
+        "model": "gemini",
+        "tryIt": "What might make you feel a little disappointment?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-04-03",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 4,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-04-03T06:59:06.146778+00:00",
+  "word": "disappointment",
+  "wordId": "disappointment"
+}

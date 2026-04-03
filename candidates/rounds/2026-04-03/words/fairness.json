@@ -1,0 +1,64 @@
+{
+  "createdAt": "2026-04-03T06:59:06.146778+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-04-03/assets/fairness/preschooler-a9352f9c71.png",
+      "createdAt": "2026-04-03T06:59:06.146778+00:00",
+      "imageId": "a9352f9c71",
+      "model": "gemini",
+      "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: It's important to show fairness when we share our blocks with friends.. Do not include any text, letters, or words in the image."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-03/assets/fairness/kindergartener-731432822f.png",
+      "createdAt": "2026-04-03T06:59:06.146778+00:00",
+      "imageId": "731432822f",
+      "model": "gemini",
+      "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: When we shared the cookies so everyone got two, that was fairness!. Do not include any text, letters, or words in the image."
+    },
+    {
+      "assetPath": "candidates/rounds/2026-04-03/assets/fairness/first grader-9020c8b8ab.png",
+      "createdAt": "2026-04-03T06:59:06.146778+00:00",
+      "imageId": "9020c8b8ab",
+      "model": "gemini",
+      "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: When we share snacks, Mom always shows fairness by giving everyone the same amount.. Do not include any text, letters, or words in the image."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Fairness means everyone gets treated the same, like when everyone gets a turn or an equal share.",
+        "example": "When we share snacks, Mom always shows fairness by giving everyone the same amount.",
+        "model": "gemini",
+        "tryIt": "Can you think of a time when you or a friend showed fairness when playing a game?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Fairness means everyone gets treated in a way that feels good and equal, like everyone gets a turn.",
+        "example": "When we shared the cookies so everyone got two, that was fairness!",
+        "model": "gemini",
+        "tryIt": "Today, try to show fairness when you play with your friends by sharing your toys!"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Fairness means everyone gets what's right or what's their turn, so no one feels left out.",
+        "example": "It's important to show fairness when we share our blocks with friends.",
+        "model": "gemini",
+        "tryIt": "Next time you play, try to share your toys fairly with everyone!"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-04-03",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-04-03T06:59:06.146778+00:00",
+  "word": "fairness",
+  "wordId": "fairness"
+}
