@@ -51,14 +51,23 @@
   },
   "partOfSpeech": "noun",
   "roundId": "2026-04-01",
-  "selected": {},
+  "selected": {
+    "imageId": "59e224c374",
+    "levels": {
+      "preK": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
+      }
+    }
+  },
   "status": "approved",
   "subPrompts": {},
   "syllables": 1,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-01T21:43:18.648Z",
+  "updatedAt": "2026-04-05T22:49:54.676Z",
   "word": "clue",
   "wordId": "clue"
 }
