@@ -42,7 +42,10 @@ export async function POST(
     return NextResponse.json({ ok: true });
   } catch (err) {
     if (err instanceof NotFoundError) return NextResponse.json({ error: err.message }, { status: 404 });
-    if (err instanceof ProviderError)  return NextResponse.json({ error: err.message }, { status: 502 });
+    if (err instanceof ProviderError) {
+      console.error(`[POST /api/admin/candidates/${wordId}/publish] GitHub error ${err.statusCode}:`, err.message);
+      return NextResponse.json({ error: err.message }, { status: 502 });
+    }
     console.error(`[POST /api/admin/candidates/${wordId}/publish]`, err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

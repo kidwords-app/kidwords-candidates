@@ -125,7 +125,8 @@ export function makeGitHubClient(config: GitHubConfig) {
     });
     // GitHub returns 204 No Content on success
     if (!res.ok && res.status !== 204) {
-      throw new ProviderError(res.status, `workflow_dispatch failed for: ${workflowFile}`);
+      const body = await res.text().catch(() => '(unreadable)');
+      throw new ProviderError(res.status, `workflow_dispatch failed (${res.status}) for ${workflowFile}: ${body}`);
     }
   }
 

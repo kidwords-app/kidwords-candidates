@@ -147,7 +147,7 @@ function LevelPanel({
             <div className="tooltip-wrap">
               <button
                 className="btn btn-outline btn-sm"
-                disabled={savingImg}
+                disabled={savingImg || !imgSubprompt.trim()}
                 onClick={async () => {
                   setSavingImg(true);
                   try { await onImageSubpromptSave(imgSubprompt); } finally { setSavingImg(false); }
@@ -217,7 +217,7 @@ function LevelPanel({
                 <div className="tooltip-wrap">
                   <button
                     className="btn btn-outline btn-sm"
-                    disabled={savingLevel}
+                    disabled={savingLevel || !levelSubprompt.trim()}
                     onClick={async () => {
                       setSavingLevel(true);
                       try { await onLevelSubpromptSave(levelSubprompt); } finally { setSavingLevel(false); }
