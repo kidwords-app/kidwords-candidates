@@ -51,14 +51,23 @@
   },
   "partOfSpeech": "noun",
   "roundId": "2026-04-03",
-  "selected": {},
+  "selected": {
+    "imageId": "c7655b5052",
+    "levels": {
+      "preK": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
+      }
+    }
+  },
   "status": "pending",
   "subPrompts": {},
   "syllables": 4,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-03T06:59:06.146778+00:00",
+  "updatedAt": "2026-04-15T13:47:01.365Z",
   "word": "disappointment",
   "wordId": "disappointment"
 }
