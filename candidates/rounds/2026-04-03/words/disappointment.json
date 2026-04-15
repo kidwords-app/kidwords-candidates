@@ -66,13 +66,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 4,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-15T13:47:12.189Z",
+  "updatedAt": "2026-04-15T13:47:33.485Z",
   "word": "disappointment",
   "wordId": "disappointment"
 }
