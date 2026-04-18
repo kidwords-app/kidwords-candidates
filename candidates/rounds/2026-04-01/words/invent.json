@@ -71,13 +71,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 2,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-18T05:38:23.859Z",
+  "updatedAt": "2026-04-18T05:38:25.555Z",
   "word": "invent",
   "wordId": "invent"
 }
