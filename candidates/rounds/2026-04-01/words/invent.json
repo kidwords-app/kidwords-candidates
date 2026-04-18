@@ -51,14 +51,23 @@
   },
   "partOfSpeech": "verb",
   "roundId": "2026-04-01",
-  "selected": {},
+  "selected": {
+    "imageId": "11cbd389c0",
+    "levels": {
+      "preK": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
+      }
+    }
+  },
   "status": "pending",
   "subPrompts": {},
   "syllables": 2,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-01T18:42:14.004199+00:00",
+  "updatedAt": "2026-04-18T05:38:11.484Z",
   "word": "invent",
   "wordId": "invent"
 }
