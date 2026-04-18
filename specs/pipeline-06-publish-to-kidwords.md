@@ -31,8 +31,9 @@ Both workflows call `scripts/publish.py`, which:
 2. **Maps** the candidate to a `WordEntry` (see [WordEntry shape](#wordentry-shape)),
    respecting the mix-and-match field selections.
 3. **Copies the selected image** from `candidates/rounds/{roundId}/assets/{wordId}/{imageId}.png`
-   to `public/cartoons/{wordId}.png` in the public repo (via GitHub Contents API).
-4. **Upserts** the word into `src/core/words-data.json` in the public repo
+   to `kidwords-web/public/cartoons/{wordId}.png` in repo `kidwords.github.io` (via GitHub Contents API).
+   The `kidwords-web` segment is configurable (`PUBLIC_APP_SUBDIR`) for monorepo layouts.
+4. **Upserts** the word into `kidwords-web/src/core/words-data.json` in the same repo
    (sorted alphabetically by `wordId`).
 5. **Pushes directly to `main`** — no PR is opened. The approval step in the admin
    UI is the human review gate; a second PR would be redundant. Vercel deploys
@@ -58,7 +59,7 @@ Both workflows call `scripts/publish.py`, which:
 }
 ```
 
-The public app imports `src/core/words-data.json` in `src/core/words.ts`.
+Inside the `kidwords-web` app package, the bundle reads `src/core/words-data.json` (see `src/core/words.ts`).
 
 ### GitHub secrets required
 
@@ -66,6 +67,8 @@ The public app imports `src/core/words-data.json` in `src/core/words.ts`.
 |---|---|
 | `CANDIDATES_REPO_TOKEN` | Checkout the private candidates repo |
 | `PUBLIC_REPO_TOKEN` | Write images + words-data.json to the public repo |
+| `PUBLIC_REPO_NAME` | Default `kidwords.github.io` |
+| `PUBLIC_APP_SUBDIR` | Default `kidwords-web` — app root inside that monorepo |
 | `SMTP_*` / `NOTIFY_EMAIL_*` | Email notification on completion / failure |
 
 ## Validation

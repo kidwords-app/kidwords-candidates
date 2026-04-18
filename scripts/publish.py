@@ -12,14 +12,17 @@ Environment variables:
   CANDIDATES_REPO_PATH   Path to checked-out candidates repo (default: .)
   PUBLIC_REPO_TOKEN      GitHub PAT with contents:write on the public repo
   PUBLIC_REPO_OWNER      Public repo owner (default: kidwords-app)
-  PUBLIC_REPO_NAME       Public repo name  (default: kidwords.github.io)
+  PUBLIC_REPO_NAME       GitHub repo name (default: kidwords.github.io)
+  PUBLIC_APP_SUBDIR      App folder inside that repo (default: kidwords-web).
+                         Files are written to {subdir}/src/core/words-data.json and
+                         {subdir}/public/cartoons/{wordId}.png. Set empty for a flat repo.
   PR_BASE_BRANCH         Base branch for the PR (default: main)
 
 What it does:
   1. Validates each approved WordCandidate (selections complete, indexes in range).
-  2. Maps each to a WordEntry and upserts it into src/core/words-data.json in the
-     public repo.
-  3. Copies the selected image to public/cartoons/{wordId}.png in the public repo.
+  2. Maps each to a WordEntry and upserts it into src/core/words-data.json under the
+     app subdir in the public repo.
+  3. Copies the selected image to public/cartoons/{wordId}.png under the app subdir.
   4. Commits both changes to a new branch and opens a PR for review.
 """
 
@@ -37,7 +40,16 @@ import requests
 # ── Constants ──────────────────────────────────────────────────────────────────
 
 LEVEL_IDS = ["preK", "K", "G1"]
-WORDS_DATA_PATH = "src/core/words-data.json"
+WORDS_DATA_REL = "src/core/words-data.json"
+
+
+def _paths_in_public_repo(app_subdir: str, word_id: str) -> tuple[str, str]:
+    """Return (cartoon_png_path, words_json_path) in the GitHub repo."""
+    root = (app_subdir or "").strip().strip("/")
+    cartoon_rel = f"public/cartoons/{word_id}.png"
+    if root:
+        return f"{root}/{cartoon_rel}", f"{root}/{WORDS_DATA_REL}"
+    return cartoon_rel, WORDS_DATA_REL
 
 
 # ── Error types ────────────────────────────────────────────────────────────────
@@ -53,7 +65,12 @@ class ValidationError(PublishError):
 # ── Validation ─────────────────────────────────────────────────────────────────
 
 def validate_word_candidate(word: dict) -> None:
-    """Raise ValidationError if the candidate is not ready to publish."""
+    """Raise ValidationError if the candidate is not ready to publish.
+
+    Levels are optional — only levels present in selected.levels are validated.
+    At least one level must be complete. Missing levels are skipped at publish
+    time and can be shown as 'coming soon' in the public app.
+    """
     word_id = word.get("wordId", "<unknown>")
 
     if word.get("status") != "approved":
@@ -75,13 +92,12 @@ def validate_word_candidate(word: dict) -> None:
     selected_levels = selected.get("levels", {})
     levels_data = word.get("levels", {})
 
-    for level in LEVEL_IDS:
-        if level not in selected_levels:
-            raise ValidationError(f"{word_id}: no field selections for level '{level}'")
+    # Validate only the levels that have selections; require at least one.
+    if not selected_levels:
+        raise ValidationError(f"{word_id}: no level selections — at least one level is required")
 
-        sel = selected_levels[level]
+    for level, sel in selected_levels.items():
         candidates = levels_data.get(level, [])
-
         for field in ("definition", "example", "tryIt"):
             if sel.get(field) is None:
                 raise ValidationError(
@@ -100,6 +116,8 @@ def validate_word_candidate(word: dict) -> None:
 def map_to_word_entry(word: dict) -> dict:
     """Convert an approved WordCandidate to the WordEntry shape for the public app.
 
+    Only levels present in selected.levels are included. Missing levels are
+    omitted from the output so the public app can show a 'coming soon' banner.
     Each level field (definition, example, tryIt) is resolved independently
     from the candidate at the selected index — allowing mix-and-match across
     model attempts.
@@ -108,8 +126,7 @@ def map_to_word_entry(word: dict) -> dict:
     levels_data = word["levels"]
 
     levels = {}
-    for level in LEVEL_IDS:
-        sel = selected_levels[level]
+    for level, sel in selected_levels.items():
         candidates = levels_data[level]
         levels[level] = {
             "definition": candidates[sel["definition"]]["definition"],
@@ -225,13 +242,15 @@ def publish_word(
     candidates_path: Path,
     public_gh: GitHubClient,
     branch: str,
+    *,
+    app_subdir: str = "",
 ) -> None:
     """Copy image and upsert words-data.json for a single word."""
     word_id = word["wordId"]
+    image_dest, words_data_path = _paths_in_public_repo(app_subdir, word_id)
 
     # 1. Copy selected image to public repo
     image_bytes = load_image_bytes(candidates_path, word)
-    image_dest = f"public/cartoons/{word_id}.png"
     existing_image = public_gh.get_file(image_dest)
     public_gh.put_file(
         image_dest,
@@ -243,7 +262,7 @@ def publish_word(
     print(f"  ✓ image  → {image_dest}")
 
     # 2. Upsert words-data.json
-    existing_data_file = public_gh.get_file(WORDS_DATA_PATH)
+    existing_data_file = public_gh.get_file(words_data_path)
     if existing_data_file:
         content = base64.b64decode(
             existing_data_file["content"].replace("\n", "")
@@ -260,13 +279,13 @@ def publish_word(
     words_list.sort(key=lambda e: e["wordId"])
 
     public_gh.put_file(
-        WORDS_DATA_PATH,
+        words_data_path,
         json.dumps(words_list, indent=2, ensure_ascii=False).encode(),
         message=f"publish: add word '{word_id}'",
         sha=data_sha,
         branch=branch,
     )
-    print(f"  ✓ words  → {WORDS_DATA_PATH} (upserted '{word_id}')")
+    print(f"  ✓ words  → {words_data_path} (upserted '{word_id}')")
 
 
 # ── Orchestration ──────────────────────────────────────────────────────────────
@@ -276,6 +295,7 @@ def run(args: argparse.Namespace) -> None:
     token = os.environ["PUBLIC_REPO_TOKEN"]
     owner = os.environ.get("PUBLIC_REPO_OWNER", "kidwords-app")
     repo = os.environ.get("PUBLIC_REPO_NAME", "kidwords.github.io")
+    app_subdir = os.environ.get("PUBLIC_APP_SUBDIR", "kidwords-web")
     base_branch = os.environ.get("PR_BASE_BRANCH", "main")
 
     public_gh = GitHubClient(token, owner, repo)
@@ -303,7 +323,7 @@ def run(args: argparse.Namespace) -> None:
     published = []
     for word in words:
         print(f"Publishing {word['wordId']}…")
-        publish_word(word, candidates_path, public_gh, base_branch)
+        publish_word(word, candidates_path, public_gh, base_branch, app_subdir=app_subdir)
         published.append(word["wordId"])
 
     print(f"\n✓ Published {len(published)} word(s) to {base_branch}: {', '.join(published)}")

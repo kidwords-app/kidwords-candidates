@@ -90,13 +90,19 @@ class TestValidateWordCandidate:
         with pytest.raises(ValidationError, match="not found in images"):
             validate_word_candidate(word)
 
-    def test_rejects_missing_level_selection(self):
+    def test_allows_partial_level_selection(self):
+        # Missing G1 is fine — partial levels are allowed
         selected = {**APPROVED_WORD["selected"]}
         levels = {**selected["levels"]}
         del levels["G1"]
         selected = {**selected, "levels": levels}
         word = {**APPROVED_WORD, "selected": selected}
-        with pytest.raises(ValidationError, match="G1"):
+        validate_word_candidate(word)  # should not raise
+
+    def test_rejects_no_level_selections(self):
+        selected = {**APPROVED_WORD["selected"], "levels": {}}
+        word = {**APPROVED_WORD, "selected": selected}
+        with pytest.raises(ValidationError, match="at least one level"):
             validate_word_candidate(word)
 
     def test_rejects_out_of_range_field_index(self):
@@ -152,6 +158,15 @@ class TestMapToWordEntry:
             assert "definition" in entry["levels"][level]
             assert "example"    in entry["levels"][level]
             assert "tryIt"      in entry["levels"][level]
+
+    def test_omits_unselected_levels(self):
+        selected = {**APPROVED_WORD["selected"]}
+        levels = {**selected["levels"]}
+        del levels["G1"]
+        word = {**APPROVED_WORD, "selected": {**selected, "levels": levels}}
+        entry = map_to_word_entry(word)
+        assert set(entry["levels"].keys()) == {"preK", "K"}
+        assert "G1" not in entry["levels"]
 
     def test_includes_publishedAt(self):
         entry = map_to_word_entry(APPROVED_WORD)
@@ -234,7 +249,7 @@ class TestPublishWord:
         mock_gh = MagicMock(spec=GitHubClient)
         mock_gh.get_file.return_value = None  # both files are new
 
-        publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test-branch")
+        publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test-branch", app_subdir="")
 
         put_calls = mock_gh.put_file.call_args_list
         paths = [c.args[0] for c in put_calls]
@@ -246,7 +261,7 @@ class TestPublishWord:
         mock_gh = MagicMock(spec=GitHubClient)
         mock_gh.get_file.return_value = None
 
-        publish_word(APPROVED_WORD, tmp_path, mock_gh, "main")
+        publish_word(APPROVED_WORD, tmp_path, mock_gh, "main", app_subdir="")
 
         for c in mock_gh.put_file.call_args_list:
             assert c.kwargs.get("branch") == "main"
@@ -264,7 +279,7 @@ class TestPublishWord:
             else None
         )
 
-        publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test")
+        publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test", app_subdir="")
 
         data_call = next(
             c for c in mock_gh.put_file.call_args_list
@@ -274,6 +289,17 @@ class TestPublishWord:
         word_ids = [e["wordId"] for e in written]
         assert "empathy" in word_ids
         assert "resilience" in word_ids  # existing word preserved
+
+    def test_writes_under_app_subdirectory(self, tmp_path):
+        self._setup_candidates(tmp_path)
+        mock_gh = MagicMock(spec=GitHubClient)
+        mock_gh.get_file.return_value = None
+
+        publish_word(APPROVED_WORD, tmp_path, mock_gh, "main", app_subdir="kidwords-web")
+
+        put_paths = [c.args[0] for c in mock_gh.put_file.call_args_list]
+        assert "kidwords-web/public/cartoons/empathy.png" in put_paths
+        assert "kidwords-web/src/core/words-data.json" in put_paths
 
     def test_upserts_word_if_already_exists(self, tmp_path):
         self._setup_candidates(tmp_path)
@@ -288,7 +314,7 @@ class TestPublishWord:
             else None
         )
 
-        publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test")
+        publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test", app_subdir="")
 
         data_call = next(
             c for c in mock_gh.put_file.call_args_list

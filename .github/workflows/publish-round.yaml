@@ -37,6 +37,7 @@ jobs:
           PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
           PUBLIC_REPO_OWNER: kidwords-app
           PUBLIC_REPO_NAME: kidwords.github.io
+          PUBLIC_APP_SUBDIR: kidwords-web
           PR_BASE_BRANCH: main
         run: |
           set -euo pipefail

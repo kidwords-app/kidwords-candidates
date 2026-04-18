@@ -7,7 +7,7 @@ This keeps raw candidates and assets out of the public codebase.
 
 Repo names:
 - Candidates repo (private): `kidwords-app/kidwords-candidates`
-- Public app repo: `kidwords-app/kidwords.github.io`
+- Public site repo: `kidwords-app/kidwords.github.io` (app source under `kidwords-web/`)
 
 ## Entities
 
