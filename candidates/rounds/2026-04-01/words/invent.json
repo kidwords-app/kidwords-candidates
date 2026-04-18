@@ -52,9 +52,14 @@
   "partOfSpeech": "verb",
   "roundId": "2026-04-01",
   "selected": {
-    "imageId": "11cbd389c0",
+    "imageId": "bfa6e7fab1",
     "levels": {
       "preK": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
+      },
+      "K": {
         "definition": 0,
         "example": 0,
         "tryIt": 0
@@ -67,7 +72,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-18T05:38:11.484Z",
+  "updatedAt": "2026-04-18T05:38:17.113Z",
   "word": "invent",
   "wordId": "invent"
 }
