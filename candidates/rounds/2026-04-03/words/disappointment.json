@@ -52,7 +52,7 @@
   "partOfSpeech": "noun",
   "roundId": "2026-04-03",
   "selected": {
-    "imageId": "911ea7e550",
+    "imageId": "c2f1ae5dad",
     "levels": {
       "preK": {
         "definition": 0,
@@ -60,6 +60,11 @@
         "tryIt": 0
       },
       "K": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
+      },
+      "G1": {
         "definition": 0,
         "example": 0,
         "tryIt": 0
@@ -72,7 +77,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-25T05:30:48.230Z",
+  "updatedAt": "2026-04-25T05:30:56.026Z",
   "word": "disappointment",
   "wordId": "disappointment"
 }
