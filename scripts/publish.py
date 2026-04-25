@@ -31,16 +31,38 @@ import base64
 import json
 import os
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
 import requests
+from pydantic import BaseModel, ConfigDict, Field
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-LEVEL_IDS = ["preK", "K", "G1"]
 WORDS_DATA_REL = "src/core/words-data.json"
+
+
+class LevelCopy(BaseModel):
+    """Must stay in sync with LevelCopy / levels payload in the public kidwords-web app."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    definition: str
+    example:    str
+    tryIt:      str
+
+
+class WordEntry(BaseModel):
+    """Must stay in sync with WordEntry in the public kidwords-web app (words-data.json)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    word:          str
+    partOfSpeech:  str
+    syllables:     int = Field(ge=0)
+    tags:          list[str]
+    cartoonId:     str
+    levels:        dict[str, LevelCopy]
 
 
 def _paths_in_public_repo(app_subdir: str, word_id: str) -> tuple[str, str]:
@@ -121,11 +143,14 @@ def map_to_word_entry(word: dict) -> dict:
     Each level field (definition, example, tryIt) is resolved independently
     from the candidate at the selected index — allowing mix-and-match across
     model attempts.
+
+    Output keys match ``WordEntry`` in kidwords-web (cartoonId ties to
+    ``public/cartoons/{cartoonId}.png``); pipeline-only metadata must not appear here.
     """
     selected_levels = word["selected"]["levels"]
     levels_data = word["levels"]
 
-    levels = {}
+    levels: dict[str, dict] = {}
     for level, sel in selected_levels.items():
         candidates = levels_data[level]
         levels[level] = {
@@ -134,17 +159,21 @@ def map_to_word_entry(word: dict) -> dict:
             "tryIt":      candidates[sel["tryIt"]]["tryIt"],
         }
 
-    return {
-        "wordId":       word["wordId"],
+    wid = word["wordId"]
+    raw = {
         "word":         word["word"],
         "partOfSpeech": word.get("partOfSpeech", ""),
-        "syllables":    word.get("syllables", 0),
-        "tags":         word.get("tags", []),
-        "imageUrl":     f"/cartoons/{word['wordId']}.png",
+        "syllables":    int(word.get("syllables", 0) or 0),
+        "tags":         list(word.get("tags", [])),
+        "cartoonId":    wid,
         "levels":       levels,
-        "roundId":      word["roundId"],
-        "publishedAt":  datetime.now(timezone.utc).isoformat(),
     }
+    return WordEntry.model_validate(raw).model_dump()
+
+
+def _entry_cartoon_id(entry: dict) -> str:
+    """Stable id for upsert + sort; supports legacy rows that used ``wordId``."""
+    return str(entry.get("cartoonId") or entry.get("wordId") or "")
 
 
 # ── GitHub API client ──────────────────────────────────────────────────────────
@@ -274,9 +303,11 @@ def publish_word(
         data_sha = None
 
     entry = map_to_word_entry(word)
-    words_list = [e for e in words_list if e["wordId"] != word_id]
+    words_list = [e for e in words_list if _entry_cartoon_id(e) != word_id]
     words_list.append(entry)
-    words_list.sort(key=lambda e: e["wordId"])
+    words_list.sort(
+        key=lambda e: (_entry_cartoon_id(e) or e.get("word", "")).lower(),
+    )
 
     public_gh.put_file(
         words_data_path,

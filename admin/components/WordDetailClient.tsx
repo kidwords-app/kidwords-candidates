@@ -6,6 +6,15 @@ import type { WordCandidate, LevelId, FieldSelection, WordStatus } from '@/lib/t
 import LevelTabs from './LevelTabs';
 import RegenPanel from './RegenPanel';
 
+const LEVEL_IDS: LevelId[] = ['preK', 'K', 'G1'];
+const LEVEL_LABELS: Record<LevelId, string> = { preK: 'preK', K: 'K', G1: 'G1' };
+
+function isLevelComplete(levelId: LevelId, selected: WordCandidate['selected']): boolean {
+  const sel = selected.levels?.[levelId];
+  if (!sel) return false;
+  return sel.definition !== undefined && sel.example !== undefined && sel.tryIt !== undefined;
+}
+
 const STATUS_LABELS: Record<WordStatus, string> = {
   pending:     'pending',
   in_review:   'in review',
@@ -18,16 +27,21 @@ interface Toast { id: number; msg: string; type: 'success' | 'error' | 'info' }
 export default function WordDetailClient({ word: initial }: { word: WordCandidate }) {
   const router = useRouter();
 
-  const [word,       setWord]       = useState<WordCandidate>(initial);
-  const [regenOpen,  setRegenOpen]  = useState(false);
-  const [saving,     setSaving]     = useState(false);
-  const [approving,  setApproving]  = useState(false);
-  const [publishing, setPublishing] = useState(false);
-  const [toasts,     setToasts]     = useState<Toast[]>([]);
+  const [word,               setWord]               = useState<WordCandidate>(initial);
+  const [regenOpen,          setRegenOpen]          = useState(false);
+  const [saving,             setSaving]             = useState(false);
+  const [approving,          setApproving]          = useState(false);
+  const [publishing,         setPublishing]         = useState(false);
+  const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+  const [toasts,             setToasts]             = useState<Toast[]>([]);
 
   // Local selection state (mirrors word.selected, optimistically updated)
   const [selectedImageId, setSelectedImageId] = useState<string | undefined>(word.selected.imageId);
   const [selectedLevels,  setSelectedLevels]  = useState(word.selected.levels ?? {});
+
+  // Publish readiness is based on the *saved* state (word.selected), not local picks
+  const levelReadiness = LEVEL_IDS.map((l) => ({ level: l, complete: isLevelComplete(l, word.selected) }));
+  const canPublish = word.status === 'approved' && !!word.selected.imageId && levelReadiness.every((l) => l.complete);
 
   function addToast(msg: string, type: Toast['type'] = 'info') {
     const id = Date.now();
@@ -83,6 +97,7 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
   }
 
   async function handlePublish() {
+    setShowPublishConfirm(false);
     setPublishing(true);
     try {
       const res = await fetch(`/api/admin/candidates/${word.wordId}/publish`, {
@@ -157,7 +172,11 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
               <div className="detail-meta" style={{ marginTop: 10 }}>
                 <span className="meta-chip">🏷 {word.partOfSpeech}</span>
                 <span className="meta-chip">🔤 {word.syllables} syllables</span>
-                <span className="meta-chip">📚 preK · K · G1</span>
+                {levelReadiness.map(({ level, complete }) => (
+                  <span key={level} className={`level-status-chip ${complete ? 'complete' : 'incomplete'}`}>
+                    {complete ? '✓' : '○'} {LEVEL_LABELS[level]}
+                  </span>
+                ))}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
                 {word.tags.map((t) => (
@@ -194,12 +213,16 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
                 <div className="tooltip-wrap">
                   <button
                     className="btn btn-teal"
-                    onClick={handlePublish}
-                    disabled={publishing}
+                    onClick={() => setShowPublishConfirm(true)}
+                    disabled={publishing || !canPublish}
                   >
                     {publishing ? '…' : '🚀 Publish'}
                   </button>
-                  <span className="tooltip-tip">POST /api/admin/candidates/:wordId/publish</span>
+                  <span className="tooltip-tip">
+                    {canPublish
+                      ? 'POST /api/admin/candidates/:wordId/publish'
+                      : `Save all levels first — missing: ${levelReadiness.filter((l) => !l.complete).map((l) => l.level).join(', ')}`}
+                  </span>
                 </div>
               )}
 
@@ -252,6 +275,48 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
           <div key={t.id} className={`toast ${t.type}`}>{t.msg}</div>
         ))}
       </div>
+
+      {/* Publish confirmation modal */}
+      {showPublishConfirm && (
+        <div className="modal-overlay" onClick={() => setShowPublishConfirm(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title">Publish &ldquo;{word.word}&rdquo;?</div>
+              <button className="modal-close" onClick={() => setShowPublishConfirm(false)}>✕</button>
+            </div>
+            <p className="modal-body-text">
+              This triggers the publish workflow. The following content will go live:
+            </p>
+            <div className="modal-publish-summary">
+              <div className="modal-summary-image">
+                <span className="modal-summary-label">Image</span>
+                <span className="modal-summary-value">{word.selected.imageId}</span>
+              </div>
+              {LEVEL_IDS.map((level) => {
+                const sel  = word.selected.levels?.[level];
+                const candidates = word.levels[level] ?? [];
+                const def  = sel !== undefined ? candidates[sel.definition]?.definition : undefined;
+                return (
+                  <div key={level} className="modal-summary-level">
+                    <span className="modal-summary-label">{LEVEL_LABELS[level]}</span>
+                    <span className="modal-summary-value">
+                      {def ? `"${def.length > 80 ? def.slice(0, 80) + '…' : def}"` : '—'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="modal-actions">
+              <button className="btn btn-outline" onClick={() => setShowPublishConfirm(false)}>
+                Cancel
+              </button>
+              <button className="btn btn-teal" onClick={handlePublish} disabled={publishing}>
+                {publishing ? '…' : '🚀 Confirm Publish'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

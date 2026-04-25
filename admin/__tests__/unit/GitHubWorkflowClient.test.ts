@@ -14,7 +14,11 @@ describe('GitHubWorkflowClient', () => {
   });
 
   function mockDispatch(status = 204) {
-    fetchMock.mockResolvedValueOnce({ ok: status < 400, status });
+    fetchMock.mockResolvedValueOnce({
+      ok:     status >= 200 && status < 300,
+      status,
+      text:   () => Promise.resolve('{"message":"mock GitHub error"}'),
+    });
   }
 
   function dispatchUrl(workflow: string) {

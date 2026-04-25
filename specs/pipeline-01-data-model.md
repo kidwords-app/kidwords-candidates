@@ -113,10 +113,11 @@ Recommended tokens:
 - `PUBLIC_REPO_TOKEN` with `contents: write` on public app repo.
 
 ## Mapping to Public App
-When approved, `WordCandidate` maps to `WordEntry` in the public repo
-`src/core/words.ts`, with `levels` fields providing:
-- `definition`, `example`, `tryIt`
-- `speak` can be computed or set by admin in a follow-up step.
+When published, `WordCandidate` maps to `WordEntry` in the public app’s
+`words-data.json` (see `pipeline-06-publish-to-kidwords.md`): `word`, `partOfSpeech`,
+`syllables`, `tags`, `cartoonId` (same slug as candidate `wordId`), and `levels`
+with `definition`, `example`, `tryIt` per level. The public shape is enforced in
+`scripts/publish.py` via Pydantic and must match kidwords-web’s `WordEntry` type.
 
 ## Acceptance Criteria
 - Data model supports multiple candidates per level and per image.

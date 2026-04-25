@@ -35,8 +35,8 @@ export async function POST(
   if (field !== 'image' && field !== 'level') {
     return NextResponse.json({ error: 'field must be "image" or "level"' }, { status: 400 });
   }
-  if (typeof text !== 'string' || !text.trim()) {
-    return NextResponse.json({ error: 'text is required' }, { status: 400 });
+  if (typeof text !== 'string') {
+    return NextResponse.json({ error: 'text must be a string' }, { status: 400 });
   }
   if (field === 'level') {
     if (!levelId || !VALID_LEVELS.has(levelId as LevelId)) {

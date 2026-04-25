@@ -135,12 +135,13 @@ class TestValidateWordCandidate:
 class TestMapToWordEntry:
     def test_returns_correct_structure(self):
         entry = map_to_word_entry(APPROVED_WORD)
-        assert entry["wordId"]       == "empathy"
         assert entry["word"]         == "empathy"
         assert entry["partOfSpeech"] == "noun"
         assert entry["syllables"]    == 3
-        assert entry["imageUrl"]     == "/cartoons/empathy.png"
+        assert entry["cartoonId"]    == "empathy"
+        assert entry["tags"]         == ["emotions"]
         assert set(entry["levels"].keys()) == {"preK", "K", "G1"}
+        assert set(entry.keys()) == {"word", "partOfSpeech", "syllables", "tags", "cartoonId", "levels"}
 
     def test_respects_mix_and_match_selections(self):
         entry = map_to_word_entry(APPROVED_WORD)
@@ -168,10 +169,10 @@ class TestMapToWordEntry:
         assert set(entry["levels"].keys()) == {"preK", "K"}
         assert "G1" not in entry["levels"]
 
-    def test_includes_publishedAt(self):
+    def test_has_no_pipeline_only_fields(self):
         entry = map_to_word_entry(APPROVED_WORD)
-        assert "publishedAt" in entry
-        assert entry["publishedAt"].endswith("+00:00") or entry["publishedAt"].endswith("Z")
+        for bad in ("wordId", "imageUrl", "roundId", "publishedAt"):
+            assert bad not in entry
 
 
 # ── load_word_candidate ─────────────────────────────────────────────────────────
@@ -268,7 +269,7 @@ class TestPublishWord:
 
     def test_preserves_existing_words_in_data_file(self, tmp_path):
         self._setup_candidates(tmp_path)
-        existing_word = {"wordId": "resilience", "word": "resilience", "levels": {}}
+        existing_word = {"cartoonId": "resilience", "word": "resilience", "partOfSpeech": "noun", "syllables": 4, "tags": [], "levels": {}}
         existing_content = json.dumps([existing_word], indent=2).encode()
         encoded = base64.b64encode(existing_content).decode()
 
@@ -286,9 +287,9 @@ class TestPublishWord:
             if c.args[0] == "src/core/words-data.json"
         )
         written = json.loads(data_call.args[1].decode())
-        word_ids = [e["wordId"] for e in written]
-        assert "empathy" in word_ids
-        assert "resilience" in word_ids  # existing word preserved
+        ids = [e["cartoonId"] for e in written]
+        assert "empathy" in ids
+        assert "resilience" in ids  # existing word preserved
 
     def test_writes_under_app_subdirectory(self, tmp_path):
         self._setup_candidates(tmp_path)
@@ -301,9 +302,41 @@ class TestPublishWord:
         assert "kidwords-web/public/cartoons/empathy.png" in put_paths
         assert "kidwords-web/src/core/words-data.json" in put_paths
 
+    def test_replaces_legacy_row_that_used_wordId_instead_of_cartoonId(self, tmp_path):
+        self._setup_candidates(tmp_path)
+        legacy = {
+            "wordId": "empathy",
+            "word": "empathy",
+            "partOfSpeech": "noun",
+            "syllables": 3,
+            "tags": [],
+            "imageUrl": "/cartoons/empathy.png",
+            "levels": {"preK": {"definition": "legacy", "example": "legacy", "tryIt": "legacy"}},
+        }
+        existing_content = json.dumps([legacy], indent=2).encode()
+        encoded = base64.b64encode(existing_content).decode()
+
+        mock_gh = MagicMock(spec=GitHubClient)
+        mock_gh.get_file.side_effect = lambda path: (
+            {"content": encoded, "sha": "abc123"}
+            if path == "src/core/words-data.json"
+            else None
+        )
+
+        publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test", app_subdir="")
+
+        data_call = next(
+            c for c in mock_gh.put_file.call_args_list
+            if c.args[0] == "src/core/words-data.json"
+        )
+        written = json.loads(data_call.args[1].decode())
+        assert len(written) == 1
+        assert written[0]["cartoonId"] == "empathy"
+        assert written[0]["levels"]["preK"]["definition"] != "legacy"
+
     def test_upserts_word_if_already_exists(self, tmp_path):
         self._setup_candidates(tmp_path)
-        old_entry = {**map_to_word_entry(APPROVED_WORD), "publishedAt": "2000-01-01T00:00:00Z"}
+        old_entry = {**map_to_word_entry(APPROVED_WORD), "levels": {"preK": {"definition": "old", "example": "old", "tryIt": "old"}}}
         existing_content = json.dumps([old_entry], indent=2).encode()
         encoded = base64.b64encode(existing_content).decode()
 
@@ -321,6 +354,6 @@ class TestPublishWord:
             if c.args[0] == "src/core/words-data.json"
         )
         written = json.loads(data_call.args[1].decode())
-        empathy_entries = [e for e in written if e["wordId"] == "empathy"]
+        empathy_entries = [e for e in written if e["cartoonId"] == "empathy"]
         assert len(empathy_entries) == 1  # not duplicated
-        assert empathy_entries[0]["publishedAt"] != "2000-01-01T00:00:00Z"  # refreshed
+        assert empathy_entries[0]["levels"]["preK"]["definition"] != "old"  # replaced from candidate
