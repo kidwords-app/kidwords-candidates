@@ -33,8 +33,10 @@ Both workflows call `scripts/publish.py`, which:
 3. **Copies the selected image** from `candidates/rounds/{roundId}/assets/{wordId}/{imageId}.png`
    to `kidwords-web/public/cartoons/{wordId}.png` in repo `kidwords.github.io` (via GitHub Contents API).
    The `kidwords-web` segment is configurable (`PUBLIC_APP_SUBDIR`) for monorepo layouts.
-4. **Upserts** the word into `kidwords-web/src/core/words-data.json` in the same repo
-   (sorted alphabetically by `cartoonId`, with backward compatibility for legacy rows that used `wordId`).
+4. **Upserts** the word into `kidwords-web/src/core/words-data.json` in the same repo.
+   That file is always a JSON object **`{ "words": [ ... ] }`**: the `words` array holds
+   `WordEntry` objects sorted alphabetically by `cartoonId` (with backward compatibility
+   for legacy rows that used `wordId` instead of `cartoonId` inside each entry).
 5. **Pushes directly to `main`** — no PR is opened. The approval step in the admin
    UI is the human review gate; a second PR would be redundant. Vercel deploys
    automatically on push to `main`.
@@ -63,12 +65,12 @@ This pipeline must emit exactly that JSON shape — no extra keys (`wordId`, `im
 
 **Current invariant:** `cartoonId := wordId` during publish. Keep this as a 1:1 mapping unless the app type contract changes to support independent content IDs vs asset IDs.
 
-Inside the `kidwords-web` app package, the bundle reads `src/core/words-data.json` (see `src/core/words.ts`).
+Inside the `kidwords-web` app package, the bundle reads `src/core/words-data.json` (see `src/core/words.ts`). The file must expose the list as **`data.words`**, not a top-level JSON array.
 
 ### Contract / drift prevention
 
 - **Implementations:** `scripts/publish.py` defines Pydantic models `WordEntry` and `LevelCopy` with `extra="forbid"`. Any new field must be added in **kidwords-web** first, then mirrored here and in this spec.
-- **Tests:** `scripts/tests/test_publish.py` asserts the serialized object has only the public keys and includes `cartoonId`.
+- **Tests:** `scripts/tests/test_publish.py` asserts each entry under `words` matches the public `WordEntry` keys (including `cartoonId`).
 - **Optional:** Periodically diff this spec block against kidwords-web’s `WordEntry` type, or add a shared JSON Schema in a common package if the repos are merged later.
 
 ### GitHub secrets required

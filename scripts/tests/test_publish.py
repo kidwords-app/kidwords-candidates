@@ -256,6 +256,11 @@ class TestPublishWord:
         paths = [c.args[0] for c in put_calls]
         assert "public/cartoons/empathy.png" in paths
         assert "src/core/words-data.json" in paths
+        data_call = next(c for c in put_calls if c.args[0] == "src/core/words-data.json")
+        written = json.loads(data_call.args[1].decode())
+        assert list(written.keys()) == ["words"]
+        assert len(written["words"]) == 1
+        assert written["words"][0]["cartoonId"] == "empathy"
 
     def test_passes_correct_branch_to_put_file(self, tmp_path):
         self._setup_candidates(tmp_path)
@@ -270,7 +275,7 @@ class TestPublishWord:
     def test_preserves_existing_words_in_data_file(self, tmp_path):
         self._setup_candidates(tmp_path)
         existing_word = {"cartoonId": "resilience", "word": "resilience", "partOfSpeech": "noun", "syllables": 4, "tags": [], "levels": {}}
-        existing_content = json.dumps([existing_word], indent=2).encode()
+        existing_content = json.dumps({"words": [existing_word]}, indent=2).encode()
         encoded = base64.b64encode(existing_content).decode()
 
         mock_gh = MagicMock(spec=GitHubClient)
@@ -287,7 +292,7 @@ class TestPublishWord:
             if c.args[0] == "src/core/words-data.json"
         )
         written = json.loads(data_call.args[1].decode())
-        ids = [e["cartoonId"] for e in written]
+        ids = [e["cartoonId"] for e in written["words"]]
         assert "empathy" in ids
         assert "resilience" in ids  # existing word preserved
 
@@ -313,7 +318,7 @@ class TestPublishWord:
             "imageUrl": "/cartoons/empathy.png",
             "levels": {"preK": {"definition": "legacy", "example": "legacy", "tryIt": "legacy"}},
         }
-        existing_content = json.dumps([legacy], indent=2).encode()
+        existing_content = json.dumps({"words": [legacy]}, indent=2).encode()
         encoded = base64.b64encode(existing_content).decode()
 
         mock_gh = MagicMock(spec=GitHubClient)
@@ -330,14 +335,14 @@ class TestPublishWord:
             if c.args[0] == "src/core/words-data.json"
         )
         written = json.loads(data_call.args[1].decode())
-        assert len(written) == 1
-        assert written[0]["cartoonId"] == "empathy"
-        assert written[0]["levels"]["preK"]["definition"] != "legacy"
+        assert len(written["words"]) == 1
+        assert written["words"][0]["cartoonId"] == "empathy"
+        assert written["words"][0]["levels"]["preK"]["definition"] != "legacy"
 
     def test_upserts_word_if_already_exists(self, tmp_path):
         self._setup_candidates(tmp_path)
         old_entry = {**map_to_word_entry(APPROVED_WORD), "levels": {"preK": {"definition": "old", "example": "old", "tryIt": "old"}}}
-        existing_content = json.dumps([old_entry], indent=2).encode()
+        existing_content = json.dumps({"words": [old_entry]}, indent=2).encode()
         encoded = base64.b64encode(existing_content).decode()
 
         mock_gh = MagicMock(spec=GitHubClient)
@@ -354,6 +359,71 @@ class TestPublishWord:
             if c.args[0] == "src/core/words-data.json"
         )
         written = json.loads(data_call.args[1].decode())
-        empathy_entries = [e for e in written if e["cartoonId"] == "empathy"]
+        empathy_entries = [e for e in written["words"] if e["cartoonId"] == "empathy"]
         assert len(empathy_entries) == 1  # not duplicated
         assert empathy_entries[0]["levels"]["preK"]["definition"] != "old"  # replaced from candidate
+
+    def test_preserves_object_wrapped_words_shape(self, tmp_path):
+        """Other top-level keys beside ``words`` are preserved."""
+        self._setup_candidates(tmp_path)
+        existing_word = {
+            "cartoonId": "resilience",
+            "word": "resilience",
+            "partOfSpeech": "noun",
+            "syllables": 4,
+            "tags": [],
+            "levels": {},
+        }
+        wrapper = {"schemaVersion": 1, "words": [existing_word]}
+        existing_content = json.dumps(wrapper, indent=2).encode()
+        encoded = base64.b64encode(existing_content).decode()
+
+        mock_gh = MagicMock(spec=GitHubClient)
+        mock_gh.get_file.side_effect = lambda path: (
+            {"content": encoded, "sha": "abc123"}
+            if path == "src/core/words-data.json"
+            else None
+        )
+
+        publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test", app_subdir="")
+
+        data_call = next(
+            c for c in mock_gh.put_file.call_args_list
+            if c.args[0] == "src/core/words-data.json"
+        )
+        written = json.loads(data_call.args[1].decode())
+        assert written["schemaVersion"] == 1
+        ids = [e["cartoonId"] for e in written["words"]]
+        assert "empathy" in ids
+        assert "resilience" in ids
+
+    def test_raises_when_words_data_object_has_no_words_array(self, tmp_path):
+        self._setup_candidates(tmp_path)
+        bad = {"entries": [{"cartoonId": "x", "word": "x", "partOfSpeech": "n", "syllables": 1, "tags": [], "levels": {}}]}
+        existing_content = json.dumps(bad, indent=2).encode()
+        encoded = base64.b64encode(existing_content).decode()
+
+        mock_gh = MagicMock(spec=GitHubClient)
+        mock_gh.get_file.side_effect = lambda path: (
+            {"content": encoded, "sha": "abc123"}
+            if path == "src/core/words-data.json"
+            else None
+        )
+
+        with pytest.raises(PublishError, match='top-level "words" array'):
+            publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test", app_subdir="")
+
+    def test_raises_when_words_data_is_bare_array(self, tmp_path):
+        self._setup_candidates(tmp_path)
+        existing_content = json.dumps([{"cartoonId": "x", "word": "x", "partOfSpeech": "n", "syllables": 1, "tags": [], "levels": {}}], indent=2).encode()
+        encoded = base64.b64encode(existing_content).decode()
+
+        mock_gh = MagicMock(spec=GitHubClient)
+        mock_gh.get_file.side_effect = lambda path: (
+            {"content": encoded, "sha": "abc123"}
+            if path == "src/core/words-data.json"
+            else None
+        )
+
+        with pytest.raises(PublishError, match="not a bare array"):
+            publish_word(APPROVED_WORD, tmp_path, mock_gh, "publish/test", app_subdir="")

@@ -21,7 +21,8 @@ Environment variables:
 What it does:
   1. Validates each approved WordCandidate (selections complete, indexes in range).
   2. Maps each to a WordEntry and upserts it into src/core/words-data.json under the
-     app subdir in the public repo.
+     app subdir in the public repo. That file is always {"words": [<WordEntry>, ...]}
+     (same shape when the file is created).
   3. Copies the selected image to public/cartoons/{wordId}.png under the app subdir.
   4. Commits both changes to a new branch and opens a PR for review.
 """
@@ -176,6 +177,29 @@ def _entry_cartoon_id(entry: dict) -> str:
     return str(entry.get("cartoonId") or entry.get("wordId") or "")
 
 
+def _require_words_data_root(parsed: object) -> dict:
+    """Return the words-data.json root object; must have a ``words`` list of word dicts."""
+    if isinstance(parsed, list):
+        raise PublishError(
+            'words-data.json must be a JSON object {"words": [...]}, not a bare array.'
+        )
+    if not isinstance(parsed, dict):
+        raise PublishError(
+            f"words-data.json root must be a JSON object, not {type(parsed).__name__}"
+        )
+    words = parsed.get("words")
+    if not isinstance(words, list):
+        raise PublishError(
+            'words-data.json must include a top-level "words" array (list of word objects).'
+        )
+    for i, item in enumerate(words):
+        if not isinstance(item, dict):
+            raise PublishError(
+                f"words-data.json words[{i}] must be an object, not {type(item).__name__}"
+            )
+    return parsed
+
+
 # ── GitHub API client ──────────────────────────────────────────────────────────
 
 class GitHubClient:
@@ -290,28 +314,30 @@ def publish_word(
     )
     print(f"  ✓ image  → {image_dest}")
 
-    # 2. Upsert words-data.json
+    # 2. Upsert words-data.json (schema: {"words": [<WordEntry>, ...]})
     existing_data_file = public_gh.get_file(words_data_path)
     if existing_data_file:
         content = base64.b64decode(
             existing_data_file["content"].replace("\n", "")
         ).decode()
-        words_list: list = json.loads(content)
+        words_root = _require_words_data_root(json.loads(content))
         data_sha: Optional[str] = existing_data_file["sha"]
     else:
-        words_list = []
+        words_root = {"words": []}
         data_sha = None
 
+    words_list = words_root["words"]
     entry = map_to_word_entry(word)
     words_list = [e for e in words_list if _entry_cartoon_id(e) != word_id]
     words_list.append(entry)
     words_list.sort(
         key=lambda e: (_entry_cartoon_id(e) or e.get("word", "")).lower(),
     )
+    words_root["words"] = words_list
 
     public_gh.put_file(
         words_data_path,
-        json.dumps(words_list, indent=2, ensure_ascii=False).encode(),
+        json.dumps(words_root, indent=2, ensure_ascii=False).encode(),
         message=f"publish: add word '{word_id}'",
         sha=data_sha,
         branch=branch,
