@@ -30,8 +30,12 @@ Both workflows call `scripts/publish.py`, which:
    field selections must be complete (all three levels: preK / K / G1).
 2. **Maps** the candidate to a `WordEntry` (see [WordEntry shape](#wordentry-shape)),
    respecting the mix-and-match field selections.
-3. **Copies the selected image** from `candidates/rounds/{roundId}/assets/{wordId}/{imageId}.png`
-   to `kidwords-web/public/cartoons/{wordId}.png` in repo `kidwords.github.io` (via GitHub Contents API).
+3. **Copies cartoon PNGs** from `candidates/rounds/{roundId}/assets/{wordId}/…` to
+   `kidwords-web/public/cartoons/{preK|K|G1}/{wordId}.png` in repo `kidwords.github.io` (via GitHub Contents API),
+   once per grade in the candidate’s selection. `scripts/generate-images.py` produces **one shared illustration** per run
+   (a single scene concept + soft pastel style) and **level-specific** definition / example / tryIt text. Assets are typically
+   `shared-*.png`; legacy `preschooler-` / `kindergartener-` / `first grader-` filenames are still supported. Publish picks the file
+   for each grade using `admin/lib/imageLevel.ts` and `scripts/publish.py` heuristics, plus optional `selected.imageIdsByLevel`.
    The `kidwords-web` segment is configurable (`PUBLIC_APP_SUBDIR`) for monorepo layouts.
 4. **Upserts** the word into `kidwords-web/src/core/words-data.json` in the same repo.
    That file is always a JSON object **`{ "words": [ ... ] }`**: the `words` array holds
@@ -61,7 +65,7 @@ This pipeline must emit exactly that JSON shape — no extra keys (`wordId`, `im
 }
 ```
 
-`cartoonId` matches the filename published as `public/cartoons/{cartoonId}.png` (same slug as `wordId` in the candidates repo). The web app resolves it to `/cartoons/{cartoonId}.png`; native builds use `imageMap[cartoonId]`.
+`cartoonId` matches the basename of each published PNG: `public/cartoons/preK/{cartoonId}.png`, `public/cartoons/K/{cartoonId}.png`, and `public/cartoons/G1/{cartoonId}.png` for levels in the selection (same slug as `wordId` in the candidates repo). The web app should resolve per grade, e.g. `/cartoons/preK/{cartoonId}.png`; native builds can mirror that layout in `imageMap`.
 
 **Current invariant:** `cartoonId := wordId` during publish. Keep this as a 1:1 mapping unless the app type contract changes to support independent content IDs vs asset IDs.
 
@@ -111,12 +115,13 @@ Coverage:
 
 ## Deploy
 
+- Publish **commits directly to `main`** in the public app repo (GitHub Contents API). **No pull request** is opened for these changes; admin approval is the review gate.
 - Vercel deploys automatically on push to `main` in the public repo.
-- Rollback by reverting the commit (or re-publishing a corrected candidate).
+- Rollback by reverting the commit on `main` (or re-publishing a corrected candidate).
 
 ## Acceptance Criteria
-- `POST /publish` triggers the correct workflow with `wordId` and `roundId`.
-- Workflow validates the word before writing anything to the public repo.
-- The PR contains the updated `words-data.json` and the image asset.
+- `POST /api/admin/candidates/:wordId/publish` (and round publish, when used) triggers the correct workflow with `wordId` and `roundId`.
+- The workflow validates the word before writing anything to the public repo.
+- The resulting **commit on `main`** updates `words-data.json` (under `kidwords-web` as configured) and the published cartoon PNGs — not a PR branch.
 - Validation errors surface in the GitHub Actions log with a clear message.
-- New words appear in the public app after merge and deploy.
+- New words appear in the public app after the workflow finishes and Vercel deploys.

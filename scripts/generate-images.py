@@ -15,6 +15,7 @@ from typing import Iterable, List
 from google import genai
 
 ALLOWED_LEVELS = frozenset(["preschooler", "kindergartener", "first grader"])
+LEVEL_GENERATION_ORDER: tuple[str, ...] = ("preschooler", "kindergartener", "first grader")
 LEVEL_ID_MAP = {
     "preschooler": "preK",
     "kindergartener": "K",
@@ -22,23 +23,67 @@ LEVEL_ID_MAP = {
 }
 
 # ---- Cartoon pipeline (Gemini text + image generation) ----
+# One shared illustration concept for the word; level-specific copy; one image.
 
 TEXT_PROMPT_RESPONSE_TEMPLATE = {"definition": "", "example": "", "tryIt": ""}
-TEXT_PROMPT_TEMPLATE = (
-    "For the word '{word}', generate the following content appropriate for a {level}. "
-    "Return a JSON object with exactly these three fields: "
-    "'definition' (a simple, level-friendly definition of the word), "
-    "'example' (one sentence showing the word used in context), "
-    "'tryIt' (a short prompt encouraging the child to use or think about the word). "
-    "Return them in JSON format like so: {text_prompt_response_template}. "
-    "Do not format the response in a code block or include any other text or formatting."
-)
-CARTOON_PROMPT_TEMPLATE = (
-    "Create a single-frame cartoon illustration in flat vector style with clean outlines, "
-    "bright saturated colors, simple friendly shapes, and a white background. "
-    "The scene depicts: {phrase}. "
-    "Do not include any text, letters, or words in the image."
-)
+
+STAGE1_CONCEPT_PROMPT_TEMPLATE = """You are designing ONE illustration for a children's vocabulary app. The same picture will be shown for preschool, kindergarten, and first grade; only the written explanations will change by age.
+
+Word: "{word}"
+Part of speech: "{part_of_speech}"
+Optional tags (themes): {tags}
+
+Requirements:
+- Choose a single concrete scene that makes the meaning obvious without reading text.
+- Use objects and actions a preschooler can name (e.g. cookie, stepstool, playground, book — not abstract ideas alone).
+- The scene must work as-is for all ages; do not rely on reading, school routines, or culture-specific games unless universally obvious.
+- Prefer one focal child or animal and one clear action; avoid busy crowds or tiny details.
+- Tone: warm, safe, positive (never scary or shaming).
+
+Return ONLY valid JSON with these keys:
+- "visual_concept": one short phrase (e.g. "one cookie into a jar — just enough")
+- "scene_for_artist": 2–4 sentences describing exactly what to draw (characters, pose, setting, key props). No camera or art-direction jargon.
+- "concrete_anchor": the main prop or action in simple words (for consistency checks)
+- "avoid": array of strings — metaphors or second scenes to NOT add (e.g. a separate "treasure hunt" if we already chose a cookie jar scene)
+
+Do not use a code fence or any text outside the JSON."""
+
+STAGE2_LEVEL_TEXT_PROMPT_TEMPLATE = """Word: "{word}"
+Audience: {level} (use vocabulary and sentence length right for this age only).
+
+Shared illustration (the app will show a picture of THIS scene — your example must fit it):
+{scene_for_artist}
+
+Concrete focus (must stay consistent): {concrete_anchor}
+
+Tasks:
+1. "definition" — short, level-appropriate; you may refer to the concrete_anchor in plain words.
+2. "example" — ONE sentence that could be happening in the scene above (same place, props, and idea). Do not introduce a new location or metaphor.
+3. "tryIt" — a simple activity or question for the child; no new visual scenario that contradicts the scene.
+
+Return ONLY valid JSON:
+{text_template}
+No code fence or other text."""
+
+STAGE3_IMAGE_PROMPT_TEMPLATE = """Create a single children's vocabulary illustration — one clear scene, no comic panels.
+
+Scene to depict (follow closely; do not add a second story or setting):
+{scene_for_artist}
+
+Art style (match a gentle educational app, not bold marketing vector):
+- 2D cartoon, soft rounded shapes, friendly proportions.
+- Color: soft pastel palette — warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.
+- Line: soft brown or dusty blue outlines; not heavy black outlines.
+- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.
+- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.
+- Lighting: soft and even, no dramatic shadows.
+
+Hard rules:
+- No text, letters, numbers, logos, or labels anywhere in the image.
+- No scary, violent, or shaming imagery.
+
+Output: one square-friendly illustration suitable for a flashcard."""
+
 TEXT_MODEL = "gemini-2.5-flash"
 IMAGE_MODEL = "gemini-2.5-flash-image"
 
@@ -63,14 +108,10 @@ class ConfigurationError(RuntimeError):
     pass
 
 
-def _build_text_prompt(word: str, level: str) -> str:
-    return TEXT_PROMPT_TEMPLATE.format(
-        word=word, level=level, text_prompt_response_template=json.dumps(TEXT_PROMPT_RESPONSE_TEMPLATE)
-    )
-
-
-def _build_cartoon_prompt(phrase: str) -> str:
-    return CARTOON_PROMPT_TEMPLATE.format(phrase=phrase)
+def _ordered_generation_levels(levels: List[str]) -> List[str]:
+    """Stable order for API calls (subset of batch levels)."""
+    want = set(levels)
+    return [lev for lev in LEVEL_GENERATION_ORDER if lev in want]
 
 
 def _is_budget_error(error: BaseException) -> bool:
@@ -107,8 +148,76 @@ def _parse_text_response(response_text: str) -> dict:
     }
 
 
-def _generate_level_content(client: genai.Client, word: str, level: str, model: str = TEXT_MODEL) -> dict:
-    prompt = _build_text_prompt(word, level)
+def _parse_concept_response(response_text: str) -> dict:
+    try:
+        payload = json.loads(response_text)
+    except json.JSONDecodeError as exc:
+        raise InvalidResponseError("Concept response is not valid JSON.") from exc
+    if not isinstance(payload, dict):
+        raise InvalidResponseError("Concept response JSON must be an object.")
+    for key in ("visual_concept", "scene_for_artist", "concrete_anchor", "avoid"):
+        if key not in payload:
+            raise InvalidResponseError(f"Concept JSON missing key '{key}'.")
+        if key != "avoid" and (not isinstance(payload[key], str) or not str(payload[key]).strip()):
+            raise InvalidResponseError(f"Concept JSON field '{key}' must be a non-empty string.")
+    avoid = payload["avoid"]
+    if not isinstance(avoid, list) or not all(isinstance(x, str) for x in avoid):
+        raise InvalidResponseError("Concept JSON 'avoid' must be an array of strings.")
+    return {
+        "visual_concept": str(payload["visual_concept"]).strip(),
+        "scene_for_artist": str(payload["scene_for_artist"]).strip(),
+        "concrete_anchor": str(payload["concrete_anchor"]).strip(),
+        "avoid": [str(x).strip() for x in avoid],
+    }
+
+
+def _build_level_text_prompt(word: str, level: str, scene_for_artist: str, concrete_anchor: str) -> str:
+    return STAGE2_LEVEL_TEXT_PROMPT_TEMPLATE.format(
+        word=word,
+        level=level,
+        scene_for_artist=scene_for_artist,
+        concrete_anchor=concrete_anchor,
+        text_template=json.dumps(TEXT_PROMPT_RESPONSE_TEMPLATE),
+    )
+
+
+def _build_image_prompt(scene_for_artist: str) -> str:
+    return STAGE3_IMAGE_PROMPT_TEMPLATE.format(scene_for_artist=scene_for_artist)
+
+
+def _generate_shared_concept(client: genai.Client, word: str, entry: dict, model: str = TEXT_MODEL) -> dict:
+    part = entry.get("partOfSpeech") or "noun"
+    tags = entry.get("tags") or []
+    if not isinstance(tags, list):
+        tags = []
+    tags_json = json.dumps(tags)
+    prompt = STAGE1_CONCEPT_PROMPT_TEMPLATE.format(
+        word=word, part_of_speech=part, tags=tags_json
+    )
+    print(f"[cartoon] API concept request model={model} word={word!r}", flush=True)
+    try:
+        response = client.models.generate_content(model=model, contents=prompt)
+    except Exception as exc:
+        if _is_budget_error(exc):
+            raise BudgetLimitError("Budget or quota limit reached.") from exc
+        raise TextGenerationError("Failed to generate shared illustration concept.") from exc
+    if response is None:
+        raise TextGenerationError("API returned no response.")
+    response_text = _extract_text_from_response(response)
+    concept = _parse_concept_response(response_text)
+    print(f"[cartoon] visual_concept: {concept['visual_concept']!r}", flush=True)
+    return concept
+
+
+def _generate_level_content(
+    client: genai.Client,
+    word: str,
+    level: str,
+    scene_for_artist: str,
+    concrete_anchor: str,
+    model: str = TEXT_MODEL,
+) -> dict:
+    prompt = _build_level_text_prompt(word, level, scene_for_artist, concrete_anchor)
     print(f"[cartoon] API text request model={model} word={word!r} level={level!r}", flush=True)
     try:
         response = client.models.generate_content(model=model, contents=prompt)
@@ -131,12 +240,12 @@ def _extract_image_from_response(response):
 
 
 def _generate_cartoon_image(
-    client: genai.Client, phrase: str, output_path: Path, model: str = IMAGE_MODEL
+    client: genai.Client, image_prompt: str, output_path: Path, model: str = IMAGE_MODEL
 ) -> Path:
-    prompt = _build_cartoon_prompt(phrase)
-    print(f"[cartoon] API image request model={model} phrase={phrase[:50]!r}...", flush=True)
+    preview = image_prompt[:80].replace("\n", " ")
+    print(f"[cartoon] API image request model={model} prompt={preview!r}...", flush=True)
     try:
-        response = client.models.generate_content(model=model, contents=prompt)
+        response = client.models.generate_content(model=model, contents=image_prompt)
     except Exception as exc:
         if _is_budget_error(exc):
             raise BudgetLimitError("Budget or quota limit reached.") from exc
@@ -149,23 +258,56 @@ def _generate_cartoon_image(
     return output_path
 
 
-def run_cartoon_pipeline(word: str, level: str, output_path: Path) -> tuple[Path, str, dict]:
-    """Run text + image generation. Returns (output_path, image_prompt, level_content)."""
-    print(f"[cartoon] start word={word!r} level={level!r} output={output_path}", flush=True)
+def run_word_visual_pipeline(
+    entry: dict,
+    levels: List[str],
+    output_path: Path,
+) -> tuple[Path, str, dict[str, dict]]:
+    """One shared scene concept, level-specific JSON text, one illustration.
+
+    Returns ``(output_path, image_prompt, level_gemini_id -> level_content)`` for each
+    requested audience level in ``levels``.
+    """
+    word = (entry.get("word") or "").strip()
+    if not word:
+        raise ValueError("entry must include a non-empty 'word'.")
+    ordered = _ordered_generation_levels(levels)
+    if not ordered:
+        raise ValueError("levels must include at least one allowed audience level.")
+
+    print(f"[cartoon] start word={word!r} levels={ordered} output={output_path}", flush=True)
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ConfigurationError("GEMINI_API_KEY is missing from the environment.")
     client = genai.Client(api_key=api_key)
-    print(f"[cartoon] client ready, generating level content...", flush=True)
-    level_content = _generate_level_content(client, word, level)
-    phrase = level_content["example"]
-    print(f"[cartoon] definition: {level_content['definition']!r}", flush=True)
-    print(f"[cartoon] example (image phrase): {phrase!r}", flush=True)
-    print(f"[cartoon] tryIt: {level_content['tryIt']!r}", flush=True)
-    image_prompt = _build_cartoon_prompt(phrase)
-    out = _generate_cartoon_image(client, phrase, output_path)
+
+    concept = _generate_shared_concept(client, word, entry)
+    scene = concept["scene_for_artist"]
+    anchor = concept["concrete_anchor"]
+
+    level_contents: dict[str, dict] = {}
+    for level in ordered:
+        content = _generate_level_content(client, word, level, scene, anchor)
+        print(f"[cartoon] {level} definition: {content['definition']!r}", flush=True)
+        level_contents[LEVEL_ID_MAP[level]] = content
+
+    image_prompt = _build_image_prompt(scene)
+    out = _generate_cartoon_image(client, image_prompt, output_path)
     print(f"[cartoon] done -> {out}", flush=True)
-    return out, image_prompt, level_content
+    return out, image_prompt, level_contents
+
+
+def run_cartoon_pipeline(word: str, level: str, output_path: Path) -> tuple[Path, str, dict]:
+    """Backward-compatible single-level wrapper (runs full three-level pipeline if needed)."""
+    entry = {
+        "word": word,
+        "partOfSpeech": "noun",
+        "tags": [],
+        "levels": [level],
+    }
+    out, image_prompt, by_id = run_word_visual_pipeline(entry, [level], output_path)
+    content = by_id[LEVEL_ID_MAP[level]]
+    return out, image_prompt, content
 
 
 # ---- Batch / candidate logic ----
@@ -239,18 +381,27 @@ def generate_images_for_entry(
     existing_paths = {img.get("assetPath") for img in images if isinstance(img, dict)}
     created = 0
 
-    for level in levels:
-        image_id = uuid.uuid4().hex[:10]
-        output_dir = assets_dir / word_id
-        output_dir.mkdir(parents=True, exist_ok=True)
-        output_path = output_dir / f"{level}-{image_id}.png"
-        rel_path = str(output_path.as_posix())
-        if rel_path in existing_paths:
-            print(f"[word] {word!r} {level!r} skip (already exists)", flush=True)
-            continue
-        print(f"[word] {word!r} {level!r} generating -> {output_path}", flush=True)
-        _out_path, image_prompt, level_content = run_cartoon_pipeline(word, level, output_path)
-        print(f"[word] {word!r} {level!r} saved", flush=True)
+    image_id = uuid.uuid4().hex[:10]
+    output_dir = assets_dir / word_id
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / f"shared-{image_id}.png"
+    rel_path = str(output_path.as_posix())
+    if rel_path in existing_paths:
+        print(f"[word] {word!r} skip shared asset (already in candidate)", flush=True)
+    else:
+        ordered = _ordered_generation_levels(levels)
+        pipeline_entry = {
+            "word": word,
+            "partOfSpeech": entry.get("partOfSpeech") or candidate.get("partOfSpeech") or "noun",
+            "tags": entry.get("tags")
+            if entry.get("tags") is not None
+            else candidate.get("tags") or [],
+            "levels": levels,
+        }
+        print(f"[word] {word!r} generating shared illustration -> {output_path}", flush=True)
+        _out_path, image_prompt, level_contents = run_word_visual_pipeline(
+            pipeline_entry, ordered, output_path
+        )
         images.append(
             {
                 "imageId": image_id,
@@ -260,16 +411,17 @@ def generate_images_for_entry(
                 "createdAt": now,
             }
         )
-        level_id = LEVEL_ID_MAP[level]
-        candidate["levels"].setdefault(level_id, []).append(
-            {
-                "definition": level_content["definition"],
-                "example": level_content["example"],
-                "tryIt": level_content["tryIt"],
-                "model": "gemini",
-            }
-        )
-        created += 1
+        for level_id, level_content in level_contents.items():
+            candidate["levels"].setdefault(level_id, []).append(
+                {
+                    "definition": level_content["definition"],
+                    "example": level_content["example"],
+                    "tryIt": level_content["tryIt"],
+                    "model": "gemini",
+                }
+            )
+        created = 1
+        print(f"[word] {word!r} saved ({len(level_contents)} level(s) of text + 1 image)", flush=True)
 
     candidate["images"] = images
     candidate["updatedAt"] = now
@@ -326,7 +478,20 @@ def parse_args(argv: Iterable[str]):
         help="Repo root for batch mode. Defaults to CANDIDATES_REPO_PATH.",
     )
     parser.add_argument("--word", help="Single-word mode: word to illustrate.")
-    parser.add_argument("--level", help="Single-word mode: audience level.")
+    parser.add_argument(
+        "--levels",
+        help="Single-word mode: comma-separated audience levels (preschooler,kindergartener,first grader). Default: all three.",
+    )
+    parser.add_argument(
+        "--level",
+        help="Single-word mode: one audience level (backward compat; only that level gets generated text).",
+    )
+    parser.add_argument(
+        "--part-of-speech",
+        default="noun",
+        dest="part_of_speech",
+        help="Single-word mode: part of speech for the shared concept prompt.",
+    )
     parser.add_argument("--output", default="generated_image.png", help="Single-word mode: output path.")
     args = parser.parse_args(list(argv))
     return args
@@ -335,15 +500,37 @@ def parse_args(argv: Iterable[str]):
 def main(argv: Iterable[str]) -> int:
     args = parse_args(argv)
 
-    # Single-word mode: generate one cartoon and exit
-    if args.word and args.level:
+    # Single-word mode: shared concept + level text + one image
+    if args.word:
+        if args.level:
+            levels_list = [args.level]
+        elif args.levels:
+            levels_list = [s.strip() for s in args.levels.split(",") if s.strip()]
+        else:
+            levels_list = list(LEVEL_GENERATION_ORDER)
         try:
-            out, image_prompt, level_content = run_cartoon_pipeline(args.word, args.level, Path(args.output))
+            validate_levels(levels_list, args.word)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        entry = {
+            "word": args.word,
+            "partOfSpeech": args.part_of_speech,
+            "tags": [],
+            "levels": levels_list,
+        }
+        try:
+            out, image_prompt, by_level = run_word_visual_pipeline(
+                entry, levels_list, Path(args.output)
+            )
             print(f"Saved cartoon image to {out}")
-            print(f"Image prompt: {image_prompt}")
-            print(f"Definition: {level_content['definition']}")
-            print(f"Example: {level_content['example']}")
-            print(f"Try it: {level_content['tryIt']}")
+            print(f"Image prompt:\n{image_prompt}")
+            for level_id in sorted(by_level.keys()):
+                lc = by_level[level_id]
+                print(f"\n--- {level_id} ---")
+                print(f"Definition: {lc['definition']}")
+                print(f"Example: {lc['example']}")
+                print(f"Try it: {lc['tryIt']}")
             return 0
         except BudgetLimitError as exc:
             print(f"Error: {exc}", file=sys.stderr)

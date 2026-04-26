@@ -1,13 +1,12 @@
 import type { ImageCandidate, LevelId } from './types';
 
 /**
- * The generate-images script names files with a level-persona prefix, e.g.
- *   preschooler-64fd2fd536.png   → preK
- *   kindergartener-1d89ba95a4.png → K
- *   first grader-cd100579b7.png  → G1
+ * The generate-images script may name files:
+ * - Legacy (one PNG per level): preschooler-*.png → preK, kindergartener-*.png → K, first grader-*.png → G1
+ * - Current (one shared illustration): shared-*.png — no level in the filename; use explicit `level` if set.
  *
  * When an ImageCandidate has an explicit `level` field we use that; otherwise
- * we derive it by matching the filename prefix.
+ * we derive it by matching the legacy filename prefix.
  */
 const PERSONA_TO_LEVEL: Record<string, LevelId> = {
   preschooler:   'preK',

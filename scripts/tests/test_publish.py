@@ -21,6 +21,7 @@ from publish import (
     map_to_word_entry,
     publish_word,
     validate_word_candidate,
+    _pick_image_record_for_level,
 )
 
 # ── Fixtures ────────────────────────────────────────────────────────────────────
@@ -103,6 +104,23 @@ class TestValidateWordCandidate:
         selected = {**APPROVED_WORD["selected"], "levels": {}}
         word = {**APPROVED_WORD, "selected": selected}
         with pytest.raises(ValidationError, match="at least one level"):
+            validate_word_candidate(word)
+
+    def test_rejects_when_leveled_assets_missing_for_a_selected_grade(self):
+        word = {
+            **APPROVED_WORD,
+            "images": [
+                {
+                    "imageId": "only_preK",
+                    "prompt": "p",
+                    "model": "gemini",
+                    "assetPath": "candidates/rounds/2026-03-03/assets/empathy/preschooler-only_preK.png",
+                    "createdAt": "2026-03-03T09:00:00Z",
+                },
+            ],
+            "selected": {**APPROVED_WORD["selected"], "imageId": "only_preK"},
+        }
+        with pytest.raises(ValidationError, match="no image for level"):
             validate_word_candidate(word)
 
     def test_rejects_out_of_range_field_index(self):
@@ -254,7 +272,11 @@ class TestPublishWord:
 
         put_calls = mock_gh.put_file.call_args_list
         paths = [c.args[0] for c in put_calls]
-        assert "public/cartoons/empathy.png" in paths
+        assert {
+            "public/cartoons/preK/empathy.png",
+            "public/cartoons/K/empathy.png",
+            "public/cartoons/G1/empathy.png",
+        }.issubset(set(paths))
         assert "src/core/words-data.json" in paths
         data_call = next(c for c in put_calls if c.args[0] == "src/core/words-data.json")
         written = json.loads(data_call.args[1].decode())
@@ -304,8 +326,130 @@ class TestPublishWord:
         publish_word(APPROVED_WORD, tmp_path, mock_gh, "main", app_subdir="kidwords-web")
 
         put_paths = [c.args[0] for c in mock_gh.put_file.call_args_list]
-        assert "kidwords-web/public/cartoons/empathy.png" in put_paths
+        assert {
+            "kidwords-web/public/cartoons/preK/empathy.png",
+            "kidwords-web/public/cartoons/K/empathy.png",
+            "kidwords-web/public/cartoons/G1/empathy.png",
+        }.issubset(set(put_paths))
         assert "kidwords-web/src/core/words-data.json" in put_paths
+
+    def test_writes_cartoon_only_for_levels_in_selection(self, tmp_path):
+        word = json.loads(json.dumps(APPROVED_WORD))
+        word["selected"] = {
+            **APPROVED_WORD["selected"],
+            "levels": {"preK": APPROVED_WORD["selected"]["levels"]["preK"]},
+        }
+        word["levels"] = {"preK": APPROVED_WORD["levels"]["preK"]}
+        word_dir = tmp_path / "candidates" / "rounds" / "2026-03-03" / "words"
+        word_dir.mkdir(parents=True)
+        (word_dir / "empathy.json").write_text(json.dumps(word))
+        asset_dir = tmp_path / "candidates" / "rounds" / "2026-03-03" / "assets" / "empathy"
+        asset_dir.mkdir(parents=True)
+        (asset_dir / "img_abc.png").write_bytes(b"\x89PNG\r\nfake-image-data")
+
+        mock_gh = MagicMock(spec=GitHubClient)
+        mock_gh.get_file.return_value = None
+        publish_word(word, tmp_path, mock_gh, "main", app_subdir="")
+
+        paths = [c.args[0] for c in mock_gh.put_file.call_args_list]
+        cartoon_paths = [p for p in paths if "/cartoons/" in p]
+        assert cartoon_paths == ["public/cartoons/preK/empathy.png"]
+
+    def test_publishes_distinct_bytes_per_level_from_generate_images_filenames(self, tmp_path):
+        word_dir = tmp_path / "candidates" / "rounds" / "2026-03-03" / "words"
+        word_dir.mkdir(parents=True)
+        asset_dir = tmp_path / "candidates" / "rounds" / "2026-03-03" / "assets" / "empathy"
+        asset_dir.mkdir(parents=True)
+        (asset_dir / "preschooler-a1.png").write_bytes(b"PRE")
+        (asset_dir / "kindergartener-a2.png").write_bytes(b"KLV")
+        (asset_dir / "first grader-a3.png").write_bytes(b"G1!")
+        word = {
+            **APPROVED_WORD,
+            "images": [
+                {
+                    "imageId": "a1",
+                    "prompt": "p",
+                    "model": "gemini",
+                    "assetPath": "candidates/rounds/2026-03-03/assets/empathy/preschooler-a1.png",
+                    "createdAt": "2026-03-03T09:00:00Z",
+                },
+                {
+                    "imageId": "a2",
+                    "prompt": "p",
+                    "model": "gemini",
+                    "assetPath": "candidates/rounds/2026-03-03/assets/empathy/kindergartener-a2.png",
+                    "createdAt": "2026-03-03T09:01:00Z",
+                },
+                {
+                    "imageId": "a3",
+                    "prompt": "p",
+                    "model": "gemini",
+                    "assetPath": "candidates/rounds/2026-03-03/assets/empathy/first grader-a3.png",
+                    "createdAt": "2026-03-03T09:02:00Z",
+                },
+            ],
+            "selected": {**APPROVED_WORD["selected"], "imageId": "a2"},
+        }
+        (word_dir / "empathy.json").write_text(json.dumps(word))
+
+        mock_gh = MagicMock(spec=GitHubClient)
+        mock_gh.get_file.return_value = None
+        publish_word(word, tmp_path, mock_gh, "main", app_subdir="")
+
+        by_path = {c.args[0]: c.args[1] for c in mock_gh.put_file.call_args_list}
+        assert by_path["public/cartoons/preK/empathy.png"] == b"PRE"
+        assert by_path["public/cartoons/K/empathy.png"] == b"KLV"
+        assert by_path["public/cartoons/G1/empathy.png"] == b"G1!"
+
+    def test_image_ids_by_level_overrides_pick(self, tmp_path):
+        word_dir = tmp_path / "candidates" / "rounds" / "2026-03-03" / "words"
+        word_dir.mkdir(parents=True)
+        asset_dir = tmp_path / "candidates" / "rounds" / "2026-03-03" / "assets" / "empathy"
+        asset_dir.mkdir(parents=True)
+        (asset_dir / "preschooler-a1.png").write_bytes(b"PRE")
+        (asset_dir / "kindergartener-a2.png").write_bytes(b"KLV")
+        (asset_dir / "first grader-a3.png").write_bytes(b"G1!")
+        word = {
+            **APPROVED_WORD,
+            "images": [
+                {
+                    "imageId": "a1",
+                    "prompt": "p",
+                    "model": "gemini",
+                    "assetPath": "candidates/rounds/2026-03-03/assets/empathy/preschooler-a1.png",
+                    "createdAt": "2026-03-03T09:00:00Z",
+                },
+                {
+                    "imageId": "a2",
+                    "prompt": "p",
+                    "model": "gemini",
+                    "assetPath": "candidates/rounds/2026-03-03/assets/empathy/kindergartener-a2.png",
+                    "createdAt": "2026-03-03T09:01:00Z",
+                },
+                {
+                    "imageId": "a3",
+                    "prompt": "p",
+                    "model": "gemini",
+                    "assetPath": "candidates/rounds/2026-03-03/assets/empathy/first grader-a3.png",
+                    "createdAt": "2026-03-03T09:02:00Z",
+                },
+            ],
+            "selected": {
+                **APPROVED_WORD["selected"],
+                "imageId": "a1",
+                "imageIdsByLevel": {"preK": "a1", "K": "a3", "G1": "a2"},
+            },
+        }
+        (word_dir / "empathy.json").write_text(json.dumps(word))
+        assert _pick_image_record_for_level(word, "K")["imageId"] == "a3"
+        assert _pick_image_record_for_level(word, "G1")["imageId"] == "a2"
+
+        mock_gh = MagicMock(spec=GitHubClient)
+        mock_gh.get_file.return_value = None
+        publish_word(word, tmp_path, mock_gh, "main", app_subdir="")
+        by_path = {c.args[0]: c.args[1] for c in mock_gh.put_file.call_args_list}
+        assert by_path["public/cartoons/K/empathy.png"] == b"G1!"
+        assert by_path["public/cartoons/G1/empathy.png"] == b"KLV"
 
     def test_replaces_legacy_row_that_used_wordId_instead_of_cartoonId(self, tmp_path):
         self._setup_candidates(tmp_path)

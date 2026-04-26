@@ -254,7 +254,7 @@ Table: word-candidates
 Image assets in S3:
 ```
 kidwords-candidates/rounds/{roundId}/assets/{wordId}/{imageId}.png  ← private
-kidwords-public/cartoons/{wordId}.png                               ← published
+kidwords-public/cartoons/{level}/{wordId}.png                      ← published (preK, K, G1)
 ```
 
 ---

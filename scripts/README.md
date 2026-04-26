@@ -5,7 +5,8 @@
 Generate a cartoon image for a word using Gemini.
 
 ```
-npm run cartoon:gen -- --word "rocket" --level "kid-6" --output "generated_image.png"
+npm run cartoon:gen -- --word "rocket" --output "generated_image.png"
+# Optional: --level kindergartener   (text for one level only) or --levels preschooler,kindergartener
 ```
 
 Notes:

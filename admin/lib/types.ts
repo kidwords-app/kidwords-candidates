@@ -32,6 +32,8 @@ export interface FieldSelection {
 
 export interface Selections {
   imageId?: string;
+  /** When set, overrides which ImageCandidate is published for each grade (optional). */
+  imageIdsByLevel?: Partial<Record<LevelId, string>>;
   levels?:  Partial<Record<LevelId, FieldSelection>>;
 }
 

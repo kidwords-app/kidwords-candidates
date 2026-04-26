@@ -32,11 +32,11 @@ export class GitHubAssetRepository implements AssetRepository {
   }
 
   /**
-   * Copy a selected image into the public repo at public/cartoons/{wordId}.png.
-   * Returns the public path where the asset now lives.
+   * Copy a selected image into the public repo under public/cartoons/{level}/{wordId}.png
+   * (see scripts/publish.py — one file per published grade). Returns the public path.
    */
   async putPublishedAsset(wordId: string, _imageId: string, data: Buffer): Promise<string> {
-    const destPath = `public/cartoons/${wordId}.png`;
+    const destPath = `public/cartoons/preK/${wordId}.png`;
 
     // Try to get the existing file's SHA (required for update; absent for create)
     let sha: string | undefined;

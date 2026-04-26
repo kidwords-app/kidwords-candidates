@@ -11,10 +11,9 @@ Generate candidate images and definitions for each word in a batch.
   `kidwords-app/kidwords-candidates` repo.
 - Reads: `inputs/word-batches/YYYY-MM-DD.json` for the round.
 - For each word:
-  - Build a prompt template with word, level, tags.
-  - Call Gemini API for image candidates (N=3 default).
+  - Call Gemini for one **shared illustration concept**, then level-specific definition/example/tryIt, then **one** soft-pastel cartoon image (`shared-*.png`). See `scripts/generate-images.py` prompt stages.
   - Save images to `candidates/rounds/<roundId>/assets/<wordId>/`.
-  - Append image metadata to the word's `WordCandidate`.
+  - Append image metadata and new `LevelCandidate` rows to the word's `WordCandidate`.
 
 ### 2) `generate-definitions.yml`
 - Trigger: cron daily + manual workflow dispatch with `roundId`.

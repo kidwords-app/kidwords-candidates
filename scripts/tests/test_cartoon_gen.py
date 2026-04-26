@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import sys
 import tempfile
 import unittest
@@ -17,12 +18,6 @@ sys.modules.setdefault("google", google_module)
 sys.modules.setdefault("google.genai", genai_module)
 sys.modules[spec.name] = gen_images
 spec.loader.exec_module(gen_images)
-
-
-class FakeTextPart:
-    def __init__(self, text):
-        self.text = text
-        self.inline_data = None
 
 
 class FakeImage:
@@ -50,41 +45,40 @@ class FakeResponse:
 
 
 class CartoonPipelineTests(unittest.TestCase):
-    def test_build_text_prompt(self):
-        prompt = gen_images._build_text_prompt("rocket", "kid-6")
-        self.assertIn("rocket", prompt)
-        self.assertIn("kid-6", prompt)
-        self.assertIn('"prompts"', prompt)
+    def test_build_image_prompt_includes_scene_and_style(self):
+        prompt = gen_images._build_image_prompt("A child shares a toy with a friend.")
+        self.assertIn("A child shares a toy with a friend.", prompt)
+        self.assertIn("pastel", prompt.lower())
+        self.assertIn("No text", prompt)
 
-    def test_build_cartoon_prompt(self):
-        prompt = gen_images._build_cartoon_prompt("A rocket ship")
-        self.assertIn("A rocket ship", prompt)
-        self.assertIn("Do not include any words", prompt)
-
-    def test_generate_text_examples_calls_client(self):
-        response_json = '{"prompts":[{"first":"one"},{"second":"two"},{"third":"three"}]}'
-        client = MagicMock()
-        client.models.generate_content.return_value = FakeResponse([FakeTextPart(response_json)])
-
-        result = gen_images._generate_text_examples(client, "rocket", "kindergartener")
-
-        self.assertEqual(result, ["one", "two", "three"])
-        expected_prompt = gen_images._build_text_prompt("rocket", "kindergartener")
-        client.models.generate_content.assert_called_once_with(
-            model=gen_images.TEXT_MODEL,
-            contents=expected_prompt,
+    def test_build_level_text_prompt_includes_shared_scene(self):
+        p = gen_images._build_level_text_prompt(
+            "share",
+            "preschooler",
+            "Two children pass a ball.",
+            "ball",
         )
+        self.assertIn("share", p)
+        self.assertIn("preschooler", p)
+        self.assertIn("Two children pass a ball.", p)
+        self.assertIn("ball", p)
 
-    def test_generate_text_examples_budget_error(self):
-        client = MagicMock()
-        client.models.generate_content.side_effect = Exception("RESOURCE_EXHAUSTED: quota")
+    def test_parse_concept_response(self):
+        raw = json.dumps(
+            {
+                "visual_concept": "sharing a ball",
+                "scene_for_artist": "Two kids and a red ball.",
+                "concrete_anchor": "ball",
+                "avoid": ["treasure hunt"],
+            }
+        )
+        c = gen_images._parse_concept_response(raw)
+        self.assertEqual(c["concrete_anchor"], "ball")
+        self.assertEqual(c["avoid"], ["treasure hunt"])
 
-        with self.assertRaises(gen_images.BudgetLimitError):
-            gen_images._generate_text_examples(client, "rocket", "kindergartener")
-
-    def test_parse_text_response_invalid_json(self):
+    def test_parse_concept_response_rejects_missing_key(self):
         with self.assertRaises(gen_images.InvalidResponseError):
-            gen_images._parse_text_response("not-json")
+            gen_images._parse_concept_response("{}")
 
     def test_generate_cartoon_image_saves_file(self):
         client = MagicMock()
@@ -94,7 +88,7 @@ class CartoonPipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "cartoon.png"
             result_path = gen_images._generate_cartoon_image(
-                client, "A rocket ship", output_path
+                client, "Full image prompt text here.", output_path
             )
 
         self.assertEqual(result_path, output_path)

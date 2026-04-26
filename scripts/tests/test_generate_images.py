@@ -4,12 +4,18 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import ModuleType
 from unittest.mock import MagicMock, patch
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "generate-images.py"
 spec = importlib.util.spec_from_file_location("generate_images", MODULE_PATH)
 generate_images = importlib.util.module_from_spec(spec)
+google_module = ModuleType("google")
+genai_module = ModuleType("genai")
+google_module.genai = genai_module
+sys.modules.setdefault("google", google_module)
+sys.modules.setdefault("google.genai", genai_module)
 sys.modules[spec.name] = generate_images
 spec.loader.exec_module(generate_images)
 
@@ -41,16 +47,20 @@ class GenerateImagesTests(unittest.TestCase):
             ["preschooler", "kindergartener", "first grader"], "x"
         )
 
-    def _fake_run_cartoon_pipeline(self, word, level, output_path):
+    def _fake_run_word_visual_pipeline(self, entry, levels, output_path):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_bytes(b"PNG")
-        image_prompt = f"Create a cartoon: {word} ({level})"
-        level_content = {
-            "definition": f"{word} means something.",
-            "example": f"The {word} is great.",
-            "tryIt": f"Can you use {word} in a sentence?",
-        }
-        return output_path, image_prompt, level_content
+        word = entry.get("word", "")
+        image_prompt = f"Soft cartoon for {word}"
+        by_id = {}
+        for lev in levels:
+            lid = generate_images.LEVEL_ID_MAP[lev]
+            by_id[lid] = {
+                "definition": f"{word} means something.",
+                "example": f"The {word} is great.",
+                "tryIt": f"Can you use {word} in a sentence?",
+            }
+        return output_path, image_prompt, by_id
 
     def test_process_round_creates_candidates_and_images(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -76,15 +86,15 @@ class GenerateImagesTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            fake_ids = [FakeUUID("abc123def4"), FakeUUID("zzz999yyy8")]
+            fake_ids = [FakeUUID("abc123def4")]
             with patch.object(generate_images.uuid, "uuid4", side_effect=fake_ids), patch.object(
-                generate_images, "run_cartoon_pipeline", side_effect=self._fake_run_cartoon_pipeline
+                generate_images, "run_word_visual_pipeline", side_effect=self._fake_run_word_visual_pipeline
             ):
                 created = generate_images.process_round(
                     "2026-02-08", candidates_repo
                 )
 
-            self.assertEqual(created, 2)
+            self.assertEqual(created, 1)
 
             candidate_path = (
                 candidates_repo
@@ -99,9 +109,8 @@ class GenerateImagesTests(unittest.TestCase):
             payload = json.loads(candidate_path.read_text(encoding="utf-8"))
             self.assertEqual(payload["word"], "Blue Bird")
             self.assertEqual(payload["tags"], ["animal"])
-            self.assertEqual(len(payload["images"]), 2)
-            asset_paths = {img["assetPath"] for img in payload["images"]}
-            self.assertEqual(len(asset_paths), 2)
+            self.assertEqual(len(payload["images"]), 1)
+            self.assertIn("shared-abc123def4.png", payload["images"][0]["assetPath"])
 
             levels = payload["levels"]
             self.assertIn("K", levels)
