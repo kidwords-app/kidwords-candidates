@@ -21,9 +21,41 @@
       "imageId": "90105abc30",
       "model": "gemini",
       "prompt": "generated via run_cartoon_pipeline for respect (first grader)"
+    },
+    {
+      "assetPath": "candidates/rounds/2026-03-01/assets/respect/shared-697a0b0d55.png",
+      "createdAt": "2026-04-28T05:12:26.067630+00:00",
+      "imageId": "697a0b0d55",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA friendly child with bright eyes sits on the floor, gently holding a vibrant red toy car. Another child kneels beside them, looking at the first child with a thoughtful, open expression and an outstretched hand gesturing towards the toy, as if asking for a turn. The child with the toy car looks back with a kind smile, ready to respond. They are in a cozy, sunlit playroom with a few other soft toys scattered nearby.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
     }
   ],
-  "levels": {},
+  "levels": {
+    "G1": [
+      {
+        "definition": "Respect means treating someone nicely and caring about what is theirs, like asking before you play with their toy.",
+        "example": "When the child asked, 'May I please have a turn with your red car?' they were showing respect.",
+        "model": "gemini",
+        "tryIt": "What could you say to show respect when you want to play with a friend's toy, like the red car?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Respect means being kind and thinking about others. Like asking nicely when you want to play with a friend's toy.",
+        "example": "The child showed respect by gently asking, 'May I please have a turn with your red car?'",
+        "model": "gemini",
+        "tryIt": "What nice words could you use to ask for a turn with the toy car?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Respect means being kind to friends and asking nicely. Like when you want to play with a toy someone else has.",
+        "example": "The child showed respect when they asked their friend, 'May I please have a turn with the red car?'",
+        "model": "gemini",
+        "tryIt": "What could the child say to show respect and ask for a turn with the toy car?"
+      }
+    ]
+  },
   "partOfSpeech": "noun",
   "roundId": "2026-03-01",
   "selected": {},
@@ -33,7 +65,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-03-01T22:56:13.350597+00:00",
+  "updatedAt": "2026-04-28T05:12:26.067630+00:00",
   "word": "respect",
   "wordId": "respect"
 }
