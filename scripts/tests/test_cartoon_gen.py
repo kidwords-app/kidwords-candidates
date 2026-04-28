@@ -80,6 +80,42 @@ class CartoonPipelineTests(unittest.TestCase):
         with self.assertRaises(gen_images.InvalidResponseError):
             gen_images._parse_concept_response("{}")
 
+    def test_parse_concept_strips_markdown_fence(self):
+        inner = json.dumps(
+            {
+                "visual_concept": "x",
+                "scene_for_artist": "y",
+                "concrete_anchor": "z",
+                "avoid": [],
+            }
+        )
+        raw = f"Sure!\n```json\n{inner}\n```\n"
+        c = gen_images._parse_concept_response(raw)
+        self.assertEqual(c["visual_concept"], "x")
+        self.assertEqual(c["avoid"], [])
+
+    def test_parse_concept_prose_before_brace(self):
+        inner = {
+            "visual_concept": "a",
+            "scene_for_artist": "b",
+            "concrete_anchor": "c",
+            "avoid": ["d"],
+        }
+        raw = "Here you go: " + json.dumps(inner)
+        c = gen_images._parse_concept_response(raw)
+        self.assertEqual(c["concrete_anchor"], "c")
+
+    def test_parse_concept_omitted_avoid_defaults_empty(self):
+        raw = json.dumps(
+            {
+                "visual_concept": "v",
+                "scene_for_artist": "s",
+                "concrete_anchor": "c",
+            }
+        )
+        c = gen_images._parse_concept_response(raw)
+        self.assertEqual(c["avoid"], [])
+
     def test_generate_cartoon_image_saves_file(self):
         client = MagicMock()
         fake_image = FakeImage()

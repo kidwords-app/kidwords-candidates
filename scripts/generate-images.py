@@ -46,7 +46,7 @@ Return ONLY valid JSON with these keys:
 - "concrete_anchor": the main prop or action in simple words (for consistency checks)
 - "avoid": array of strings — metaphors or second scenes to NOT add (e.g. a separate "treasure hunt" if we already chose a cookie jar scene)
 
-Do not use a code fence or any text outside the JSON."""
+Do not use a code fence or any text outside the JSON. Use standard JSON only: straight double quotes on keys and string values, no trailing commas."""
 
 STAGE2_LEVEL_TEXT_PROMPT_TEMPLATE = """Word: "{word}"
 Audience: {level} (use vocabulary and sentence length right for this age only).
@@ -130,10 +130,65 @@ def _extract_text_from_response(response) -> str:
     return "\n".join(text_chunks).strip()
 
 
-def _parse_text_response(response_text: str) -> dict:
+def _coerce_llm_json_text(raw: str) -> str:
+    """Strip markdown fences and surrounding prose so ``json.loads`` can run.
+
+    Gemini often returns ```json ... ``` or text before/after the object.
+    """
+    text = (raw or "").strip()
+    if not text:
+        return text
+    fence = re.search(r"```(?:json)?\s*\n?(.*?)```", text, re.DOTALL | re.IGNORECASE)
+    if fence:
+        return fence.group(1).strip()
+    start = text.find("{")
+    if start == -1:
+        return text
+    depth = 0
+    for i in range(start, len(text)):
+        if text[i] == "{":
+            depth += 1
+        elif text[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start : i + 1]
+    return text[start:]
+
+
+def _debug_log_gemini_parse_failure(
+    label: str,
+    response,
+    response_text: str,
+    coerced: str,
+    exc: BaseException,
+) -> None:
+    """Print model output and response metadata when JSON parsing fails."""
+    print(f"[cartoon] DEBUG parse failure [{label}]: {exc}", flush=True)
+    print(f"[cartoon] DEBUG [{label}] raw extracted text ({len(response_text)} chars):", flush=True)
+    print(response_text, flush=True)
+    print(
+        f"[cartoon] DEBUG [{label}] after coercion ({len(coerced)} chars):\n{coerced}",
+        flush=True,
+    )
+    if response is None:
+        print(f"[cartoon] DEBUG [{label}] (no response object passed to parser)", flush=True)
+        return
+    rtype = type(response).__name__
+    rrepr = repr(response)
+    if len(rrepr) > 4000:
+        rrepr = rrepr[:4000] + "…[truncated]"
+    print(f"[cartoon] DEBUG [{label}] response type={rtype!r} repr:\n{rrepr}", flush=True)
+    cand = getattr(response, "candidates", None)
+    if cand is not None:
+        print(f"[cartoon] DEBUG [{label}] response.candidates={cand!r}", flush=True)
+
+
+def _parse_text_response(response_text: str, *, response=None) -> dict:
+    coerced = _coerce_llm_json_text(response_text)
     try:
-        payload = json.loads(response_text)
+        payload = json.loads(coerced)
     except json.JSONDecodeError as exc:
+        _debug_log_gemini_parse_failure("level_text", response, response_text, coerced, exc)
         raise InvalidResponseError("Text response is not valid JSON.") from exc
     if not isinstance(payload, dict):
         raise InvalidResponseError("Text response JSON must be an object.")
@@ -148,19 +203,28 @@ def _parse_text_response(response_text: str) -> dict:
     }
 
 
-def _parse_concept_response(response_text: str) -> dict:
+def _parse_concept_response(response_text: str, *, response=None) -> dict:
+    coerced = _coerce_llm_json_text(response_text)
     try:
-        payload = json.loads(response_text)
+        payload = json.loads(coerced)
     except json.JSONDecodeError as exc:
+        _debug_log_gemini_parse_failure("concept", response, response_text, coerced, exc)
         raise InvalidResponseError("Concept response is not valid JSON.") from exc
     if not isinstance(payload, dict):
+        _debug_log_gemini_parse_failure(
+            "concept", response, response_text, coerced, ValueError("not an object")
+        )
         raise InvalidResponseError("Concept response JSON must be an object.")
-    for key in ("visual_concept", "scene_for_artist", "concrete_anchor", "avoid"):
+    for key in ("visual_concept", "scene_for_artist", "concrete_anchor"):
         if key not in payload:
             raise InvalidResponseError(f"Concept JSON missing key '{key}'.")
-        if key != "avoid" and (not isinstance(payload[key], str) or not str(payload[key]).strip()):
+        if not isinstance(payload[key], str) or not str(payload[key]).strip():
             raise InvalidResponseError(f"Concept JSON field '{key}' must be a non-empty string.")
-    avoid = payload["avoid"]
+    avoid = payload.get("avoid", [])
+    if avoid is None:
+        avoid = []
+    if isinstance(avoid, str):
+        avoid = [avoid] if avoid.strip() else []
     if not isinstance(avoid, list) or not all(isinstance(x, str) for x in avoid):
         raise InvalidResponseError("Concept JSON 'avoid' must be an array of strings.")
     return {
@@ -204,7 +268,7 @@ def _generate_shared_concept(client: genai.Client, word: str, entry: dict, model
     if response is None:
         raise TextGenerationError("API returned no response.")
     response_text = _extract_text_from_response(response)
-    concept = _parse_concept_response(response_text)
+    concept = _parse_concept_response(response_text, response=response)
     print(f"[cartoon] visual_concept: {concept['visual_concept']!r}", flush=True)
     return concept
 
@@ -228,7 +292,7 @@ def _generate_level_content(
     if response is None:
         raise TextGenerationError("API returned no response.")
     response_text = _extract_text_from_response(response)
-    return _parse_text_response(response_text)
+    return _parse_text_response(response_text, response=response)
 
 
 def _extract_image_from_response(response):
