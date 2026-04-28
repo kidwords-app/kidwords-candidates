@@ -23,6 +23,11 @@ export function imageLevelId(img: ImageCandidate): LevelId | undefined {
   return undefined;
 }
 
+export function isSharedImage(img: ImageCandidate): boolean {
+  const filename = img.assetPath.split('/').pop() ?? '';
+  return filename.startsWith('shared-');
+}
+
 export const LEVEL_LABELS: Record<LevelId, string> = {
   preK: 'Pre-K',
   K:    'Kindergarten',

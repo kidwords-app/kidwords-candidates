@@ -598,6 +598,7 @@ tbody td { padding: 11px 14px; vertical-align: middle; font-size: 13px; }
   position: relative;
   overflow: hidden;
   background: #f1f5f9;
+  border-radius: 14px;
 }
 .img-placeholder img {
   max-width: 100%;

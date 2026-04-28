@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { ImageCandidate, LevelId } from '@/lib/types';
-import { imageLevelId, LEVEL_LABELS } from '@/lib/imageLevel';
+import { imageLevelId, isSharedImage, LEVEL_LABELS } from '@/lib/imageLevel';
 
 interface Props {
   wordId:          string;
@@ -113,12 +113,20 @@ export default function ImagePanel({
     );
   }
 
-  // Group images by their derived level; ungrouped images land in a fallback bucket
+  const sharedImages = images.filter(isSharedImage);
+  const useSharedImages = sharedImages.length > 0;
+
+  // Group images by their derived level; ungrouped images land in a fallback bucket.
+  // Shared images always take precedence over level-specific images.
   const grouped = new Map<LevelId | 'other', ImageCandidate[]>();
-  for (const img of images) {
-    const key = imageLevelId(img) ?? 'other';
-    if (!grouped.has(key)) grouped.set(key, []);
-    grouped.get(key)!.push(img);
+  if (useSharedImages) {
+    grouped.set('other', sharedImages);
+  } else {
+    for (const img of images) {
+      const key = imageLevelId(img) ?? 'other';
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key)!.push(img);
+    }
   }
 
   const orderedKeys: (LevelId | 'other')[] = [

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { ImageCandidate, LevelCandidate, LevelId, FieldSelection } from '@/lib/types';
-import { imageLevelId, LEVEL_LABELS } from '@/lib/imageLevel';
+import { imageLevelId, isSharedImage, LEVEL_LABELS } from '@/lib/imageLevel';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -249,9 +249,13 @@ export default function LevelTabs({
 }: Props) {
   const [activeLevel, setActiveLevel] = useState<LevelId>('preK');
 
-  // Group images by their derived level
+  const sharedImages = images.filter(isSharedImage);
+  const useSharedImages = sharedImages.length > 0;
+
+  // Group images by their derived level (ignored when shared images exist)
   const imagesByLevel = new Map<LevelId, ImageCandidate[]>();
   for (const img of images) {
+    if (useSharedImages) continue;
     const lvl = imageLevelId(img);
     if (lvl) {
       if (!imagesByLevel.has(lvl)) imagesByLevel.set(lvl, []);
@@ -286,7 +290,7 @@ export default function LevelTabs({
             level={level}
             wordId={wordId}
             roundId={roundId}
-            levelImages={imagesByLevel.get(level) ?? []}
+            levelImages={useSharedImages ? sharedImages : (imagesByLevel.get(level) ?? [])}
             candidates={levels[level] ?? []}
             sel={selectedLevels[level]}
             initialSubprompt={subpromptLevels[level] ?? ''}
