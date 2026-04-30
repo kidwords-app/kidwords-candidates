@@ -59,6 +59,23 @@ describe('POST /api/admin/candidates/:wordId/select', () => {
     expect(word.selected.levels?.preK?.definition).toBe(1);
   });
 
+  it('saves imageIdsByLevel', async () => {
+    const res = await postSelect(
+      makeReq({
+        roundId: '2026-03-03',
+        imageId: 'img_primary',
+        imageIdsByLevel: { preK: 'img_prek', K: 'img_k', G1: 'img_g1' },
+      }),
+      { params: wordParams('empathy') },
+    );
+    expect(res.status).toBe(200);
+    const word = await mockRepo.getWord('2026-03-03', 'empathy');
+    expect(word.selected.imageIdsByLevel?.preK).toBe('img_prek');
+    expect(word.selected.imageIdsByLevel?.K).toBe('img_k');
+    expect(word.selected.imageIdsByLevel?.G1).toBe('img_g1');
+    expect(word.selected.imageId).toBe('img_primary');
+  });
+
   it('returns 400 when roundId is missing', async () => {
     const res = await postSelect(makeReq({ imageId: 'img_1' }), { params: wordParams('empathy') });
     expect(res.status).toBe(400);

@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { WordCandidate, LevelId, FieldSelection, WordStatus } from '@/lib/types';
+import { inferImageIdsByLevelFromLegacy, isSharedImage, levelHasChosenImage } from '@/lib/imageLevel';
 import LevelTabs from './LevelTabs';
 import RegenPanel from './RegenPanel';
 
@@ -13,6 +14,46 @@ function isLevelComplete(levelId: LevelId, selected: WordCandidate['selected']):
   const sel = selected.levels?.[levelId];
   if (!sel) return false;
   return sel.definition !== undefined && sel.example !== undefined && sel.tryIt !== undefined;
+}
+
+/** True if persisted selections include an image choice and/or any level field picks. */
+function hasSomeSavedSelection(selected: WordCandidate['selected']): boolean {
+  if (selected.imageId) return true;
+  const byLevelImg = selected.imageIdsByLevel;
+  if (byLevelImg) {
+    for (const id of Object.values(byLevelImg)) {
+      if (id) return true;
+    }
+  }
+  const levels = selected.levels;
+  if (!levels) return false;
+  for (const sel of Object.values(levels)) {
+    if (!sel) continue;
+    if (
+      sel.definition !== undefined ||
+      sel.example !== undefined ||
+      sel.tryIt !== undefined
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function useSharedImagesFromList(images: WordCandidate['images']): boolean {
+  return (images ?? []).filter(isSharedImage).length > 0;
+}
+
+function primaryImageIdForPayload(
+  useShared: boolean,
+  global: string | undefined,
+  byLevel: Partial<Record<LevelId, string>>,
+): string | undefined {
+  if (useShared) return global;
+  for (const l of LEVEL_IDS) {
+    if (byLevel[l]) return byLevel[l];
+  }
+  return undefined;
 }
 
 const STATUS_LABELS: Record<WordStatus, string> = {
@@ -35,13 +76,42 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
   const [toasts,             setToasts]             = useState<Toast[]>([]);
 
+  const initShared = useSharedImagesFromList(initial.images);
+  const initInferredByLevel = !initShared
+    ? inferImageIdsByLevelFromLegacy(initial.images ?? [], initial.selected.imageId)
+    : {};
+
   // Local selection state (mirrors word.selected, optimistically updated)
-  const [selectedImageId, setSelectedImageId] = useState<string | undefined>(word.selected.imageId);
-  const [selectedLevels,  setSelectedLevels]  = useState(word.selected.levels ?? {});
+  const [selectedImageId, setSelectedImageId] = useState<string | undefined>(() =>
+    initShared ? initial.selected.imageId : undefined,
+  );
+  const [selectedImageIdsByLevel, setSelectedImageIdsByLevel] = useState<
+    Partial<Record<LevelId, string>>
+  >(() => ({
+    ...initial.selected.imageIdsByLevel,
+    ...initInferredByLevel,
+  }));
+  const [selectedLevels, setSelectedLevels] = useState(initial.selected.levels ?? {});
+
+  const useSharedImages = useSharedImagesFromList(word.images);
 
   // Publish readiness is based on the *saved* state (word.selected), not local picks
   const levelReadiness = LEVEL_IDS.map((l) => ({ level: l, complete: isLevelComplete(l, word.selected) }));
-  const canPublish = word.status === 'approved' && !!word.selected.imageId && levelReadiness.every((l) => l.complete);
+  const imageReadiness = LEVEL_IDS.map((l) => ({
+    level: l,
+    complete: levelHasChosenImage(
+      l,
+      useSharedImages,
+      word.selected.imageId,
+      word.selected.imageIdsByLevel,
+      word.images ?? [],
+    ),
+  }));
+  const canPublish =
+    word.status === 'approved' &&
+    imageReadiness.every((x) => x.complete) &&
+    levelReadiness.every((l) => l.complete);
+  const canApprove = hasSomeSavedSelection(word.selected);
 
   function addToast(msg: string, type: Toast['type'] = 'info') {
     const id = Date.now();
@@ -49,8 +119,13 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3500);
   }
 
-  function handleImageSelect(imageId: string) {
-    setSelectedImageId(imageId);
+  function handleImageSelect(level: LevelId, imageId: string) {
+    if (useSharedImages) {
+      setSelectedImageId(imageId);
+      setSelectedImageIdsByLevel({});
+    } else {
+      setSelectedImageIdsByLevel((prev) => ({ ...prev, [level]: imageId }));
+    }
   }
 
   function handleFieldSelect(level: LevelId, field: keyof FieldSelection, idx: number) {
@@ -63,13 +138,36 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
   async function handleSaveSelections() {
     setSaving(true);
     try {
+      const shared = useSharedImagesFromList(word.images);
+      const primary = primaryImageIdForPayload(shared, selectedImageId, selectedImageIdsByLevel);
+      const levelsPayload = { ...word.selected.levels, ...selectedLevels };
+      const body: Record<string, unknown> = {
+        roundId: word.roundId,
+        levels:  levelsPayload,
+      };
+      if (primary) body.imageId = primary;
+      if (!shared && Object.keys(selectedImageIdsByLevel).length > 0) {
+        body.imageIdsByLevel = selectedImageIdsByLevel;
+      }
+
       const res = await fetch(`/api/admin/candidates/${word.wordId}/select`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ roundId: word.roundId, imageId: selectedImageId, levels: selectedLevels }),
+        body:    JSON.stringify(body),
       });
       if (!res.ok) throw new Error(await res.text());
-      setWord((w) => ({ ...w, selected: { imageId: selectedImageId, levels: selectedLevels } }));
+
+      setWord((w) => {
+        const mergedByLevel = shared ? {} : { ...w.selected.imageIdsByLevel, ...selectedImageIdsByLevel };
+        const nextSel = { ...w.selected, levels: levelsPayload };
+        if (primary) nextSel.imageId = primary;
+        if (shared) {
+          delete nextSel.imageIdsByLevel;
+        } else if (Object.keys(mergedByLevel).length > 0) {
+          nextSel.imageIdsByLevel = mergedByLevel;
+        }
+        return { ...w, selected: nextSel };
+      });
       addToast('Selections saved', 'success');
     } catch {
       addToast('Failed to save selections', 'error');
@@ -203,11 +301,15 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
                   <button
                     className="btn btn-teal"
                     onClick={handleApprove}
-                    disabled={approving}
+                    disabled={approving || !canApprove}
                   >
                     {approving ? '…' : '✓ Approve'}
                   </button>
-                  <span className="tooltip-tip">POST /api/admin/candidates/:wordId/approve</span>
+                  <span className="tooltip-tip">
+                    {canApprove
+                      ? 'POST /api/admin/candidates/:wordId/approve'
+                      : 'Save selections first — choose an image and/or at least one level field, then Save'}
+                  </span>
                 </div>
               ) : (
                 <div className="tooltip-wrap">
@@ -221,7 +323,16 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
                   <span className="tooltip-tip">
                     {canPublish
                       ? 'POST /api/admin/candidates/:wordId/publish'
-                      : `Save all levels first — missing: ${levelReadiness.filter((l) => !l.complete).map((l) => l.level).join(', ')}`}
+                      : (() => {
+                          const missImg = imageReadiness.filter((x) => !x.complete).map((x) => x.level);
+                          const missDef = levelReadiness.filter((l) => !l.complete).map((l) => l.level);
+                          const parts: string[] = [];
+                          if (missImg.length) parts.push(`image: ${missImg.join(', ')}`);
+                          if (missDef.length) parts.push(`definitions: ${missDef.join(', ')}`);
+                          return parts.length
+                            ? `Complete all levels first — missing ${parts.join('; ')}`
+                            : 'Complete all levels first';
+                        })()}
                   </span>
                 </div>
               )}
@@ -259,6 +370,7 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
           images={word.images ?? []}
           levels={word.levels}
           selectedImageId={selectedImageId}
+          selectedImageIdsByLevel={selectedImageIdsByLevel}
           selectedLevels={selectedLevels}
           subpromptLevels={word.subPrompts.levels ?? {}}
           initialImageSubprompt={word.subPrompts.image ?? ''}
@@ -289,8 +401,16 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
             </p>
             <div className="modal-publish-summary">
               <div className="modal-summary-image">
-                <span className="modal-summary-label">Image</span>
-                <span className="modal-summary-value">{word.selected.imageId}</span>
+                <span className="modal-summary-label">Image(s)</span>
+                <span className="modal-summary-value">
+                  {useSharedImages
+                    ? (word.selected.imageId ?? '—')
+                    : LEVEL_IDS.map((l) => {
+                        const id =
+                          word.selected.imageIdsByLevel?.[l] ?? word.selected.imageId;
+                        return `${LEVEL_LABELS[l]}: ${id ?? '—'}`;
+                      }).join(' · ')}
+                </span>
               </div>
               {LEVEL_IDS.map((level) => {
                 const sel  = word.selected.levels?.[level];

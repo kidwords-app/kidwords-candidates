@@ -28,6 +28,50 @@ export function isSharedImage(img: ImageCandidate): boolean {
   return filename.startsWith('shared-');
 }
 
+/** Images shown for a grade tab: shared pool, or assets tagged to that level. */
+export function imagesForLevelTab(images: ImageCandidate[], level: LevelId): ImageCandidate[] {
+  const shared = images.filter(isSharedImage);
+  if (shared.length > 0) return shared;
+  return images.filter((img) => imageLevelId(img) === level);
+}
+
+/** When not using shared art, map a legacy single `imageId` onto the grade it belongs to (if any). */
+export function inferImageIdsByLevelFromLegacy(
+  images: ImageCandidate[],
+  legacyImageId: string | undefined,
+): Partial<Record<LevelId, string>> {
+  if (!legacyImageId || images.some(isSharedImage)) return {};
+  const out: Partial<Record<LevelId, string>> = {};
+  for (const img of images) {
+    if (img.imageId !== legacyImageId) continue;
+    const lvl = imageLevelId(img);
+    if (lvl) out[lvl] = legacyImageId;
+  }
+  return out;
+}
+
+export function effectiveImageIdForLevel(
+  level: LevelId,
+  useSharedImages: boolean,
+  imageId: string | undefined,
+  imageIdsByLevel: Partial<Record<LevelId, string>> | undefined,
+): string | undefined {
+  if (useSharedImages) return imageId;
+  return imageIdsByLevel?.[level];
+}
+
+export function levelHasChosenImage(
+  level: LevelId,
+  useSharedImages: boolean,
+  imageId: string | undefined,
+  imageIdsByLevel: Partial<Record<LevelId, string>> | undefined,
+  images: ImageCandidate[],
+): boolean {
+  const id = effectiveImageIdForLevel(level, useSharedImages, imageId, imageIdsByLevel);
+  if (!id) return false;
+  return imagesForLevelTab(images, level).some((img) => img.imageId === id);
+}
+
 export const LEVEL_LABELS: Record<LevelId, string> = {
   preK: 'Pre-K',
   K:    'Kindergarten',

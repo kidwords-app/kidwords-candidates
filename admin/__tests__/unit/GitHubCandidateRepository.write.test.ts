@@ -66,6 +66,16 @@ describe('GitHubCandidateRepository — write methods', () => {
       expect(written.selected.levels?.preK).toEqual({ definition: 1, example: 0, tryIt: 2 });
     });
 
+    it('merges per-level image ids', async () => {
+      mockReadThenWrite();
+      await repo.saveSelections('2026-03-03', 'empathy', {
+        imageIdsByLevel: { preK: 'img_a', K: 'img_b' },
+      });
+      const written = getPutBody();
+      expect(written.selected.imageIdsByLevel?.preK).toBe('img_a');
+      expect(written.selected.imageIdsByLevel?.K).toBe('img_b');
+    });
+
     it('sends the current file SHA in the PUT request', async () => {
       mockReadThenWrite();
       await repo.saveSelections('2026-03-03', 'empathy', { imageId: 'img_1' });

@@ -2,7 +2,12 @@
 
 import { useState } from 'react';
 import type { ImageCandidate, LevelCandidate, LevelId, FieldSelection } from '@/lib/types';
-import { imageLevelId, isSharedImage, LEVEL_LABELS } from '@/lib/imageLevel';
+import {
+  effectiveImageIdForLevel,
+  imageLevelId,
+  isSharedImage,
+  LEVEL_LABELS,
+} from '@/lib/imageLevel';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -12,10 +17,11 @@ interface Props {
   images:               ImageCandidate[];
   levels:               Partial<Record<LevelId, LevelCandidate[]>>;
   selectedImageId:      string | undefined;
+  selectedImageIdsByLevel: Partial<Record<LevelId, string>>;
   selectedLevels:       Partial<Record<LevelId, FieldSelection>>;
   subpromptLevels:      Partial<Record<LevelId, string>>;
   initialImageSubprompt: string;
-  onImageSelect:        (imageId: string) => void;
+  onImageSelect:        (level: LevelId, imageId: string) => void;
   onFieldSelect:        (level: LevelId, field: keyof FieldSelection, idx: number) => void;
   onImageSubpromptSave: (text: string) => Promise<void>;
   onLevelSubpromptSave: (level: LevelId, text: string) => Promise<void>;
@@ -88,7 +94,8 @@ function ImageCard({
 function LevelPanel({
   level, wordId, roundId,
   levelImages, candidates, sel, initialSubprompt, initialImgSubprompt,
-  selectedImageId, onImageSelect, onFieldSelect, onLevelSubpromptSave, onImageSubpromptSave,
+  selectedImageId, selectedImageIdsByLevel, useSharedImages,
+  onImageSelect, onFieldSelect, onLevelSubpromptSave, onImageSubpromptSave,
 }: {
   level:               LevelId;
   wordId:              string;
@@ -99,11 +106,19 @@ function LevelPanel({
   initialSubprompt:    string;
   initialImgSubprompt: string;
   selectedImageId:     string | undefined;
+  selectedImageIdsByLevel: Partial<Record<LevelId, string>>;
+  useSharedImages:     boolean;
   onImageSelect:       (imageId: string) => void;
   onFieldSelect:       (field: keyof FieldSelection, idx: number) => void;
   onLevelSubpromptSave:(text: string) => Promise<void>;
   onImageSubpromptSave:(text: string) => Promise<void>;
 }) {
+  const levelImagePick = effectiveImageIdForLevel(
+    level,
+    useSharedImages,
+    selectedImageId,
+    selectedImageIdsByLevel,
+  );
   const [levelSubprompt, setLevelSubprompt] = useState(initialSubprompt);
   const [imgSubprompt,   setImgSubprompt]   = useState(initialImgSubprompt);
   const [savingLevel,    setSavingLevel]     = useState(false);
@@ -128,7 +143,7 @@ function LevelPanel({
               img={img}
               wordId={wordId}
               roundId={roundId}
-              selected={selectedImageId === img.imageId}
+              selected={levelImagePick === img.imageId}
               onSelect={() => onImageSelect(img.imageId)}
             />
           ))
@@ -244,7 +259,7 @@ function LevelPanel({
 
 export default function LevelTabs({
   wordId, roundId, images, levels,
-  selectedImageId, selectedLevels, subpromptLevels, initialImageSubprompt,
+  selectedImageId, selectedImageIdsByLevel, selectedLevels, subpromptLevels, initialImageSubprompt,
   onImageSelect, onFieldSelect, onImageSubpromptSave, onLevelSubpromptSave,
 }: Props) {
   const [activeLevel, setActiveLevel] = useState<LevelId>('preK');
@@ -296,7 +311,9 @@ export default function LevelTabs({
             initialSubprompt={subpromptLevels[level] ?? ''}
             initialImgSubprompt={initialImageSubprompt}
             selectedImageId={selectedImageId}
-            onImageSelect={onImageSelect}
+            selectedImageIdsByLevel={selectedImageIdsByLevel}
+            useSharedImages={useSharedImages}
+            onImageSelect={(imageId) => onImageSelect(level, imageId)}
             onFieldSelect={(field, idx) => onFieldSelect(level, field, idx)}
             onLevelSubpromptSave={(text) => onLevelSubpromptSave(level, text)}
             onImageSubpromptSave={onImageSubpromptSave}

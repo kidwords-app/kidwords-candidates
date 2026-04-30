@@ -54,6 +54,12 @@ export class GitHubCandidateRepository implements CandidateRepository {
       if (selections.imageId !== undefined) {
         word.selected.imageId = selections.imageId;
       }
+      if (selections.imageIdsByLevel) {
+        word.selected.imageIdsByLevel ??= {};
+        for (const [level, id] of Object.entries(selections.imageIdsByLevel) as [LevelId, string][]) {
+          if (id) word.selected.imageIdsByLevel[level] = id;
+        }
+      }
       if (selections.levels) {
         word.selected.levels ??= {};
         for (const [level, fields] of Object.entries(selections.levels) as [LevelId, FieldSelection][]) {
