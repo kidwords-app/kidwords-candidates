@@ -2,21 +2,21 @@
   "createdAt": "2026-04-01T18:42:14.004199+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-04-01/assets/solve/preschooler-5fd3b0c6a8.png",
+      "assetPath": "candidates/archives/rounds/2026-04-01/assets/solve/preschooler-5fd3b0c6a8.png",
       "createdAt": "2026-04-01T18:42:14.004199+00:00",
       "imageId": "5fd3b0c6a8",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: We can solve the puzzle by putting all the pieces in the right spot!. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-01/assets/solve/kindergartener-981424ebaa.png",
+      "assetPath": "candidates/archives/rounds/2026-04-01/assets/solve/kindergartener-981424ebaa.png",
       "createdAt": "2026-04-01T18:42:14.004199+00:00",
       "imageId": "981424ebaa",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: We can solve the puzzle by putting all the pieces together.. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-01/assets/solve/first grader-cc902bc7b6.png",
+      "assetPath": "candidates/archives/rounds/2026-04-01/assets/solve/first grader-cc902bc7b6.png",
       "createdAt": "2026-04-01T18:42:14.004199+00:00",
       "imageId": "cc902bc7b6",
       "model": "gemini",

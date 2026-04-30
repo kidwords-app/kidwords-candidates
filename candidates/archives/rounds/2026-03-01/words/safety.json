@@ -2,28 +2,28 @@
   "createdAt": "2026-03-01T22:56:13.350597+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-03-01/assets/safety/preschooler-721796e490.png",
+      "assetPath": "candidates/archives/rounds/2026-03-01/assets/safety/preschooler-721796e490.png",
       "createdAt": "2026-03-01T22:56:13.350597+00:00",
       "imageId": "721796e490",
       "model": "gemini",
       "prompt": "generated via run_cartoon_pipeline for safety (preschooler)"
     },
     {
-      "assetPath": "candidates/rounds/2026-03-01/assets/safety/kindergartener-139d851d27.png",
+      "assetPath": "candidates/archives/rounds/2026-03-01/assets/safety/kindergartener-139d851d27.png",
       "createdAt": "2026-03-01T22:56:13.350597+00:00",
       "imageId": "139d851d27",
       "model": "gemini",
       "prompt": "generated via run_cartoon_pipeline for safety (kindergartener)"
     },
     {
-      "assetPath": "candidates/rounds/2026-03-01/assets/safety/first grader-0b947e034a.png",
+      "assetPath": "candidates/archives/rounds/2026-03-01/assets/safety/first grader-0b947e034a.png",
       "createdAt": "2026-03-01T22:56:13.350597+00:00",
       "imageId": "0b947e034a",
       "model": "gemini",
       "prompt": "generated via run_cartoon_pipeline for safety (first grader)"
     },
     {
-      "assetPath": "candidates/rounds/2026-03-01/assets/safety/shared-96048d39eb.png",
+      "assetPath": "candidates/archives/rounds/2026-03-01/assets/safety/shared-96048d39eb.png",
       "createdAt": "2026-04-28T05:12:26.067630+00:00",
       "imageId": "96048d39eb",
       "model": "gemini",

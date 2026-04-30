@@ -2,21 +2,21 @@
   "createdAt": "2026-04-03T06:59:06.146778+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-04-03/assets/disappointment/preschooler-c7655b5052.png",
+      "assetPath": "candidates/archives/rounds/2026-04-03/assets/disappointment/preschooler-c7655b5052.png",
       "createdAt": "2026-04-03T06:59:06.146778+00:00",
       "imageId": "c7655b5052",
       "model": "gemini",
       "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: I felt a little disappointment when my friend couldn't come over to play today.. Do not include any text, letters, or words in the image."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-03/assets/disappointment/kindergartener-911ea7e550.png",
+      "assetPath": "candidates/archives/rounds/2026-04-03/assets/disappointment/kindergartener-911ea7e550.png",
       "createdAt": "2026-04-03T06:59:06.146778+00:00",
       "imageId": "911ea7e550",
       "model": "gemini",
       "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: Lily felt **disappointment** when her balloon popped before she could show it to her friends.. Do not include any text, letters, or words in the image."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-03/assets/disappointment/first grader-c2f1ae5dad.png",
+      "assetPath": "candidates/archives/rounds/2026-04-03/assets/disappointment/first grader-c2f1ae5dad.png",
       "createdAt": "2026-04-03T06:59:06.146778+00:00",
       "imageId": "c2f1ae5dad",
       "model": "gemini",

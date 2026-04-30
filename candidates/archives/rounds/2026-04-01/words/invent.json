@@ -2,21 +2,21 @@
   "createdAt": "2026-04-01T18:42:14.004199+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-04-01/assets/invent/preschooler-11cbd389c0.png",
+      "assetPath": "candidates/archives/rounds/2026-04-01/assets/invent/preschooler-11cbd389c0.png",
       "createdAt": "2026-04-01T18:42:14.004199+00:00",
       "imageId": "11cbd389c0",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: Let's invent a new silly song to sing together!. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-01/assets/invent/kindergartener-bfa6e7fab1.png",
+      "assetPath": "candidates/archives/rounds/2026-04-01/assets/invent/kindergartener-bfa6e7fab1.png",
       "createdAt": "2026-04-01T18:42:14.004199+00:00",
       "imageId": "bfa6e7fab1",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: My friend wants to invent a machine that makes endless cookies!. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-01/assets/invent/first grader-b066e8c7d1.png",
+      "assetPath": "candidates/archives/rounds/2026-04-01/assets/invent/first grader-b066e8c7d1.png",
       "createdAt": "2026-04-01T18:42:14.004199+00:00",
       "imageId": "b066e8c7d1",
       "model": "gemini",

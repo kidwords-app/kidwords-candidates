@@ -2,28 +2,28 @@
   "createdAt": "2026-03-01T22:56:13.350597+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-03-01/assets/respect/preschooler-c0f08baade.png",
+      "assetPath": "candidates/archives/rounds/2026-03-01/assets/respect/preschooler-c0f08baade.png",
       "createdAt": "2026-03-01T22:56:13.350597+00:00",
       "imageId": "c0f08baade",
       "model": "gemini",
       "prompt": "generated via run_cartoon_pipeline for respect (preschooler)"
     },
     {
-      "assetPath": "candidates/rounds/2026-03-01/assets/respect/kindergartener-5d6352276e.png",
+      "assetPath": "candidates/archives/rounds/2026-03-01/assets/respect/kindergartener-5d6352276e.png",
       "createdAt": "2026-03-01T22:56:13.350597+00:00",
       "imageId": "5d6352276e",
       "model": "gemini",
       "prompt": "generated via run_cartoon_pipeline for respect (kindergartener)"
     },
     {
-      "assetPath": "candidates/rounds/2026-03-01/assets/respect/first grader-90105abc30.png",
+      "assetPath": "candidates/archives/rounds/2026-03-01/assets/respect/first grader-90105abc30.png",
       "createdAt": "2026-03-01T22:56:13.350597+00:00",
       "imageId": "90105abc30",
       "model": "gemini",
       "prompt": "generated via run_cartoon_pipeline for respect (first grader)"
     },
     {
-      "assetPath": "candidates/rounds/2026-03-01/assets/respect/shared-697a0b0d55.png",
+      "assetPath": "candidates/archives/rounds/2026-03-01/assets/respect/shared-697a0b0d55.png",
       "createdAt": "2026-04-28T05:12:26.067630+00:00",
       "imageId": "697a0b0d55",
       "model": "gemini",

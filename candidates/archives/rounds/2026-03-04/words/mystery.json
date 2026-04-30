@@ -2,21 +2,21 @@
   "createdAt": "2026-03-04T06:36:53.913958+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-03-04/assets/mystery/preschooler-3852515a2d.png",
+      "assetPath": "candidates/archives/rounds/2026-03-04/assets/mystery/preschooler-3852515a2d.png",
       "createdAt": "2026-03-04T06:36:53.913958+00:00",
       "imageId": "3852515a2d",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: Oh no! Someone ate all the cookies from the cookie jar! There are crumbs all over the table. Who could have done it? Was it a sneaky squirrel, or maybe even a little mouse? Let's look for more clues!. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-03-04/assets/mystery/kindergartener-882625c24b.png",
+      "assetPath": "candidates/archives/rounds/2026-03-04/assets/mystery/kindergartener-882625c24b.png",
       "createdAt": "2026-03-04T06:36:53.913958+00:00",
       "imageId": "882625c24b",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: My teddy bear's favorite red button is gone! I looked under the bed, but it wasn't there. Then I saw a little sparkle on the floor right by the open toy box. Who do you think might have the button?. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-03-04/assets/mystery/first grader-9cefab0848.png",
+      "assetPath": "candidates/archives/rounds/2026-03-04/assets/mystery/first grader-9cefab0848.png",
       "createdAt": "2026-03-04T06:36:53.913958+00:00",
       "imageId": "9cefab0848",
       "model": "gemini",

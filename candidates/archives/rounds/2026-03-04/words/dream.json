@@ -2,21 +2,21 @@
   "createdAt": "2026-03-04T06:36:53.913958+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-03-04/assets/dream/preschooler-7293c49f63.png",
+      "assetPath": "candidates/archives/rounds/2026-03-04/assets/dream/preschooler-7293c49f63.png",
       "createdAt": "2026-03-04T06:36:53.913958+00:00",
       "imageId": "7293c49f63",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: I was playing in a giant bouncy house, and all my friends were there, and we jumped super high almost to the sky!. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-03-04/assets/dream/kindergartener-565d3c97e7.png",
+      "assetPath": "candidates/archives/rounds/2026-03-04/assets/dream/kindergartener-565d3c97e7.png",
       "createdAt": "2026-03-04T06:36:53.913958+00:00",
       "imageId": "565d3c97e7",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: I dreamed I was flying super high like a bird, and I could touch the clouds!. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-03-04/assets/dream/first grader-584dc611be.png",
+      "assetPath": "candidates/archives/rounds/2026-03-04/assets/dream/first grader-584dc611be.png",
       "createdAt": "2026-03-04T06:36:53.913958+00:00",
       "imageId": "584dc611be",
       "model": "gemini",

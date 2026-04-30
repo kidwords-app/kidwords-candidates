@@ -2,21 +2,21 @@
   "createdAt": "2026-03-04T06:36:53.913958+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-03-04/assets/impressive/preschooler-d17b2200f6.png",
+      "assetPath": "candidates/archives/rounds/2026-03-04/assets/impressive/preschooler-d17b2200f6.png",
       "createdAt": "2026-03-04T06:36:53.913958+00:00",
       "imageId": "d17b2200f6",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: Wow, you built a block tower that's taller than your head and it didn't fall down!. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-03-04/assets/impressive/kindergartener-dac48ce51b.png",
+      "assetPath": "candidates/archives/rounds/2026-03-04/assets/impressive/kindergartener-dac48ce51b.png",
       "createdAt": "2026-03-04T06:36:53.913958+00:00",
       "imageId": "dac48ce51b",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: Building a block tower taller than your teacher that doesn't fall down.. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-03-04/assets/impressive/first grader-5f9d91fe48.png",
+      "assetPath": "candidates/archives/rounds/2026-03-04/assets/impressive/first grader-5f9d91fe48.png",
       "createdAt": "2026-03-04T06:36:53.913958+00:00",
       "imageId": "5f9d91fe48",
       "model": "gemini",

@@ -2,21 +2,21 @@
   "createdAt": "2026-04-01T18:42:14.004199+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-04-01/assets/clue/preschooler-59e224c374.png",
+      "assetPath": "candidates/archives/rounds/2026-04-01/assets/clue/preschooler-59e224c374.png",
       "createdAt": "2026-04-01T18:42:14.004199+00:00",
       "imageId": "59e224c374",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: We found a red ribbon, and that was a clue to find the hidden treasure!. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-01/assets/clue/kindergartener-1451e4b4a3.png",
+      "assetPath": "candidates/archives/rounds/2026-04-01/assets/clue/kindergartener-1451e4b4a3.png",
       "createdAt": "2026-04-01T18:42:14.004199+00:00",
       "imageId": "1451e4b4a3",
       "model": "gemini",
       "prompt": "Create a cartoon with a single frame or image, describing the following: The muddy paw prints were a clue that our dog had been playing in the garden.. Do not include any words in the cartoon."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-01/assets/clue/first grader-f8cbec5381.png",
+      "assetPath": "candidates/archives/rounds/2026-04-01/assets/clue/first grader-f8cbec5381.png",
       "createdAt": "2026-04-01T18:42:14.004199+00:00",
       "imageId": "f8cbec5381",
       "model": "gemini",

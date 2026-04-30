@@ -2,21 +2,21 @@
   "createdAt": "2026-04-03T06:59:06.146778+00:00",
   "images": [
     {
-      "assetPath": "candidates/rounds/2026-04-03/assets/fairness/preschooler-a9352f9c71.png",
+      "assetPath": "candidates/archives/rounds/2026-04-03/assets/fairness/preschooler-a9352f9c71.png",
       "createdAt": "2026-04-03T06:59:06.146778+00:00",
       "imageId": "a9352f9c71",
       "model": "gemini",
       "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: It's important to show fairness when we share our blocks with friends.. Do not include any text, letters, or words in the image."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-03/assets/fairness/kindergartener-731432822f.png",
+      "assetPath": "candidates/archives/rounds/2026-04-03/assets/fairness/kindergartener-731432822f.png",
       "createdAt": "2026-04-03T06:59:06.146778+00:00",
       "imageId": "731432822f",
       "model": "gemini",
       "prompt": "Create a single-frame cartoon illustration in flat vector style with clean outlines, bright saturated colors, simple friendly shapes, and a white background. The scene depicts: When we shared the cookies so everyone got two, that was fairness!. Do not include any text, letters, or words in the image."
     },
     {
-      "assetPath": "candidates/rounds/2026-04-03/assets/fairness/first grader-9020c8b8ab.png",
+      "assetPath": "candidates/archives/rounds/2026-04-03/assets/fairness/first grader-9020c8b8ab.png",
       "createdAt": "2026-04-03T06:59:06.146778+00:00",
       "imageId": "9020c8b8ab",
       "model": "gemini",
