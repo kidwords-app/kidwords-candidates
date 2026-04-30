@@ -1,0 +1,44 @@
+{
+  "roundId": "2026-05-08",
+  "words": [
+    {
+      "word": "isolation",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "noun",
+      "syllables": 4,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "disappointment",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "noun",
+      "syllables": 4,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "fairness",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "noun",
+      "syllables": 2,
+      "tags": [
+        "thinking"
+      ]
+    }
+  ]
+}

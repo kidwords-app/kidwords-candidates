@@ -1,8 +1,0 @@
-{
-  "roundId": "2026-03-31",
-  "words": [
-    {"word": "choice", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "noun", "syllables": 1, "tags": ["thinking"]},
-    {"word": "familiar", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "adjective", "syllables": 4, "tags": ["thinking"]},
-    {"word": "similar", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "adjective", "syllables": 3, "tags": ["thinking"]}
-  ]
-}

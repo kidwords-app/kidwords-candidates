@@ -1,0 +1,44 @@
+{
+  "roundId": "2026-05-02",
+  "words": [
+    {
+      "word": "prioritize",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "verb",
+      "syllables": 4,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "dream",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "noun",
+      "syllables": 1,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "impressive",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "adjective",
+      "syllables": 3,
+      "tags": [
+        "thinking"
+      ]
+    }
+  ]
+}

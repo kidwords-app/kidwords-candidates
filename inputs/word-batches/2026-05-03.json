@@ -1,0 +1,44 @@
+{
+  "roundId": "2026-05-03",
+  "words": [
+    {
+      "word": "mystery",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "noun",
+      "syllables": 3,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "inspire",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "verb",
+      "syllables": 2,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "succeed",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "verb",
+      "syllables": 2,
+      "tags": [
+        "thinking"
+      ]
+    }
+  ]
+}

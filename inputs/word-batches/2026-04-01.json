@@ -1,8 +1,0 @@
-{
-  "roundId": "2026-04-01",
-  "words": [
-    {"word": "invent", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "verb", "syllables": 2, "tags": ["thinking"]},
-    {"word": "clue", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "noun", "syllables": 1, "tags": ["thinking"]},
-    {"word": "solve", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "verb", "syllables": 1, "tags": ["thinking"]}
-  ]
-}

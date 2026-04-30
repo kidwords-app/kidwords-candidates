@@ -1,0 +1,44 @@
+{
+  "roundId": "2026-05-05",
+  "words": [
+    {
+      "word": "option",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "noun",
+      "syllables": 2,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "choice",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "noun",
+      "syllables": 1,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "familiar",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "adjective",
+      "syllables": 4,
+      "tags": [
+        "thinking"
+      ]
+    }
+  ]
+}

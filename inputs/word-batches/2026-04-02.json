@@ -1,8 +1,0 @@
-{
-  "roundId": "2026-04-02",
-  "words": [
-    {"word": "recall", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "verb", "syllables": 2, "tags": ["thinking"]},
-    {"word": "sequence", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "noun", "syllables": 2, "tags": ["thinking"]},
-    {"word": "isolation", "levels": ["preschooler", "kindergartener", "first grader"], "partOfSpeech": "noun", "syllables": 4, "tags": ["thinking"]}
-  ]
-}

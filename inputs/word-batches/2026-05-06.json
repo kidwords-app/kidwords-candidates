@@ -1,0 +1,44 @@
+{
+  "roundId": "2026-05-06",
+  "words": [
+    {
+      "word": "similar",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "adjective",
+      "syllables": 3,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "invent",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "verb",
+      "syllables": 2,
+      "tags": [
+        "thinking"
+      ]
+    },
+    {
+      "word": "clue",
+      "levels": [
+        "preschooler",
+        "kindergartener",
+        "first grader"
+      ],
+      "partOfSpeech": "noun",
+      "syllables": 1,
+      "tags": [
+        "thinking"
+      ]
+    }
+  ]
+}
