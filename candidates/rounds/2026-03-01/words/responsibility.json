@@ -70,6 +70,10 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "K": {
+        "definition": 0,
+        "example": 0
       }
     }
   },
@@ -79,7 +83,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-30T22:03:43.923Z",
+  "updatedAt": "2026-04-30T22:03:55.030Z",
   "word": "responsibility",
   "wordId": "responsibility"
 }
