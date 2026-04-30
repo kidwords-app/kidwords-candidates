@@ -58,14 +58,23 @@
   },
   "partOfSpeech": "noun",
   "roundId": "2026-03-01",
-  "selected": {},
+  "selected": {
+    "imageId": "65b2e9e255",
+    "levels": {
+      "G1": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
+      }
+    }
+  },
   "status": "approved",
   "subPrompts": {},
   "syllables": 6,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-04-30T21:01:23.323Z",
+  "updatedAt": "2026-04-30T21:01:39.175Z",
   "word": "responsibility",
   "wordId": "responsibility"
 }
