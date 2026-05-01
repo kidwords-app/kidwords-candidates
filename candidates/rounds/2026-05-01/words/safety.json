@@ -49,6 +49,11 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "G1": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     }
   },
@@ -58,7 +63,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-01T13:46:45.091Z",
+  "updatedAt": "2026-05-01T13:46:50.570Z",
   "word": "safety",
   "wordId": "safety"
 }
