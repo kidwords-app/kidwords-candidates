@@ -52,13 +52,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 2,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-01T13:46:38.849Z",
+  "updatedAt": "2026-05-01T13:46:45.091Z",
   "word": "safety",
   "wordId": "safety"
 }
