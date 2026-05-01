@@ -1,0 +1,50 @@
+{
+  "createdAt": "2026-05-01T08:02:32.781270+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-01/assets/responsibility/shared-beac92e713.png",
+      "createdAt": "2026-05-01T08:02:32.781270+00:00",
+      "imageId": "beac92e713",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA cheerful child, about five years old, kneels on the floor next to a low, colorful toy storage bin. The child is gently placing a favorite toy, such as a soft teddy bear or a bright building block, into the bin. A few other toys are already neatly inside the bin. The child has a focused, content, and slightly proud expression, showing they are taking care of their things.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Responsibility is when you do what you are supposed to do, like putting your toys in the bin.",
+        "example": "Putting your teddy bear neatly in the toy bin shows great responsibility.",
+        "model": "gemini",
+        "tryIt": "What is a responsibility you have for your toys at home?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Responsibility means it's your job to take care of things, like putting your toys in their bin.",
+        "example": "When you gently put your favorite toy into the bin, you are showing responsibility for your things.",
+        "model": "gemini",
+        "tryIt": "What is a responsibility you have with your toys?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Responsibility is when you take care of something important, like putting your toys in the bin.",
+        "example": "The child shows responsibility by gently placing their teddy bear back in the toy bin.",
+        "model": "gemini",
+        "tryIt": "What toy can you show responsibility for by putting it in your toy bin?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-01",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 6,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-01T08:02:32.781270+00:00",
+  "word": "responsibility",
+  "wordId": "responsibility"
+}

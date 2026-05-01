@@ -1,0 +1,50 @@
+{
+  "createdAt": "2026-05-01T08:02:32.781270+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-01/assets/respect/shared-edd3ca11d4.png",
+      "createdAt": "2026-05-01T08:02:32.781270+00:00",
+      "imageId": "edd3ca11d4",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child (preschool age, gender-neutral) kneels beside a small, vibrant potted plant. The child holds a colorful, child-sized watering can, carefully tipping it to pour a gentle stream of water onto the plant's soil. The child's expression is focused and kind, showing genuine care. The setting is bright and calm, perhaps a sunlit windowsill or a corner of a garden.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Respect means showing you care about something or someone. Like when you carefully water a plant.",
+        "example": "The child shows respect by gently pouring water so the little plant can drink.",
+        "model": "gemini",
+        "tryIt": "What is something at your home that you can show respect to, just like you show respect to the plant?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Respect means you are kind and careful with something, like when you water your plant so it can grow.",
+        "example": "The child shows respect for the little plant by gently giving it water.",
+        "model": "gemini",
+        "tryIt": "If you had a little plant, how would you water it gently to show respect?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Respect means being kind and careful with something important, like your plant.",
+        "example": "The child shows respect for the plant by carefully pouring water, helping it grow.",
+        "model": "gemini",
+        "tryIt": "How is the child in the picture showing respect for the plant?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-01",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-01T08:02:32.781270+00:00",
+  "word": "respect",
+  "wordId": "respect"
+}
