@@ -1,0 +1,50 @@
+{
+  "createdAt": "2026-05-02T07:20:20.690556+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-02/assets/dream/shared-e4da972e40.png",
+      "createdAt": "2026-05-02T07:20:20.690556+00:00",
+      "imageId": "e4da972e40",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child, around 4-5 years old, sleeps soundly in a cozy bed. Their eyes are closed, and a gentle smile plays on their face. Above their head, a soft, ethereal image shows a friendly, fluffy bunny playing gently with a small, colorful ball. The bedroom is simple and warm, with a soft blanket and a moon-shaped nightlight on a nearby dresser.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "A dream is like a picture story you see in your head when you are sleeping, just like the bunny playing above the child.",
+        "example": "The sleeping child is having a happy dream about a fluffy bunny playing with a colorful ball.",
+        "model": "gemini",
+        "tryIt": "What do you think the friendly bunny in the child's dream will do next?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "A dream is like a fun picture or story you see in your head when you are sleeping, just like the bunny playing above the child's head!",
+        "example": "The child is having a happy dream about a fluffy bunny playing with a colorful ball.",
+        "model": "gemini",
+        "tryIt": "Can you point to the fluffy bunny that is part of the child's dream?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "A dream is like pictures you see in your head when you are sleeping.",
+        "example": "The child is having a happy dream about a fluffy bunny playing gently with a colorful ball.",
+        "model": "gemini",
+        "tryIt": "What do you like to dream about when you are sleeping?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-02",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 1,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-02T07:20:20.690556+00:00",
+  "word": "dream",
+  "wordId": "dream"
+}
