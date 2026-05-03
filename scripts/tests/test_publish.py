@@ -278,8 +278,8 @@ class TestPublishWord:
 
         put_calls = mock_gh.put_file.call_args_list
         paths = [c.args[0] for c in put_calls]
-        assert "src/public/cartoons/empathy.png" in paths
-        assert paths.count("src/public/cartoons/empathy.png") == 1
+        assert "public/cartoons/empathy.png" in paths
+        assert paths.count("public/cartoons/empathy.png") == 1
         assert "src/core/words-data.json" in paths
         data_call = next(c for c in put_calls if c.args[0] == "src/core/words-data.json")
         written = json.loads(data_call.args[1].decode())
@@ -329,8 +329,8 @@ class TestPublishWord:
         publish_word(APPROVED_WORD, tmp_path, mock_gh, "main", app_subdir="kidwords-web")
 
         put_paths = [c.args[0] for c in mock_gh.put_file.call_args_list]
-        assert "kidwords-web/src/public/cartoons/empathy.png" in put_paths
-        assert put_paths.count("kidwords-web/src/public/cartoons/empathy.png") == 1
+        assert "kidwords-web/public/cartoons/empathy.png" in put_paths
+        assert put_paths.count("kidwords-web/public/cartoons/empathy.png") == 1
         assert "kidwords-web/src/core/words-data.json" in put_paths
 
     def test_writes_cartoon_only_for_levels_in_selection(self, tmp_path):
@@ -353,7 +353,7 @@ class TestPublishWord:
 
         paths = [c.args[0] for c in mock_gh.put_file.call_args_list]
         cartoon_paths = [p for p in paths if "/cartoons/" in p]
-        assert cartoon_paths == ["src/public/cartoons/empathy.png"]
+        assert cartoon_paths == ["public/cartoons/empathy.png"]
 
     def test_publishes_single_png_from_selected_image_id(self, tmp_path):
         word_dir = tmp_path / "candidates" / "rounds" / "2026-03-03" / "words"
@@ -397,7 +397,7 @@ class TestPublishWord:
         publish_word(word, tmp_path, mock_gh, "main", app_subdir="")
 
         by_path = {c.args[0]: c.args[1] for c in mock_gh.put_file.call_args_list}
-        assert by_path["src/public/cartoons/empathy.png"] == b"KLV"
+        assert by_path["public/cartoons/empathy.png"] == b"KLV"
 
     def test_image_ids_by_level_ignored_for_publish_bytes(self, tmp_path):
         word_dir = tmp_path / "candidates" / "rounds" / "2026-03-03" / "words"
@@ -444,7 +444,7 @@ class TestPublishWord:
         mock_gh.get_file.return_value = None
         publish_word(word, tmp_path, mock_gh, "main", app_subdir="")
         by_path = {c.args[0]: c.args[1] for c in mock_gh.put_file.call_args_list}
-        assert by_path["src/public/cartoons/empathy.png"] == b"PRE"
+        assert by_path["public/cartoons/empathy.png"] == b"PRE"
 
     def test_replaces_legacy_row_that_used_wordId_instead_of_cartoonId(self, tmp_path):
         self._setup_candidates(tmp_path)

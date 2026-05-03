@@ -26,7 +26,7 @@ What it does:
   2. Maps each to a WordEntry and upserts it into src/core/words-data.json under the
      app subdir in the public repo. That file is always {"words": [<WordEntry>, ...]}
      (same shape when the file is created).
-  3. Copies one cartoon PNG to /public/cartoons/{wordId}.png — the image for
+  3. Copies one cartoon PNG to public/cartoons/{wordId}.png — the image for
      ``selected.imageId`` (shared illustration for every grade).
   4. Pushes file updates to COMMIT_BASE_BRANCH (typically ``main``) in the public repo.
 """

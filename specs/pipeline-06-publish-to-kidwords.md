@@ -31,7 +31,7 @@ Both workflows call `scripts/publish.py`, which:
 2. **Maps** the candidate to a `WordEntry` (see [WordEntry shape](#wordentry-shape)),
    respecting the mix-and-match field selections.
 3. **Copies one cartoon PNG** from `candidates/rounds/{roundId}/assets/{wordId}/…` to
-   `kidwords-web/src/public/cartoons/{wordId}.png` in repo `kidwords.github.io` (via GitHub Contents API).
+   `kidwords-web/public/cartoons/{wordId}.png` in repo `kidwords.github.io` (via GitHub Contents API).
    The file is the image for `selected.imageId` — **one illustration for all grades**; only the per-level text in `words-data.json` differs.
    `scripts/generate-images.py` typically writes `shared-*.png`; legacy per-grade filenames are still fine as long as that asset is selected.
    The `kidwords-web` segment is configurable (`PUBLIC_APP_SUBDIR`) for monorepo layouts.
@@ -63,7 +63,7 @@ This pipeline must emit exactly that JSON shape — no extra keys (`wordId`, `im
 }
 ```
 
-`cartoonId` matches the basename of the single published PNG: `src/public/cartoons/{cartoonId}.png` (same slug as `wordId` in the candidates repo). The web app loads that path for every grade that has text in `levels`.
+`cartoonId` matches the basename of the single published PNG: `public/cartoons/{cartoonId}.png` under the app folder (same slug as `wordId` in the candidates repo). The web app loads that path for every grade that has text in `levels`.
 
 **Current invariant:** `cartoonId := wordId` during publish. Keep this as a 1:1 mapping unless the app type contract changes to support independent content IDs vs asset IDs.
 
