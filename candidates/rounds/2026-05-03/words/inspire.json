@@ -1,0 +1,50 @@
+{
+  "createdAt": "2026-05-03T07:49:15.419991+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-03/assets/inspire/shared-33008112cb.png",
+      "createdAt": "2026-05-03T07:49:15.419991+00:00",
+      "imageId": "33008112cb",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child (around 4-5 years old) sits at a small, child-sized table in a bright, cheerful room. They are looking intently at a colorful, imaginative drawing (like a whimsical animal, a colorful rocket, or a magical castle) displayed on a nearby wall or propped on the table in front of them. The child's eyes are wide with wonder and a soft, thoughtful smile plays on their lips. Next to them, on their own table space, is a blank sheet of paper and an open box of crayons. The child has just picked up a bright crayon (e.g., yellow or blue) and is holding it poised above their blank paper, looking down with a focused, excited expression, clearly ready to begin drawing something of their own.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Inspire means when something gives you a new idea or makes you really want to draw something on your paper!",
+        "example": "The colorful drawing on the wall helped to inspire the child to pick up a crayon and start drawing on their paper.",
+        "model": "gemini",
+        "tryIt": "What makes you want to pick up a crayon and draw something on your paper?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "It's when a picture gives you a really good idea for what you want to draw on your paper with your crayons!",
+        "example": "Looking at the bright drawing on the wall makes the child feel inspired to use their crayons on the blank paper.",
+        "model": "gemini",
+        "tryIt": "What kind of picture makes you want to pick up your crayon and draw something amazing on your paper right now?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "To inspire means something gives you a big, new idea for your paper!",
+        "example": "That colorful drawing made you want to pick up your yellow crayon and draw something wonderful on your paper!",
+        "model": "gemini",
+        "tryIt": "Now that you have your crayon, what wonderful thing will you draw on your paper?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-05-03",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-03T07:49:15.419991+00:00",
+  "word": "inspire",
+  "wordId": "inspire"
+}

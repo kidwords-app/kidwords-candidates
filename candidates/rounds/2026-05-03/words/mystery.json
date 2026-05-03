@@ -1,0 +1,50 @@
+{
+  "createdAt": "2026-05-03T07:49:15.419991+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-03/assets/mystery/shared-8a500ba14c.png",
+      "createdAt": "2026-05-03T07:49:15.419991+00:00",
+      "imageId": "8a500ba14c",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA small child (preschool age) stands in a bright, simple kitchen next to a low table or counter. On the table, there is a plate with crumbs and a single half-eaten cookie, and an empty milk glass. The child has a quizzical expression, with their head tilted slightly and one hand perhaps gently touching their chin, showing they are deep in thought. A friendly, slightly sheepish-looking dog (or cat) sits innocently on the floor nearby, looking up at the child or the plate.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "A mystery is a puzzle, like when you don't know who ate the cookie!",
+        "example": "The child looked at the half-eaten cookie, and it was a big mystery who took a bite!",
+        "model": "gemini",
+        "tryIt": "Look at the picture. Can you guess who ate the cookie? You're trying to solve the mystery!"
+      }
+    ],
+    "K": [
+      {
+        "definition": "A mystery is something you don't know the answer to, like who ate the cookie!",
+        "example": "The child looked at the half-eaten cookie and thought, 'It's a mystery who ate it!'",
+        "model": "gemini",
+        "tryIt": "Look at the picture! Can you guess who might know the secret about the missing cookie?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "A mystery is when you don't know who did something, like who ate the cookie!",
+        "example": "The child in the kitchen is trying to solve the mystery of the missing cookie.",
+        "model": "gemini",
+        "tryIt": "Look at the picture! Can you help solve the mystery? Who do you think ate the yummy cookie?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-03",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-03T07:49:15.419991+00:00",
+  "word": "mystery",
+  "wordId": "mystery"
+}
