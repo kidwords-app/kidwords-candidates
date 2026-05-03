@@ -49,6 +49,11 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "G1": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     }
   },
@@ -58,7 +63,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-03T20:01:09.306Z",
+  "updatedAt": "2026-05-03T20:01:17.460Z",
   "word": "responsibility",
   "wordId": "responsibility"
 }
