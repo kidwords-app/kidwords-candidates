@@ -15,7 +15,7 @@ Environment variables:
   PUBLIC_REPO_NAME       GitHub repo name (default: kidwords.github.io)
   PUBLIC_APP_SUBDIR      App folder inside that repo (default: kidwords-web).
                          Writes {subdir}/src/core/words-data.json and one shared PNG
-                         under {subdir}/src/public/cartoons/<wordId>.png (same art
+                         under {subdir}/public/cartoons/<wordId>.png (same art
                          for all grades; only level text varies in words-data).
                          Set empty for a flat repo.
   COMMIT_BASE_BRANCH     Target branch in the public repo (default: main). Writes land
@@ -57,6 +57,7 @@ class LevelCopy(BaseModel):
     definition: str
     example:    str
     tryIt:      str
+    speak:      Optional[str] = None
 
 
 class WordEntry(BaseModel):
@@ -160,7 +161,9 @@ def map_to_word_entry(word: dict) -> dict:
     omitted from the output so the public app can show a 'coming soon' banner.
     Each level field (definition, example, tryIt) is resolved independently
     from the candidate at the selected index — allowing mix-and-match across
-    model attempts.
+    model attempts. ``speak`` (when present on the candidate row) is taken from
+    the same row as the selected ``definition`` so pronunciation matches that
+    wording.
 
     Output keys match ``WordEntry`` in kidwords-web (``cartoonId`` ties to
     ``src/public/cartoons/{cartoonId}.png`` — one shared image for all grades); pipeline-only
@@ -172,11 +175,16 @@ def map_to_word_entry(word: dict) -> dict:
     levels: dict[str, dict] = {}
     for level, sel in selected_levels.items():
         candidates = levels_data[level]
-        levels[level] = {
-            "definition": candidates[sel["definition"]]["definition"],
+        def_row = candidates[sel["definition"]]
+        level_out = {
+            "definition": def_row["definition"],
             "example":    candidates[sel["example"]]["example"],
             "tryIt":      candidates[sel["tryIt"]]["tryIt"],
         }
+        speak_val = def_row.get("speak")
+        if isinstance(speak_val, str) and speak_val.strip():
+            level_out["speak"] = speak_val.strip()
+        levels[level] = level_out
 
     wid = word["wordId"]
     raw = {
@@ -187,7 +195,7 @@ def map_to_word_entry(word: dict) -> dict:
         "cartoonId":    wid,
         "levels":       levels,
     }
-    return WordEntry.model_validate(raw).model_dump()
+    return WordEntry.model_validate(raw).model_dump(exclude_none=True)
 
 
 def _entry_cartoon_id(entry: dict) -> str:

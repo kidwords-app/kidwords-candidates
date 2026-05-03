@@ -191,6 +191,13 @@ class TestMapToWordEntry:
         for bad in ("wordId", "imageUrl", "roundId", "publishedAt"):
             assert bad not in entry
 
+    def test_includes_speak_from_definition_row(self):
+        word = json.loads(json.dumps(APPROVED_WORD))
+        word["levels"]["preK"][1]["speak"] = "EM-puh-thee"
+        entry = map_to_word_entry(word)
+        assert entry["levels"]["preK"]["speak"] == "EM-puh-thee"
+        assert "speak" not in entry["levels"]["K"]
+
 
 # ── load_word_candidate ─────────────────────────────────────────────────────────
 

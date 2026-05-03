@@ -59,6 +59,7 @@ class GenerateImagesTests(unittest.TestCase):
                 "definition": f"{word} means something.",
                 "example": f"The {word} is great.",
                 "tryIt": f"Can you use {word} in a sentence?",
+                "speak": "WORD",
             }
         return output_path, image_prompt, by_id
 
@@ -123,6 +124,7 @@ class GenerateImagesTests(unittest.TestCase):
                 self.assertIn("definition", entry)
                 self.assertIn("example", entry)
                 self.assertIn("tryIt", entry)
+                self.assertIn("speak", entry)
                 self.assertEqual(entry["model"], "gemini")
 
 

@@ -62,6 +62,8 @@ class CartoonPipelineTests(unittest.TestCase):
         self.assertIn("preschooler", p)
         self.assertIn("Two children pass a ball.", p)
         self.assertIn("ball", p)
+        self.assertIn("speak", p)
+        self.assertIn("HAP-ee", p)
 
     def test_parse_concept_response(self):
         raw = json.dumps(
@@ -93,6 +95,18 @@ class CartoonPipelineTests(unittest.TestCase):
         c = gen_images._parse_concept_response(raw)
         self.assertEqual(c["visual_concept"], "x")
         self.assertEqual(c["avoid"], [])
+
+    def test_parse_text_response_requires_speak(self):
+        raw = json.dumps(
+            {
+                "definition": "Feeling good inside.",
+                "example": "I feel happy when we dance.",
+                "tryIt": "Show a happy face in the mirror.",
+                "speak": "HAP-ee",
+            }
+        )
+        p = gen_images._parse_text_response(raw)
+        self.assertEqual(p["speak"], "HAP-ee")
 
     def test_parse_concept_prose_before_brace(self):
         inner = {

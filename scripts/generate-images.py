@@ -25,7 +25,12 @@ LEVEL_ID_MAP = {
 # ---- Cartoon pipeline (Gemini text + image generation) ----
 # One shared illustration concept for the word; level-specific copy; one image.
 
-TEXT_PROMPT_RESPONSE_TEMPLATE = {"definition": "", "example": "", "tryIt": ""}
+TEXT_PROMPT_RESPONSE_TEMPLATE = {
+    "definition": "",
+    "example": "",
+    "tryIt": "",
+    "speak": "",
+}
 
 STAGE1_CONCEPT_PROMPT_TEMPLATE = """You are designing ONE illustration for a children's vocabulary app. The same picture will be shown for preschool, kindergarten, and first grade; only the written explanations will change by age.
 
@@ -60,6 +65,7 @@ Tasks:
 1. "definition" — short, level-appropriate; you may refer to the concrete_anchor in plain words.
 2. "example" — ONE sentence that could be happening in the scene above (same place, props, and idea). Do not introduce a new location or metaphor.
 3. "tryIt" — a simple activity or question for the child; no new visual scenario that contradicts the scene.
+4. "speak" — how to say the word "{word}" aloud for a child or caregiver (the headword only, not a sentence). Use hyphen-separated chunks (one chunk per syllable or clear beat). Mark the stressed syllable with ALL CAPS inside that chunk (e.g. "HAP-ee" for happy, "in-SPY-er" for inspire). Use familiar English spellings for sounds, not IPA. Keep it short.
 
 Return ONLY valid JSON:
 {text_template}
@@ -192,7 +198,7 @@ def _parse_text_response(response_text: str, *, response=None) -> dict:
         raise InvalidResponseError("Text response is not valid JSON.") from exc
     if not isinstance(payload, dict):
         raise InvalidResponseError("Text response JSON must be an object.")
-    for key in ("definition", "example", "tryIt"):
+    for key in ("definition", "example", "tryIt", "speak"):
         value = payload.get(key)
         if not isinstance(value, str) or not value.strip():
             raise InvalidResponseError(f"Text response JSON missing or empty field: '{key}'.")
@@ -200,6 +206,7 @@ def _parse_text_response(response_text: str, *, response=None) -> dict:
         "definition": payload["definition"].strip(),
         "example": payload["example"].strip(),
         "tryIt": payload["tryIt"].strip(),
+        "speak": payload["speak"].strip(),
     }
 
 
@@ -481,6 +488,7 @@ def generate_images_for_entry(
                     "definition": level_content["definition"],
                     "example": level_content["example"],
                     "tryIt": level_content["tryIt"],
+                    "speak": level_content["speak"],
                     "model": "gemini",
                 }
             )
@@ -595,6 +603,7 @@ def main(argv: Iterable[str]) -> int:
                 print(f"Definition: {lc['definition']}")
                 print(f"Example: {lc['example']}")
                 print(f"Try it: {lc['tryIt']}")
+                print(f"Speak: {lc['speak']}")
             return 0
         except BudgetLimitError as exc:
             print(f"Error: {exc}", file=sys.stderr)
