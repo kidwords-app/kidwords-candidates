@@ -44,6 +44,11 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "K": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     }
   },
@@ -53,7 +58,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-03T20:57:09.351Z",
+  "updatedAt": "2026-05-03T20:57:14.314Z",
   "word": "mystery",
   "wordId": "mystery"
 }
