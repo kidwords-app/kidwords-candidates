@@ -57,13 +57,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 6,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-03T20:01:17.460Z",
+  "updatedAt": "2026-05-03T20:01:19.842Z",
   "word": "responsibility",
   "wordId": "responsibility"
 }
