@@ -44,6 +44,10 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "K": {
+        "definition": 0,
+        "example": 0
       }
     }
   },
@@ -53,7 +57,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-03T20:54:41.047Z",
+  "updatedAt": "2026-05-03T20:54:44.954Z",
   "word": "dream",
   "wordId": "dream"
 }
