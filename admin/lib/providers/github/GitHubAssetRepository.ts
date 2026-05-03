@@ -32,8 +32,8 @@ export class GitHubAssetRepository implements AssetRepository {
   }
 
   /**
-   * Copy a selected image into the public repo under public/cartoons/{level}/{wordId}.png
-   * (see scripts/publish.py — one file per published grade). Returns the public path.
+   * Copy a selected image into the public repo under src/public/cartoons/{wordId}.png
+   * (see scripts/publish.py — one shared image for all grades). Returns the public path.
    */
   async putPublishedAsset(wordId: string, _imageId: string, data: Buffer): Promise<string> {
     const destPath = `public/cartoons/preK/${wordId}.png`;

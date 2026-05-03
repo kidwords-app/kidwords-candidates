@@ -14,8 +14,9 @@ Environment variables:
   PUBLIC_REPO_OWNER      Public repo owner (default: kidwords-app)
   PUBLIC_REPO_NAME       GitHub repo name (default: kidwords.github.io)
   PUBLIC_APP_SUBDIR      App folder inside that repo (default: kidwords-web).
-                         Writes {subdir}/src/core/words-data.json and one PNG per
-                         published grade under {subdir}/public/cartoons/<level>/.
+                         Writes {subdir}/src/core/words-data.json and one shared PNG
+                         under {subdir}/src/public/cartoons/<wordId>.png (same art
+                         for all grades; only level text varies in words-data).
                          Set empty for a flat repo.
   COMMIT_BASE_BRANCH     Target branch in the public repo (default: main). Writes land
                          on this branch via the Contents API — no PR is opened.
@@ -25,9 +26,8 @@ What it does:
   2. Maps each to a WordEntry and upserts it into src/core/words-data.json under the
      app subdir in the public repo. That file is always {"words": [<WordEntry>, ...]}
      (same shape when the file is created).
-  3. Copies cartoon PNGs to public/cartoons/{level}/{wordId}.png for each level in
-     the candidate's selection (resolves assets from ``generate-images.py`` output /
-     ``imageIdsByLevel`` heuristics).
+  3. Copies one cartoon PNG to src/public/cartoons/{wordId}.png — the image for
+     ``selected.imageId`` (shared illustration for every grade).
   4. Pushes file updates to COMMIT_BASE_BRANCH (typically ``main``) in the public repo.
 """
 
@@ -46,15 +46,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 WORDS_DATA_REL = "src/core/words-data.json"
 
-# Grade-level folders under public/cartoons/ (must match admin / kidwords-web level ids).
 PUBLISH_LEVEL_ORDER: tuple[str, ...] = ("preK", "K", "G1")
-
-# Filename prefixes from scripts/generate-images.py (must match admin/lib/imageLevel.ts).
-_PERSONA_FILENAME_PREFIX_TO_LEVEL: dict[str, str] = {
-    "preschooler": "preK",
-    "kindergartener": "K",
-    "first grader": "G1",
-}
 
 
 class LevelCopy(BaseModel):
@@ -90,82 +82,14 @@ def _words_data_repo_path(app_subdir: str) -> str:
     return f"{_app_repo_prefix(app_subdir)}{WORDS_DATA_REL}"
 
 
-def _cartoon_repo_path(app_subdir: str, word_id: str, level_id: str) -> str:
-    """Path to one level's cartoon PNG (``public/cartoons/{level}/{wordId}.png``)."""
-    return f"{_app_repo_prefix(app_subdir)}public/cartoons/{level_id}/{word_id}.png"
+def _cartoon_repo_path(app_subdir: str, word_id: str) -> str:
+    """Path to the shared cartoon PNG (``src/public/cartoons/{wordId}.png``)."""
+    return f"{_app_repo_prefix(app_subdir)}src/public/cartoons/{word_id}.png"
 
 
 def _ordered_publish_levels(selected_levels: dict) -> list[str]:
-    """Grade folders to write for this word, in canonical order."""
+    """Levels present in the selection, in canonical order (for iteration / docs)."""
     return [lid for lid in PUBLISH_LEVEL_ORDER if lid in selected_levels]
-
-
-def _image_level_id(img: dict) -> Optional[str]:
-    """Derive preK / K / G1 from ImageCandidate (explicit ``level`` or asset filename)."""
-    lv = img.get("level")
-    if lv in PUBLISH_LEVEL_ORDER:
-        return str(lv)
-    name = Path(str(img.get("assetPath", ""))).name
-    for persona, lid in _PERSONA_FILENAME_PREFIX_TO_LEVEL.items():
-        if name.startswith(persona):
-            return lid
-    return None
-
-
-def _any_image_has_level_tag(word: dict) -> bool:
-    return any(_image_level_id(img) is not None for img in word.get("images", []))
-
-
-def _pick_image_record_for_level(word: dict, level_id: str) -> dict:
-    """Choose which ImageCandidate to publish for this grade (JSON only).
-
-    ``generate-images.py`` writes one **shared** cartoon per run (``shared-*.png``) plus
-    per-level text; legacy assets may use ``preschooler-<imageId>.png`` etc. The admin
-    derives level the same way as ``admin/lib/imageLevel.ts``.
-
-    Optional ``selected.imageIdsByLevel`` overrides per level. If no image in the
-    word carries a level tag, the global ``selected.imageId`` is used for every
-    level (legacy / single-asset words).
-    """
-    word_id = word.get("wordId", "<unknown>")
-    sel = word.get("selected") or {}
-    images: list = list(word.get("images") or [])
-
-    by_level = sel.get("imageIdsByLevel")
-    if isinstance(by_level, dict):
-        raw = by_level.get(level_id)
-        if raw:
-            img = next((i for i in images if i.get("imageId") == raw), None)
-            if img:
-                return img
-            raise ValidationError(
-                f"{word_id}: imageIdsByLevel['{level_id}'] '{raw}' not found in images"
-            )
-
-    level_imgs = [i for i in images if _image_level_id(i) == level_id]
-    global_id = sel.get("imageId")
-
-    if level_imgs:
-        if global_id:
-            chosen = next((i for i in level_imgs if i.get("imageId") == global_id), None)
-            if chosen:
-                return chosen
-        if len(level_imgs) == 1:
-            return level_imgs[0]
-        return max(
-            level_imgs,
-            key=lambda i: (i.get("createdAt") or "", i.get("imageId") or ""),
-        )
-
-    if not _any_image_has_level_tag(word) and global_id:
-        img = next((i for i in images if i.get("imageId") == global_id), None)
-        if img:
-            return img
-
-    raise ValidationError(
-        f"{word_id}: no image for level '{level_id}'. "
-        "Use assets from generate-images (e.g. preschooler-*.png) or set selected.imageIdsByLevel."
-    )
 
 
 # ── Error types ────────────────────────────────────────────────────────────────
@@ -226,9 +150,6 @@ def validate_word_candidate(word: dict) -> None:
                     f"({len(candidates)} candidate(s) available)"
                 )
 
-    for lid in _ordered_publish_levels(selected_levels):
-        _pick_image_record_for_level(word, lid)
-
 
 # ── Mapping ────────────────────────────────────────────────────────────────────
 
@@ -242,8 +163,7 @@ def map_to_word_entry(word: dict) -> dict:
     model attempts.
 
     Output keys match ``WordEntry`` in kidwords-web (``cartoonId`` ties to
-    ``public/cartoons/<level>/{cartoonId}.png`` for each published level; the PNG is
-    the asset chosen for that grade — see ``_pick_image_record_for_level``); pipeline-only
+    ``src/public/cartoons/{cartoonId}.png`` — one shared image for all grades); pipeline-only
     metadata must not appear here.
     """
     selected_levels = word["selected"]["levels"]
@@ -387,17 +307,6 @@ def load_image_bytes(candidates_path: Path, word: dict) -> bytes:
     return asset_path.read_bytes()
 
 
-def load_image_bytes_for_level(candidates_path: Path, word: dict, level_id: str) -> bytes:
-    """Load the PNG bytes to publish for one grade (per-level asset resolution)."""
-    record = _pick_image_record_for_level(word, level_id)
-    asset_path = candidates_path / record["assetPath"]
-    if not asset_path.exists():
-        raise PublishError(
-            f"{word['wordId']}: image file not found for level {level_id}: {asset_path}"
-        )
-    return asset_path.read_bytes()
-
-
 # ── Per-word publish ───────────────────────────────────────────────────────────
 
 def publish_word(
@@ -408,23 +317,22 @@ def publish_word(
     *,
     app_subdir: str = "",
 ) -> None:
-    """Copy images per published level and upsert words-data.json for a single word."""
+    """Copy the shared cartoon and upsert words-data.json for a single word."""
     word_id = word["wordId"]
     words_data_path = _words_data_repo_path(app_subdir)
 
-    # 1. Copy per-level cartoon assets to the public repo
-    for level_id in _ordered_publish_levels(word["selected"]["levels"]):
-        image_bytes = load_image_bytes_for_level(candidates_path, word, level_id)
-        image_dest = _cartoon_repo_path(app_subdir, word_id, level_id)
-        existing_image = public_gh.get_file(image_dest)
-        public_gh.put_file(
-            image_dest,
-            image_bytes,
-            message=f"publish: image for {word_id} ({level_id})",
-            sha=existing_image["sha"] if existing_image else None,
-            branch=branch,
-        )
-        print(f"  ✓ image  → {image_dest}")
+    # 1. One cartoon for all grades (selected.imageId)
+    image_bytes = load_image_bytes(candidates_path, word)
+    image_dest = _cartoon_repo_path(app_subdir, word_id)
+    existing_image = public_gh.get_file(image_dest)
+    public_gh.put_file(
+        image_dest,
+        image_bytes,
+        message=f"publish: cartoon for {word_id}",
+        sha=existing_image["sha"] if existing_image else None,
+        branch=branch,
+    )
+    print(f"  ✓ image  → {image_dest}")
 
     # 2. Upsert words-data.json (schema: {"words": [<WordEntry>, ...]})
     existing_data_file = public_gh.get_file(words_data_path)

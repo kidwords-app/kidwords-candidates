@@ -30,12 +30,10 @@ Both workflows call `scripts/publish.py`, which:
    field selections must be complete (all three levels: preK / K / G1).
 2. **Maps** the candidate to a `WordEntry` (see [WordEntry shape](#wordentry-shape)),
    respecting the mix-and-match field selections.
-3. **Copies cartoon PNGs** from `candidates/rounds/{roundId}/assets/{wordId}/…` to
-   `kidwords-web/public/cartoons/{preK|K|G1}/{wordId}.png` in repo `kidwords.github.io` (via GitHub Contents API),
-   once per grade in the candidate’s selection. `scripts/generate-images.py` produces **one shared illustration** per run
-   (a single scene concept + soft pastel style) and **level-specific** definition / example / tryIt text. Assets are typically
-   `shared-*.png`; legacy `preschooler-` / `kindergartener-` / `first grader-` filenames are still supported. Publish picks the file
-   for each grade using `admin/lib/imageLevel.ts` and `scripts/publish.py` heuristics, plus optional `selected.imageIdsByLevel`.
+3. **Copies one cartoon PNG** from `candidates/rounds/{roundId}/assets/{wordId}/…` to
+   `kidwords-web/src/public/cartoons/{wordId}.png` in repo `kidwords.github.io` (via GitHub Contents API).
+   The file is the image for `selected.imageId` — **one illustration for all grades**; only the per-level text in `words-data.json` differs.
+   `scripts/generate-images.py` typically writes `shared-*.png`; legacy per-grade filenames are still fine as long as that asset is selected.
    The `kidwords-web` segment is configurable (`PUBLIC_APP_SUBDIR`) for monorepo layouts.
 4. **Upserts** the word into `kidwords-web/src/core/words-data.json` in the same repo.
    That file is always a JSON object **`{ "words": [ ... ] }`**: the `words` array holds
@@ -65,7 +63,7 @@ This pipeline must emit exactly that JSON shape — no extra keys (`wordId`, `im
 }
 ```
 
-`cartoonId` matches the basename of each published PNG: `public/cartoons/preK/{cartoonId}.png`, `public/cartoons/K/{cartoonId}.png`, and `public/cartoons/G1/{cartoonId}.png` for levels in the selection (same slug as `wordId` in the candidates repo). The web app should resolve per grade, e.g. `/cartoons/preK/{cartoonId}.png`; native builds can mirror that layout in `imageMap`.
+`cartoonId` matches the basename of the single published PNG: `src/public/cartoons/{cartoonId}.png` (same slug as `wordId` in the candidates repo). The web app loads that path for every grade that has text in `levels`.
 
 **Current invariant:** `cartoonId := wordId` during publish. Keep this as a 1:1 mapping unless the app type contract changes to support independent content IDs vs asset IDs.
 
