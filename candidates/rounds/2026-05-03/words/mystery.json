@@ -57,13 +57,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 3,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-03T20:57:18.172Z",
+  "updatedAt": "2026-05-03T20:57:24.422Z",
   "word": "mystery",
   "wordId": "mystery"
 }
