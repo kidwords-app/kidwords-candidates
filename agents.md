@@ -40,6 +40,16 @@ python scripts/publish.py --round-id YYYY-MM-DD --word-id myword
 - Do **not** rely on the system Python having `pytest`, `pydantic`, etc.
 - **`.venv/`** is gitignored; create it locally as above.
 
+## Git: push to `main`
+
+Before **`git push origin main`** (or when asked to ship changes to **`main`**):
+
+1. **`git fetch origin`** and check whether **`main`** is behind or diverged from **`origin/main`** (`git status`, or `git rev-list --left-right --count origin/main...main`).
+2. If so, integrate with rebase first: **`git pull --rebase origin main`**, resolve conflicts if needed, then push.
+3. Do **not** **`git push --force`** to **`main`** unless explicitly requested.
+
+(Same idea as **`.cursor/rules/git-push-main.mdc`**.)
+
 ### Admin app (Node)
 
 The **`admin/`** app is separate: use `npm install` / `npm test` there as usual; this file is about **Python** under `scripts/`.
