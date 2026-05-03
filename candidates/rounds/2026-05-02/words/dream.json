@@ -57,13 +57,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 1,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-03T20:55:01.357Z",
+  "updatedAt": "2026-05-03T20:55:05.544Z",
   "word": "dream",
   "wordId": "dream"
 }
