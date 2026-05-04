@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-04T08:19:14.678823+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-04/assets/concept/shared-2c0639a98e.png",
+      "createdAt": "2026-05-04T08:19:14.678823+00:00",
+      "imageId": "2c0639a98e",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child (perhaps 4-6 years old) is seated at a small, child-sized table. In front of them is a blank piece of paper and a single colorful crayon resting beside it. The child's gaze is directed slightly upwards and away from the paper, with a thoughtful, focused, and slightly imaginative expression, indicating they are forming an idea or plan in their mind. The background is simple and uncluttered, suggesting a calm and creative space.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "A concept is an idea you have in your head.",
+        "example": "The child thought of a concept for what to draw on the paper with the crayon.",
+        "model": "gemini",
+        "speak": "CON-sept",
+        "tryIt": "What concept do you have for drawing something right now?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "A concept is an idea, like the picture you think of in your head for your paper.",
+        "example": "The child is thinking of a concept for a drawing on the paper.",
+        "model": "gemini",
+        "speak": "CON-sept",
+        "tryIt": "Can you think of a concept, an idea, to draw on your paper right now?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "A concept is a special idea in your head, like what you want to draw on your paper with your crayon.",
+        "example": "The child has a cool concept in their head for what to draw on the paper.",
+        "model": "gemini",
+        "speak": "CON-sept",
+        "tryIt": "What fun concept can you think of for your next picture?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-04",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-04T08:19:14.678823+00:00",
+  "word": "concept",
+  "wordId": "concept"
+}

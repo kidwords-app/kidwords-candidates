@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-04T08:19:14.678823+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-04/assets/persevere/shared-94505bf45d.png",
+      "createdAt": "2026-05-04T08:19:14.678823+00:00",
+      "imageId": "94505bf45d",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA cheerful young child, 4-5 years old, is kneeling on the floor, intently focused on carefully placing a colorful wooden block on top of a tall, but slightly leaning, block tower. The tower is almost as tall as the child. The child has a look of deep concentration and determination, with a slight, hopeful smile. Scattered around the base of the tower are a few other blocks, perhaps one or two that look like they might have fallen from an earlier attempt, but the child is clearly dedicated to making the current tower stand taller. The setting is a brightly lit play area with a soft rug.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "To persevere means to keep trying something even when it's hard, like building a tall block tower.",
+        "example": "The child will persevere to make the wobbly block tower stand up tall.",
+        "model": "gemini",
+        "speak": "per-suh-VERE",
+        "tryIt": "What could the child do to persevere when their tower starts to lean?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Persevere means you keep trying, even when building your block tower is a little tricky!",
+        "example": "The child will persevere to make the block tower super tall, even if some blocks fall down.",
+        "model": "gemini",
+        "speak": "per-se-VERE",
+        "tryIt": "When you build your own block tower, do you persevere to make it really tall?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Persevere means you keep trying to build your blocks taller, even if they fall down sometimes.",
+        "example": "The child will persevere to carefully put the last block on the tall tower.",
+        "model": "gemini",
+        "speak": "per-suh-VEER",
+        "tryIt": "If your own block tower fell, would you persevere and try to build it up again?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-05-04",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-04T08:19:14.678823+00:00",
+  "word": "persevere",
+  "wordId": "persevere"
+}

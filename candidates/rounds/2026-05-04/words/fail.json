@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-04T08:19:14.678823+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-04/assets/fail/shared-a92bf86d93.png",
+      "createdAt": "2026-05-04T08:19:14.678823+00:00",
+      "imageId": "a92bf86d93",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA cheerful young child (or an anthropomorphic animal like a bear cub) sits on a brightly colored play mat. Around them are wooden building blocks. A half-built tower of blocks lies scattered on the mat, having just tumbled down. The child holds one block in their hand, looking at the fallen pieces with a thoughtful expression, ready to try rebuilding.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "To *fail* means something you tried to do didn't work out, like when your block tower tumbled down.",
+        "example": "Even though the tower tumbled, I won't *fail* to try building it again.",
+        "model": "gemini",
+        "speak": "FAIL",
+        "tryIt": "When your block tower *fails* to stay standing, what's one new way you could try to build it?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "When something doesn't work the way you wanted, like your block tower falling down.",
+        "example": "Oh no, your block tower did fail when it tumbled down.",
+        "model": "gemini",
+        "speak": "FAIL",
+        "tryIt": "What will you do after your tower falls? Will you try again?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "To fail means when something you tried to do didn't work, like when your block tower tumbled down.",
+        "example": "Your blocks tumbled down and the tower didn't stay up. It did **fail** to stand tall this time.",
+        "model": "gemini",
+        "speak": "FAIL",
+        "tryIt": "The blocks fell down! Will you try to build them up again?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-05-04",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 1,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-04T08:19:14.678823+00:00",
+  "word": "fail",
+  "wordId": "fail"
+}
