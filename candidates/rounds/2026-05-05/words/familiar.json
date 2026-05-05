@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-05T07:55:39.519744+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-05/assets/familiar/shared-9d315f377e.png",
+      "createdAt": "2026-05-05T07:55:39.519744+00:00",
+      "imageId": "9d315f377e",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA happy child, around preschool age, confidently walks along a gently winding paved path in a bright, sunny park. The child has a knowing smile and looks relaxed, perhaps glancing ahead or to the side as if recognizing landmarks. The path is clear, bordered by soft green grass and a few simple, friendly trees or bushes. There are no other people, emphasizing the child's independent navigation.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "If something is **familiar**, it means you know it really well, like a path you walk on often.",
+        "example": "The child has a happy smile because this path is so **familiar**.",
+        "model": "gemini",
+        "speak": "fuh-MIL-yar",
+        "tryIt": "What is a **familiar** path or place you know really well?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "When something is familiar, it means you know it very well, like a path you walk on lots of times.",
+        "example": "The child feels happy walking because this path in the park is very familiar to them.",
+        "model": "gemini",
+        "speak": "fuh-MIL-yer",
+        "tryIt": "What path do you walk on that feels familiar to you, like the child in the picture?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Familiar means you know something really well, like this path.",
+        "example": "The child has a happy smile because this path feels so familiar.",
+        "model": "gemini",
+        "speak": "fa-MIL-yar",
+        "tryIt": "Do you have a familiar path you like to walk on a lot?"
+      }
+    ]
+  },
+  "partOfSpeech": "adjective",
+  "roundId": "2026-05-05",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 4,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-05T07:55:39.519744+00:00",
+  "word": "familiar",
+  "wordId": "familiar"
+}

@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-05T07:55:39.519744+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-05/assets/choice/shared-0dac5005e9.png",
+      "createdAt": "2026-05-05T07:55:39.519744+00:00",
+      "imageId": "0dac5005e9",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA cheerful young child, around 4-5 years old, is kneeling on a soft rug in a bright, inviting playroom. Before the child are two clear options: a stack of colorful building blocks on one side and a soft, friendly-looking teddy bear on the other. The child's head is tilted slightly, and their hand hovers gently between the two items, showing a moment of happy deliberation as they decide which to play with.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "A choice is when you get to pick one thing from two or more things, like picking which toy to play with.",
+        "example": "The child is making a happy choice between the colorful blocks and the soft teddy bear.",
+        "model": "gemini",
+        "speak": "CHOYS",
+        "tryIt": "If you were the child in the picture, which toy would you make a choice to play with?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Choice means picking one thing when you have two toys to pick from.",
+        "example": "The child is making a choice between the colorful blocks and the soft teddy bear.",
+        "model": "gemini",
+        "speak": "CHOICE",
+        "tryIt": "Which toy would you make a choice to play with?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "A choice is when you have two things, like the blocks or the bear, and you get to pick the one you want.",
+        "example": "The child in the picture is making a choice between the colorful blocks and the soft teddy bear.",
+        "model": "gemini",
+        "speak": "CHOICE",
+        "tryIt": "Which toy would *you* make a choice to play with first, the blocks or the teddy bear?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-05",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 1,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-05T07:55:39.519744+00:00",
+  "word": "choice",
+  "wordId": "choice"
+}

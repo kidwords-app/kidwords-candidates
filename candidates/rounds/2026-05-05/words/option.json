@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-05T07:55:39.519744+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-05/assets/option/shared-b98e869b0a.png",
+      "createdAt": "2026-05-05T07:55:39.519744+00:00",
+      "imageId": "b98e869b0a",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA happy child stands on soft ground at a colorful playground. To the child's left is a bright yellow slide with steps leading up. To the child's right are a pair of red and blue swings, with their seats hanging low. The child looks from the slide to the swings, hands gently clasped in front, with a thoughtful yet pleased expression, pondering which activity to choose. The background is simple, perhaps a blue sky and a few distant trees.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "An option is a choice, like picking the slide or the swings.",
+        "example": "The child had an option to go on the yellow slide or the red and blue swings.",
+        "model": "gemini",
+        "speak": "OP-shun",
+        "tryIt": "Which option would you pick first: the slide or the swings?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "An option is when you have different things you can pick, like the slide or the swings.",
+        "example": "The child has an option: go down the yellow slide or play on the red and blue swings.",
+        "model": "gemini",
+        "speak": "OP-shun",
+        "tryIt": "Which option would you pick first, the slide or the swings?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "An option is something you can choose, like when the child can pick the slide or the swings to play on.",
+        "example": "The child has an option: to play on the bright yellow slide, or play on the red and blue swings.",
+        "model": "gemini",
+        "speak": "OP-shun",
+        "tryIt": "If you were the child in the picture, what option would *you* choose first, the slide or the swings?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-05",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-05T07:55:39.519744+00:00",
+  "word": "option",
+  "wordId": "option"
+}
