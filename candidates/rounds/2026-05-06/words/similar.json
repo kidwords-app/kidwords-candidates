@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-06T08:09:12.907904+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-06/assets/similar/shared-18ca833fbe.png",
+      "createdAt": "2026-05-06T08:09:12.907904+00:00",
+      "imageId": "18ca833fbe",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA happy child, about 4-5 years old, sits comfortably on a soft, green rug or a patch of grass. The child holds one bright red apple in their left hand and another bright red apple in their right hand. Both apples are almost identical in size and shape. One apple has a small, vibrant green leaf still attached to its stem, while the other apple has no leaf. The child looks thoughtfully from one apple to the other with a curious, gentle expression.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Similar means things look almost the same. Your two red apples are similar because they look almost alike.",
+        "example": "The two red apples are similar because they are both round and bright red.",
+        "model": "gemini",
+        "speak": "SIM-uh-ler",
+        "tryIt": "Can you find what makes your two similar apples a little bit different?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Similar means things are almost the same, like your two red apples.",
+        "example": "The two red apples you are holding look very similar.",
+        "model": "gemini",
+        "speak": "SIM-uh-ler",
+        "tryIt": "Look at your two apples. What is similar about them?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Similar means things are almost the same, like your two red apples.",
+        "example": "Your two apples are very similar because they are both round and red, even though one has a leaf.",
+        "model": "gemini",
+        "speak": "SIM-uh-ler",
+        "tryIt": "Can you point to the parts of your two apples that look similar?"
+      }
+    ]
+  },
+  "partOfSpeech": "adjective",
+  "roundId": "2026-05-06",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-06T08:09:12.907904+00:00",
+  "word": "similar",
+  "wordId": "similar"
+}

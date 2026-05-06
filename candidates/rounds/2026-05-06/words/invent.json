@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-06T08:09:12.907904+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-06/assets/invent/shared-40ad3f8a4b.png",
+      "createdAt": "2026-05-06T08:09:12.907904+00:00",
+      "imageId": "40ad3f8a4b",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA cheerful child, about five years old, sits cross-legged on the floor of a bright, simple playroom. They are holding up a whimsical, colorful 'robot' or 'creature' they have assembled from cardboard tubes, bottle caps, pipe cleaners, and construction paper. Their expression is one of joyful pride and concentration, looking at their finished creation. Around them, on a clean mat or rug, are a few scattered leftover craft supplies like a glue stick and a small pile of paper scraps, indicating their recent work.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "To invent means to make something new, like the cool robot creature you just made!",
+        "example": "The child was so proud because they got to invent a silly new creature from all their craft supplies.",
+        "model": "gemini",
+        "speak": "in-VENT",
+        "tryIt": "What new thing could you invent right now using the crafts around you?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "To invent means you make something brand new, like that super cool robot!",
+        "example": "The child got to invent a silly robot out of tubes and caps!",
+        "model": "gemini",
+        "speak": "in-VENT",
+        "tryIt": "What new thing can you invent with paper and glue?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "To invent means to make something new that no one has made before, just like this child made a brand new robot.",
+        "example": "The child used cardboard tubes and bottle caps to invent a super special robot.",
+        "model": "gemini",
+        "speak": "in-VENT",
+        "tryIt": "What new thing could you invent with the crafts you have?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-05-06",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-06T08:09:12.907904+00:00",
+  "word": "invent",
+  "wordId": "invent"
+}

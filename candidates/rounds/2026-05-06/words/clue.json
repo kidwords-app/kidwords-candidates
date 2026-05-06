@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-06T08:09:12.907904+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-06/assets/clue/shared-155dc0f70c.png",
+      "createdAt": "2026-05-06T08:09:12.907904+00:00",
+      "imageId": "155dc0f70c",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child is kneeling on a clean, bright kitchen floor. Their eyes are wide with curious discovery as they point a finger at a single, colorful cookie sprinkle on the floor. Their head is turned towards a closed kitchen cabinet door, indicating they've found a hint about what's inside. The scene captures the moment of joyful realization.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "A clue is a little hint that helps you find something, like a tiny cookie sprinkle on the floor.",
+        "example": "The tiny cookie sprinkle on the floor was a clue about where yummy treats might be hiding!",
+        "model": "gemini",
+        "speak": "KLOO",
+        "tryIt": "If you found a tiny toy block on the floor, what would that be a clue about?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "A clue is a little hint that helps you find or guess something, like the tiny sprinkle helping you guess what's in the cabinet.",
+        "example": "The tiny sprinkle on the floor was a perfect clue to guess there were cookies in the cabinet!",
+        "model": "gemini",
+        "speak": "CLOO",
+        "tryIt": "What other little clues might you find near the cabinet that could tell you what's inside?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "A clue is a little hint that helps you find something, like a tiny cookie sprinkle can help you find cookies!",
+        "example": "That tiny cookie sprinkle on the floor is a clue that yummy cookies might be in the cabinet!",
+        "model": "gemini",
+        "speak": "KLOO",
+        "tryIt": "What do you think this colorful sprinkle is a clue for?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-06",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 1,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-06T08:09:12.907904+00:00",
+  "word": "clue",
+  "wordId": "clue"
+}
