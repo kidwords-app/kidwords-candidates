@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-07T08:17:37.204520+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-07/assets/solve/shared-65d3b991e9.png",
+      "createdAt": "2026-05-07T08:17:37.204520+00:00",
+      "imageId": "65d3b991e9",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child, about 4-5 years old, sits comfortably on the floor of a brightly lit playroom. They are focused on a colorful, chunky jigsaw puzzle depicting a friendly animal or object. The child is holding the very last puzzle piece, carefully aligning it to fit perfectly into the final empty spot. Their expression shows a mix of concentration and growing satisfaction as they prepare to complete the picture.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "When you **solve** a puzzle, you find all the right pieces to finish it.",
+        "example": "The child is ready to **solve** the puzzle by putting in the last piece.",
+        "model": "gemini",
+        "speak": "SOLV",
+        "tryIt": "Can you point to the last piece the child needs to **solve** the puzzle?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "To solve means to figure out how to put all the puzzle pieces together!",
+        "example": "You are about to solve the puzzle when you put the last piece in!",
+        "model": "gemini",
+        "speak": "SOLV",
+        "tryIt": "Can you find the right spot for that last puzzle piece to solve the picture?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "To solve means you figure out the answer or finish something, like a puzzle.",
+        "example": "You are about to solve the puzzle by putting in the very last piece!",
+        "model": "gemini",
+        "speak": "SOLV",
+        "tryIt": "Can you show me where the last puzzle piece will go to solve the picture?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-05-07",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 1,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-07T08:17:37.204520+00:00",
+  "word": "solve",
+  "wordId": "solve"
+}

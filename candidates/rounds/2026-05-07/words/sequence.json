@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-07T08:17:37.204520+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-07/assets/sequence/shared-ebeb92733a.png",
+      "createdAt": "2026-05-07T08:17:37.204520+00:00",
+      "imageId": "ebeb92733a",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA cheerful child, around 4 years old, is actively climbing the brightly colored ladder to a playground slide. They have one foot on a lower step and are lifting the other foot to reach the next step up. Their hands are gripping the side rails securely. The slide's top platform is visible above them, with the curvy slide extending down. The background shows a sunny playground with green grass.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "A sequence is when things happen one after another. Like when you climb steps!",
+        "example": "Climbing the steps to the slide happens in a sequence, one foot after the other.",
+        "model": "gemini",
+        "speak": "SEE-kwens",
+        "tryIt": "What is the sequence for climbing to the top of the slide? What do you do first, then next?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "A sequence is when you do things one right after the other, in order.",
+        "example": "The child is following a sequence of steps to climb the ladder up to the slide.",
+        "model": "gemini",
+        "speak": "SEE-kwens",
+        "tryIt": "What comes next in the sequence when the child climbs the steps?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Sequence is when things happen one after another, like each step you take.",
+        "example": "Look! The child climbs the steps in a sequence to get to the slide.",
+        "model": "gemini",
+        "speak": "SEE-kwens",
+        "tryIt": "What's the next step the child will take in their climbing sequence?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-07",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-07T08:17:37.204520+00:00",
+  "word": "sequence",
+  "wordId": "sequence"
+}

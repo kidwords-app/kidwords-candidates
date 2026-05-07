@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-07T08:17:37.204520+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-07/assets/recall/shared-b9f59d9379.png",
+      "createdAt": "2026-05-07T08:17:37.204520+00:00",
+      "imageId": "b9f59d9379",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA small child, perhaps a preschooler, sits comfortably on the floor or at a low table, engrossed in drawing. They have already sketched a simple scene on paper, like a red house and a yellow sun. The child pauses, holding a crayon, looking thoughtfully at their half-finished artwork. Suddenly, their face brightens with a happy 'aha!' expression, and they immediately reach for a specific crayon (e.g., green) to draw a small, bushy tree next to the house, as if remembering it was always meant to be there.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "To recall means to remember something, like when the child in the picture remembered the green tree.",
+        "example": "The child smiled when they could recall the green tree to add next to the red house.",
+        "model": "gemini",
+        "speak": "re-CALL",
+        "tryIt": "Can you recall something else you might draw next to the house?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "To recall means to remember something, like remembering what you wanted to draw next.",
+        "example": "The child smiled when they could recall the tree they wanted to add to their picture.",
+        "model": "gemini",
+        "speak": "re-CALL",
+        "tryIt": "What color do you recall using for the sun in your picture?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "To recall means you remember something in your head!",
+        "example": "The child stopped to recall what else to draw next to their red house.",
+        "model": "gemini",
+        "speak": "re-CALL",
+        "tryIt": "Can you recall what else you might want to draw in this picture?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-05-07",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-07T08:17:37.204520+00:00",
+  "word": "recall",
+  "wordId": "recall"
+}
