@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-05-08T07:17:09.665227+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-05-08/assets/disappointment/shared-3644d7e1ca.png",
+      "createdAt": "2026-05-08T07:17:09.665227+00:00",
+      "imageId": "3644d7e1ca",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child with a friendly, round face (or a cute animal character like a bear cub) stands on a small, brightly colored step stool next to a kitchen counter. They are looking down into a clear glass cookie jar, which is visibly empty. The child has a slightly lowered head, a soft frown, and a thoughtful expression of mild disappointment, not deep sadness. The kitchen background is simple and warm, with gentle lighting.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Disappointment is when you feel a little bit sad because something you hoped for, like cookies in a jar, isn't there.",
+        "example": "The child felt disappointment when they saw the cookie jar was all empty.",
+        "model": "gemini",
+        "speak": "dis-uh-POINT-ment",
+        "tryIt": "What do you think the child hoped to find in the cookie jar?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Disappointment is a small sad feeling you get when you hope for something, but it's not there, like when you open the cookie jar and it's empty.",
+        "example": "The child felt disappointment when they looked into the cookie jar and saw no yummy treats inside.",
+        "model": "gemini",
+        "speak": "dis-uh-POYNT-ment",
+        "tryIt": "Look at the child's face. Can you make a face like theirs when they see the empty cookie jar?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Disappointment is when you hoped for something, like a cookie from the jar, but then it's empty. It's like a little 'oh no' feeling in your tummy.",
+        "example": "The child felt disappointment when they looked into the empty cookie jar and saw no cookies.",
+        "model": "gemini",
+        "speak": "dis-a-PPOYNT-ment",
+        "tryIt": "Look at the child's face by the empty cookie jar. What do you think they were hoping to find inside?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-05-08",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 4,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-05-08T07:17:09.665227+00:00",
+  "word": "disappointment",
+  "wordId": "disappointment"
+}
