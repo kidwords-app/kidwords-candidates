@@ -49,6 +49,11 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "G1": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     }
   },
@@ -58,7 +63,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-17T05:45:48.480Z",
+  "updatedAt": "2026-05-17T05:45:56.661Z",
   "word": "impressive",
   "wordId": "impressive"
 }
