@@ -41,7 +41,9 @@
     "imageId": "0b49f663d5",
     "levels": {
       "preK": {
-        "definition": 0
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     }
   },
@@ -51,7 +53,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-17T05:45:39.676Z",
+  "updatedAt": "2026-05-17T05:45:41.606Z",
   "word": "impressive",
   "wordId": "impressive"
 }
