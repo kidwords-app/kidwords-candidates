@@ -51,7 +51,9 @@
         "tryIt": 0
       },
       "G1": {
-        "definition": 0
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     }
   },
@@ -61,7 +63,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-17T05:29:22.102Z",
+  "updatedAt": "2026-05-17T05:29:24.745Z",
   "word": "respect",
   "wordId": "respect"
 }
