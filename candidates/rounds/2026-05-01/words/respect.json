@@ -41,7 +41,9 @@
     "imageId": "edd3ca11d4",
     "levels": {
       "preK": {
-        "definition": 0
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       },
       "K": {
         "definition": 0
@@ -57,7 +59,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-17T05:29:13.627Z",
+  "updatedAt": "2026-05-17T05:29:18.465Z",
   "word": "respect",
   "wordId": "respect"
 }
