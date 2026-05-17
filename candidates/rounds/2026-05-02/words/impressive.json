@@ -44,6 +44,11 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "K": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     }
   },
@@ -53,7 +58,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-17T05:45:41.606Z",
+  "updatedAt": "2026-05-17T05:45:48.480Z",
   "word": "impressive",
   "wordId": "impressive"
 }
