@@ -51,13 +51,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 2,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-17T05:29:04.229Z",
+  "updatedAt": "2026-05-17T05:29:05.436Z",
   "word": "respect",
   "wordId": "respect"
 }
