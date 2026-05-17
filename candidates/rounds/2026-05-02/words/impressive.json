@@ -57,13 +57,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 3,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-17T05:45:56.661Z",
+  "updatedAt": "2026-05-17T05:46:06.215Z",
   "word": "impressive",
   "wordId": "impressive"
 }
