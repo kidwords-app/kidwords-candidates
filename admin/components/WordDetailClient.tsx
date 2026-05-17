@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { WordCandidate, LevelId, FieldSelection, WordStatus } from '@/lib/types';
 import { inferImageIdsByLevelFromLegacy, isSharedImage, levelHasChosenImage } from '@/lib/imageLevel';
@@ -212,31 +212,6 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
     }
   }
 
-  const handleImageSubpromptSave = useCallback(async (text: string) => {
-    const res = await fetch(`/api/admin/candidates/${word.wordId}/subprompt`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ roundId: word.roundId, field: 'image', text }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    setWord((w) => ({ ...w, subPrompts: { ...w.subPrompts, image: text } }));
-    addToast('Image sub-prompt saved', 'success');
-  }, [word.wordId, word.roundId]);
-
-  const handleLevelSubpromptSave = useCallback(async (level: LevelId, text: string) => {
-    const res = await fetch(`/api/admin/candidates/${word.wordId}/subprompt`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ roundId: word.roundId, field: 'level', levelId: level, text }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    setWord((w) => ({
-      ...w,
-      subPrompts: { ...w.subPrompts, levels: { ...w.subPrompts.levels, [level]: text } },
-    }));
-    addToast(`${level} sub-prompt saved`, 'success');
-  }, [word.wordId, word.roundId]);
-
   return (
     <>
       {/* Top bar */}
@@ -357,8 +332,9 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
             roundId={word.roundId}
             onClose={() => setRegenOpen(false)}
             onQueued={(msg) => {
-              setWord((w) => ({ ...w, status: 'needs_regen' }));
-              addToast(msg, 'success');
+              const failed = msg.toLowerCase().includes('failed');
+              if (!failed) setWord((w) => ({ ...w, status: 'needs_regen' }));
+              addToast(msg, failed ? 'error' : 'success');
             }}
           />
         )}
@@ -372,12 +348,8 @@ export default function WordDetailClient({ word: initial }: { word: WordCandidat
           selectedImageId={selectedImageId}
           selectedImageIdsByLevel={selectedImageIdsByLevel}
           selectedLevels={selectedLevels}
-          subpromptLevels={word.subPrompts.levels ?? {}}
-          initialImageSubprompt={word.subPrompts.image ?? ''}
           onImageSelect={handleImageSelect}
           onFieldSelect={handleFieldSelect}
-          onImageSubpromptSave={handleImageSubpromptSave}
-          onLevelSubpromptSave={handleLevelSubpromptSave}
         />
       </div>
 

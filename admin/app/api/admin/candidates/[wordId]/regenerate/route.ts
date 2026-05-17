@@ -70,14 +70,32 @@ export async function POST(
     };
   }
 
+  const logCtx = { wordId, roundId, type, mode, levels };
+
   try {
+    console.info('[regenerate] setStatus → needs_regen', logCtx);
     await candidateRepo.setStatus(roundId, wordId, 'needs_regen');
+    console.info('[regenerate] setStatus ok', logCtx);
+
+    console.info('[regenerate] triggerRegeneration', { ...logCtx, options });
     await workflowClient.triggerRegeneration(wordId, roundId, options);
+    console.info('[regenerate] triggerRegeneration ok', logCtx);
+
     return NextResponse.json({ ok: true });
   } catch (err) {
-    if (err instanceof NotFoundError) return NextResponse.json({ error: err.message }, { status: 404 });
-    if (err instanceof ProviderError)  return NextResponse.json({ error: err.message }, { status: 502 });
-    console.error(`[POST /api/admin/candidates/${wordId}/regenerate]`, err);
+    if (err instanceof NotFoundError) {
+      console.error('[regenerate] not found', logCtx, err.message);
+      return NextResponse.json({ error: err.message }, { status: 404 });
+    }
+    if (err instanceof ProviderError) {
+      const step = err.message.includes('workflow_dispatch') ? 'triggerRegeneration' : 'github';
+      console.error('[regenerate] provider error', { ...logCtx, step, providerStatus: err.statusCode, message: err.message });
+      return NextResponse.json(
+        { error: err.message, providerStatus: err.statusCode, step },
+        { status: 502 },
+      );
+    }
+    console.error('[regenerate] unexpected error', logCtx, err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

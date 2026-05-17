@@ -29,6 +29,32 @@ class GenerateImagesTests(unittest.TestCase):
     def test_slugify(self):
         self.assertEqual(generate_images.slugify(" Blue  Bird! "), "blue-bird")
 
+    def test_insert_regen_before_output(self):
+        base = (
+            "Scene line one.\n\n"
+            "Hard rules:\n- No text.\n\n"
+            "Output: one square-friendly illustration."
+        )
+        result = generate_images.insert_regen_before_output(base, "warmer colors")
+        self.assertIn("Additional guidance:\nwarmer colors", result)
+        self.assertTrue(result.index("warmer colors") < result.index("Output:"))
+        self.assertTrue(result.endswith("Output: one square-friendly illustration."))
+
+    def test_resolve_regen_subprompt_uses_first_image_prompt(self):
+        candidate = {
+            "wordId": "respect",
+            "images": [
+                {"prompt": "First prompt.\n\nOutput: flashcard."},
+                {"prompt": "Second prompt.\n\nOutput: flashcard."},
+            ],
+        }
+        out = generate_images.resolve_regen_image_prompt(
+            "subprompt", "", "more cheerful", candidate
+        )
+        self.assertIn("First prompt", out)
+        self.assertNotIn("Second prompt", out)
+        self.assertIn("more cheerful", out)
+
     def test_validate_levels_rejects_missing_or_empty(self):
         with self.assertRaises(ValueError) as ctx:
             generate_images.validate_levels([], "test")

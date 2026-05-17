@@ -116,7 +116,7 @@ export default function RegenPanel({ wordId, roundId, onClose, onQueued }: Props
           ) : (
             <>
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 6, fontStyle: 'italic' }}>
-                Will append to the existing image prompt
+                Inserts into the original image prompt, just before the Output section
               </div>
               <textarea
                 className="regen-textarea"

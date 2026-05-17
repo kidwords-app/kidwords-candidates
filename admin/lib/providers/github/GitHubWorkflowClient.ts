@@ -22,6 +22,7 @@ export class GitHubWorkflowClient implements WorkflowClient {
   }
 
   async triggerRegeneration(wordId: string, roundId: string, options: RegenOptions): Promise<void> {
+    console.info('[workflow] triggerRegeneration', { wordId, roundId, options });
     if (options.type === 'image') {
       await this.gh.dispatchWorkflow(WORKFLOWS.generateImages, DEFAULT_REF, {
         wordId,

@@ -26,6 +26,21 @@ export interface GitHubFileContent {
   encoding: 'base64';
 }
 
+function logGitHubFailure(
+  operation: string,
+  method:  string,
+  url:     string,
+  status:  number,
+  detail:  string,
+): void {
+  console.error('[github]', { operation, method, url, status, detail: detail.slice(0, 500) });
+}
+
+async function readResponseText(res: Response): Promise<string> {
+  if (typeof res.text !== 'function') return '';
+  return res.text().catch(() => '(unreadable)');
+}
+
 export function makeGitHubClient(config: GitHubConfig) {
   const baseUrl = `https://api.github.com/repos/${config.owner}/${config.repo}`;
   const headers = {
@@ -43,6 +58,8 @@ export function makeGitHubClient(config: GitHubConfig) {
       throw new NotFoundError(`Not found in repo: ${path}`);
     }
     if (!res.ok) {
+      const body = await readResponseText(res);
+      logGitHubFailure('get', 'GET', url, res.status, body);
       throw new ProviderError(res.status, `GitHub API error ${res.status} for path: ${path}`);
     }
     return res.json() as Promise<T>;
@@ -83,6 +100,8 @@ export function makeGitHubClient(config: GitHubConfig) {
       body:    JSON.stringify({ message, content, sha }),
     });
     if (!res.ok) {
+      const body = await readResponseText(res);
+      logGitHubFailure('putJson', 'PUT', url, res.status, body);
       throw new ProviderError(res.status, `GitHub API error ${res.status} updating: ${path}`);
     }
   }
@@ -103,6 +122,8 @@ export function makeGitHubClient(config: GitHubConfig) {
       throw new NotFoundError(`Not found in repo: ${path}`);
     }
     if (!res.ok) {
+      const body = await readResponseText(res);
+      logGitHubFailure('fetchBinary', 'GET', url, res.status, body);
       throw new ProviderError(res.status, `GitHub API error ${res.status} for path: ${path}`);
     }
     return Buffer.from(await res.arrayBuffer());
@@ -125,9 +146,11 @@ export function makeGitHubClient(config: GitHubConfig) {
     });
     // GitHub returns 204 No Content on success
     if (!res.ok && res.status !== 204) {
-      const body = await res.text().catch(() => '(unreadable)');
+      const body = await readResponseText(res);
+      logGitHubFailure('dispatchWorkflow', 'POST', url, res.status, body);
       throw new ProviderError(res.status, `workflow_dispatch failed (${res.status}) for ${workflowFile}: ${body}`);
     }
+    console.info('[github] workflow_dispatch ok', { workflowFile, ref, inputs });
   }
 
   return { listDirectory, fetchJson, fetchJsonWithSha, putJson, fetchBinary, dispatchWorkflow };

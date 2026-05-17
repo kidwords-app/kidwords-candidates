@@ -6,6 +6,18 @@ on:
       roundId:
         description: "Batch round id (YYYY-MM-DD)"
         required: false
+      wordId:
+        description: "Single word to regenerate (admin regen); omit for full batch"
+        required: false
+      mode:
+        description: "Image regen mode: replace | subprompt (only with wordId)"
+        required: false
+      prompt:
+        description: "Replacement image prompt (mode=replace)"
+        required: false
+      subprompt:
+        description: "Text appended to existing image prompt (mode=subprompt)"
+        required: false
   schedule:
     - cron: "0 6 * * *"
 
@@ -49,13 +61,28 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ROUND_ID: ${{ steps.round.outputs.roundId }}
           CANDIDATES_REPO_PATH: .
+          WORD_ID: ${{ github.event.inputs.wordId }}
+          REGEN_MODE: ${{ github.event.inputs.mode }}
+          REGEN_PROMPT: ${{ github.event.inputs.prompt }}
+          REGEN_SUBPROMPT: ${{ github.event.inputs.subprompt }}
         run: |
           set -euo pipefail
           echo "::debug::PWD=$PWD"
-          echo "::debug::Batch file path: $PWD/inputs/word-batches/$ROUND_ID.json"
-          echo "::debug::Listing inputs/word-batches:"
-          ls -la inputs/word-batches/ 2>&1 || true
-          python -u scripts/generate-images.py
+          if [ -n "${WORD_ID:-}" ]; then
+            echo "::notice::Single-word image regen wordId=$WORD_ID roundId=$ROUND_ID mode=${REGEN_MODE:-replace}"
+            python -u scripts/generate-images.py \
+              --round-id "$ROUND_ID" \
+              --candidates-repo . \
+              --word-id "$WORD_ID" \
+              --regen-mode "${REGEN_MODE:-replace}" \
+              --regen-prompt "${REGEN_PROMPT:-}" \
+              --regen-subprompt "${REGEN_SUBPROMPT:-}"
+          else
+            echo "::debug::Batch file path: $PWD/inputs/word-batches/$ROUND_ID.json"
+            echo "::debug::Listing inputs/word-batches:"
+            ls -la inputs/word-batches/ 2>&1 || true
+            python -u scripts/generate-images.py
+          fi
 
       - name: Commit and push
         run: |

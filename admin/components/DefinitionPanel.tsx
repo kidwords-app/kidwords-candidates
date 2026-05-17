@@ -8,9 +8,7 @@ interface Props {
   roundId:          string;
   levels:           Partial<Record<LevelId, LevelCandidate[]>>;
   selectedLevels:   Partial<Record<LevelId, FieldSelection>>;
-  subpromptLevels:  Partial<Record<LevelId, string>>;
   onFieldSelect:    (level: LevelId, field: keyof FieldSelection, idx: number) => void;
-  onSubpromptSave:  (level: LevelId, text: string) => Promise<void>;
 }
 
 const LEVEL_IDS: LevelId[] = ['preK', 'K', 'G1'];
@@ -74,31 +72,14 @@ function FieldSection({
 }
 
 export default function DefinitionPanel({
-  wordId,
-  roundId,
   levels,
   selectedLevels,
-  subpromptLevels,
   onFieldSelect,
-  onSubpromptSave,
 }: Props) {
   const [activeLevel, setActiveLevel] = useState<LevelId>('preK');
-  const [subpromptTexts, setSubpromptTexts] = useState<Partial<Record<LevelId, string>>>(
-    () => ({ ...subpromptLevels }),
-  );
-  const [saving, setSaving] = useState<LevelId | null>(null);
 
   const candidates = levels[activeLevel] ?? [];
   const sel = selectedLevels[activeLevel];
-
-  async function handleSubpromptSave(level: LevelId) {
-    setSaving(level);
-    try {
-      await onSubpromptSave(level, subpromptTexts[level] ?? '');
-    } finally {
-      setSaving(null);
-    }
-  }
 
   return (
     <div>
@@ -133,45 +114,15 @@ export default function DefinitionPanel({
           <div>No definition candidates for {activeLevel} yet.</div>
         </div>
       ) : (
-        <>
-          {FIELDS.map((field) => (
-            <FieldSection
-              key={field}
-              field={field}
-              candidates={candidates}
-              selectedIdx={sel?.[field]}
-              onSelect={(idx) => onFieldSelect(activeLevel, field, idx)}
-            />
-          ))}
-
-          {/* Level sub-prompt */}
-          <div className="subprompt-section" style={{ marginTop: 4, borderTop: '1px solid var(--border)', paddingTop: 14 }}>
-            <div className="subprompt-label">✏️ {activeLevel} sub-prompt</div>
-            <textarea
-              className="subprompt-input"
-              rows={2}
-              placeholder={`Guidance for the next ${activeLevel} generation run…`}
-              value={subpromptTexts[activeLevel] ?? ''}
-              onChange={(e) =>
-                setSubpromptTexts((prev) => ({ ...prev, [activeLevel]: e.target.value }))
-              }
-            />
-            <div className="save-row">
-              <div className="tooltip-wrap">
-                <button
-                  className="btn btn-outline btn-sm"
-                  onClick={() => handleSubpromptSave(activeLevel)}
-                  disabled={saving === activeLevel}
-                >
-                  {saving === activeLevel ? '…' : '💾 Save sub-prompt'}
-                </button>
-                <span className="tooltip-tip">
-                  POST /api/admin/candidates/:wordId/subprompt {`{"field":"level","levelId":"${activeLevel}"}`}
-                </span>
-              </div>
-            </div>
-          </div>
-        </>
+        FIELDS.map((field) => (
+          <FieldSection
+            key={field}
+            field={field}
+            candidates={candidates}
+            selectedIdx={sel?.[field]}
+            onSelect={(idx) => onFieldSelect(activeLevel, field, idx)}
+          />
+        ))
       )}
     </div>
   );

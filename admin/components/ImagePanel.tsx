@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import type { ImageCandidate, LevelId } from '@/lib/types';
 import { imageLevelId, isSharedImage, LEVEL_LABELS } from '@/lib/imageLevel';
 
@@ -10,8 +9,6 @@ interface Props {
   images:          ImageCandidate[];
   selectedImageId: string | undefined;
   onSelect:        (imageId: string) => void;
-  onSubpromptSave: (text: string) => Promise<void>;
-  initialSubprompt?: string;
 }
 
 const LEVEL_ORDER: LevelId[] = ['preK', 'K', 'G1'];
@@ -89,21 +86,7 @@ export default function ImagePanel({
   images,
   selectedImageId,
   onSelect,
-  onSubpromptSave,
-  initialSubprompt = '',
 }: Props) {
-  const [subprompt, setSubprompt] = useState(initialSubprompt);
-  const [saving,    setSaving]    = useState(false);
-
-  async function handleSaveSubprompt() {
-    setSaving(true);
-    try {
-      await onSubpromptSave(subprompt);
-    } finally {
-      setSaving(false);
-    }
-  }
-
   if (images.length === 0) {
     return (
       <div className="empty-state" style={{ padding: '24px' }}>
@@ -173,31 +156,6 @@ export default function ImagePanel({
         </div>
       ))}
 
-      {/* Image sub-prompt */}
-      <div className="subprompt-section" style={{ marginTop: 4, borderTop: '1px solid var(--border)', paddingTop: 14 }}>
-        <div className="subprompt-label">🎨 Image sub-prompt</div>
-        <textarea
-          className="subprompt-input"
-          rows={3}
-          placeholder="Add guidance for the next image generation run, e.g. 'warmer colors, outdoor setting'"
-          value={subprompt}
-          onChange={(e) => setSubprompt(e.target.value)}
-        />
-        <div className="save-row">
-          <div className="tooltip-wrap">
-            <button
-              className="btn btn-outline btn-sm"
-              onClick={handleSaveSubprompt}
-              disabled={saving}
-            >
-              {saving ? '…' : '💾 Save sub-prompt'}
-            </button>
-            <span className="tooltip-tip">
-              POST /api/admin/candidates/:wordId/subprompt {`{"field":"image"}`}
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

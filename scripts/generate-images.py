@@ -88,7 +88,14 @@ Hard rules:
 - No text, letters, numbers, logos, or labels anywhere in the image.
 - No scary, violent, or shaming imagery.
 
+{additional_guidance_block}
+
 Output: one square-friendly illustration suitable for a flashcard."""
+
+# Inserted before ``Output:`` when an admin adds regen guidance (empty on first generation).
+ADDITIONAL_GUIDANCE_SECTION = """Additional guidance:
+{additional_guidance}
+"""
 
 TEXT_MODEL = "gemini-2.5-flash"
 IMAGE_MODEL = "gemini-2.5-flash-image"
@@ -252,8 +259,20 @@ def _build_level_text_prompt(word: str, level: str, scene_for_artist: str, concr
     )
 
 
-def _build_image_prompt(scene_for_artist: str) -> str:
-    return STAGE3_IMAGE_PROMPT_TEMPLATE.format(scene_for_artist=scene_for_artist)
+def _additional_guidance_block(additional_guidance: str = "") -> str:
+    """Rendered block for ``STAGE3_IMAGE_PROMPT_TEMPLATE`` (empty when no guidance)."""
+    text = (additional_guidance or "").strip()
+    if not text:
+        return ""
+    body = ADDITIONAL_GUIDANCE_SECTION.format(additional_guidance=text).rstrip()
+    return f"\n\n{body}\n\n"
+
+
+def _build_image_prompt(scene_for_artist: str, additional_guidance: str = "") -> str:
+    return STAGE3_IMAGE_PROMPT_TEMPLATE.format(
+        scene_for_artist=scene_for_artist,
+        additional_guidance_block=_additional_guidance_block(additional_guidance),
+    )
 
 
 def _generate_shared_concept(client: genai.Client, word: str, entry: dict, model: str = TEXT_MODEL) -> dict:
@@ -428,6 +447,108 @@ def validate_levels(levels: List[str], word: str) -> None:
         )
 
 
+def _first_image_prompt(candidate: dict) -> str | None:
+    """Prompt from the first (original) image candidate — the initial generation."""
+    images = candidate.get("images") or []
+    if not images:
+        return None
+    first = images[0]
+    if isinstance(first, dict):
+        p = first.get("prompt")
+        return p if isinstance(p, str) and p.strip() else None
+    return None
+
+
+def insert_regen_before_output(base_prompt: str, regen_text: str) -> str:
+    """Insert admin regen guidance immediately before the ``Output:`` section."""
+    extra = regen_text.strip()
+    if not extra:
+        raise ValueError("regen text must be non-empty")
+    block = _additional_guidance_block(extra)
+
+    for marker in ("\n\nOutput:", "\nOutput:", "Output:"):
+        idx = base_prompt.find(marker)
+        if idx != -1:
+            before = base_prompt[:idx].rstrip()
+            after = base_prompt[idx:].lstrip("\n")
+            return f"{before}{block}{after}"
+    return f"{base_prompt.rstrip()}{block}"
+
+
+def resolve_regen_image_prompt(mode: str, prompt: str, subprompt: str, candidate: dict) -> str:
+    if mode == "replace":
+        text = (prompt or "").strip()
+        if not text:
+            raise ValueError("replace mode requires a non-empty prompt")
+        return text
+    if mode == "subprompt":
+        base = _first_image_prompt(candidate)
+        if not base:
+            word_id = candidate.get("wordId", "?")
+            raise ValueError(f"No original image prompt to extend for wordId={word_id}")
+        extra = (subprompt or "").strip()
+        if not extra:
+            raise ValueError("subprompt mode requires a non-empty subprompt")
+        return insert_regen_before_output(base, extra)
+    raise ValueError(f"Unknown regen mode: {mode!r} (expected replace or subprompt)")
+
+
+def regenerate_image_for_word(
+    word_id: str,
+    round_id: str,
+    candidates_repo: Path,
+    mode: str,
+    prompt: str = "",
+    subprompt: str = "",
+) -> int:
+    """Append one new image candidate for an existing word (admin image regen)."""
+    candidate_path = (
+        candidates_repo / "candidates" / "rounds" / round_id / "words" / f"{word_id}.json"
+    )
+    if not candidate_path.exists():
+        raise FileNotFoundError(f"Word candidate not found: {candidate_path}")
+
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+    image_prompt = resolve_regen_image_prompt(mode, prompt, subprompt, candidate)
+
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ConfigurationError("GEMINI_API_KEY is missing from the environment.")
+    client = genai.Client(api_key=api_key)
+
+    now = datetime.now(timezone.utc).isoformat()
+    assets_dir = candidates_repo / "candidates" / "rounds" / round_id / "assets"
+    image_id = uuid.uuid4().hex[:10]
+    output_path = assets_dir / word_id / f"shared-{image_id}.png"
+    rel_path = str(output_path.as_posix())
+
+    print(
+        f"[regen] wordId={word_id!r} roundId={round_id!r} mode={mode!r} -> {output_path}",
+        flush=True,
+    )
+    _generate_cartoon_image(client, image_prompt, output_path)
+
+    images = list(candidate.get("images") or [])
+    images.append(
+        {
+            "imageId": image_id,
+            "prompt": image_prompt,
+            "model": "gemini",
+            "assetPath": rel_path,
+            "createdAt": now,
+        }
+    )
+    candidate["images"] = images
+    candidate["status"] = "in_review"
+    candidate["updatedAt"] = now
+
+    candidate_path.write_text(
+        json.dumps(candidate, indent=2, sort_keys=True), encoding="utf-8"
+    )
+    print(f"[regen] appended image {image_id!r} for {word_id!r}", flush=True)
+    return 1
+
+
 def generate_images_for_entry(
     entry: dict,
     round_id: str,
@@ -565,12 +686,66 @@ def parse_args(argv: Iterable[str]):
         help="Single-word mode: part of speech for the shared concept prompt.",
     )
     parser.add_argument("--output", default="generated_image.png", help="Single-word mode: output path.")
+    parser.add_argument(
+        "--word-id",
+        default=os.environ.get("WORD_ID"),
+        help="Admin regen: existing wordId slug in candidates/rounds/<round>/words/.",
+    )
+    parser.add_argument(
+        "--regen-mode",
+        default=os.environ.get("REGEN_MODE", "replace"),
+        choices=("replace", "subprompt"),
+        help="Admin regen: replace full prompt or append subprompt.",
+    )
+    parser.add_argument(
+        "--regen-prompt",
+        default=os.environ.get("REGEN_PROMPT", ""),
+        help="Admin regen: replacement image prompt (mode=replace).",
+    )
+    parser.add_argument(
+        "--regen-subprompt",
+        default=os.environ.get("REGEN_SUBPROMPT", ""),
+        help="Admin regen: text to append (mode=subprompt).",
+    )
     args = parser.parse_args(list(argv))
     return args
 
 
 def main(argv: Iterable[str]) -> int:
     args = parse_args(argv)
+
+    # Admin image regen for an existing candidate JSON
+    if args.word_id:
+        if not args.round_id:
+            print("Error: --round-id (or ROUND_ID) required with --word-id.", file=sys.stderr)
+            return 1
+        if not args.candidates_repo:
+            print("Error: --candidates-repo (or CANDIDATES_REPO_PATH) required with --word-id.", file=sys.stderr)
+            return 1
+        try:
+            created = regenerate_image_for_word(
+                args.word_id,
+                args.round_id,
+                Path(args.candidates_repo),
+                args.regen_mode,
+                args.regen_prompt or "",
+                args.regen_subprompt or "",
+            )
+        except (FileNotFoundError, ValueError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        except BudgetLimitError as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 2
+        except (ImageGenerationError, ConfigurationError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+        except Exception as exc:
+            print(f"Regen failed: {exc}", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            return 1
+        print(f"Regen complete: {created} image(s) for {args.word_id!r}.")
+        return 0
 
     # Single-word mode: shared concept + level text + one image
     if args.word:
