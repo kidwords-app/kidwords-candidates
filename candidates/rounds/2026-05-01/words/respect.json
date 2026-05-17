@@ -45,6 +45,9 @@
       },
       "K": {
         "definition": 0
+      },
+      "G1": {
+        "definition": 0
       }
     }
   },
@@ -54,7 +57,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-05-17T05:28:57.813Z",
+  "updatedAt": "2026-05-17T05:29:04.229Z",
   "word": "respect",
   "wordId": "respect"
 }
