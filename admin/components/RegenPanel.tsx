@@ -153,7 +153,7 @@ export default function RegenPanel({ wordId, roundId, onClose, onQueued }: Props
           </div>
 
           <div className="regen-warn">
-            ⚠ This queues both a text generation job <em>and</em> an image generation job.
+            ⚠ This queues one GitHub Actions job that regenerates selected level text and a new image.
             Existing candidates are kept until you approve new ones.
           </div>
 

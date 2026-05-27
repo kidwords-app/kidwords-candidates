@@ -1,7 +1,7 @@
 import type { ImageCandidate, LevelId } from './types';
 
 /**
- * The generate-images script may name files:
+ * The generate-word-image script may name files:
  * - Legacy (one PNG per level): preschooler-*.png → preK, kindergartener-*.png → K, first grader-*.png → G1
  * - Current (one shared illustration): shared-*.png — no level in the filename; use explicit `level` if set.
  *

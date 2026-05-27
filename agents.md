@@ -2,7 +2,7 @@
 
 ## Python: use the project virtualenv first
 
-Before running **any** Python command in this repo (`scripts/publish.py`, `scripts/generate-images.py`, `pytest`, one-off `python` snippets, etc.), use the local environment under **`.venv/`** at the repository root.
+Before running **any** Python command in this repo (`scripts/publish.py`, `scripts/generate-word-image.py`, `pytest`, one-off `python` snippets, etc.), use the local environment under **`.venv/`** at the repository root.
 
 ### Python version
 

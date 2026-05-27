@@ -33,7 +33,7 @@ Both workflows call `scripts/publish.py`, which:
 3. **Copies one cartoon PNG** from `candidates/rounds/{roundId}/assets/{wordId}/…` to
    `kidwords-web/public/cartoons/{wordId}.png` in repo `kidwords.github.io` (via GitHub Contents API).
    The file is the image for `selected.imageId` — **one illustration for all grades**; only the per-level text in `words-data.json` differs.
-   `scripts/generate-images.py` typically writes `shared-*.png`; legacy per-grade filenames are still fine as long as that asset is selected.
+   `scripts/generate-word-image.py` typically writes `shared-*.png`; legacy per-grade filenames are still fine as long as that asset is selected.
    The `kidwords-web` segment is configurable (`PUBLIC_APP_SUBDIR`) for monorepo layouts.
 4. **Upserts** the word into `kidwords-web/src/core/words-data.json` in the same repo.
    That file is always a JSON object **`{ "words": [ ... ] }`**: the `words` array holds

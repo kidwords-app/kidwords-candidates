@@ -1,104 +1,80 @@
 # Generation Jobs (GitHub Actions)
 
 ## Goal
-Generate candidate images and definitions for each word in a batch.
+Generate candidate definitions and images for each word in a batch, and support admin-triggered regeneration of one word at a time.
 
-## Workflows
+## Script
+All generation runs through **`scripts/generate-word-image.py`** (Gemini text + image). The script supports:
 
-### 1) `generate-images.yml`
-- Trigger: cron daily + manual workflow dispatch with `roundId`.
-- Runs in the public app repo, but reads/writes data in the private
-  `kidwords-app/kidwords-candidates` repo.
-- Reads: `inputs/word-batches/YYYY-MM-DD.json` for the round.
-- For each word:
-  - Call Gemini for one **shared illustration concept**, then level-specific definition/example/tryIt, then **one** soft-pastel cartoon image (`shared-*.png`). See `scripts/generate-images.py` prompt stages.
-  - Save images to `candidates/rounds/<roundId>/assets/<wordId>/`.
-  - Append image metadata and new `LevelCandidate` rows to the word's `WordCandidate`.
+| Mode | How invoked | Behavior |
+|------|-------------|----------|
+| **Batch** | No `--word-id`; `--round-id` + `--candidates-repo` | Reads `inputs/word-batches/<roundId>.json`; for each word runs the definition-first pipeline and writes/updates `WordCandidate` JSON + assets. |
+| **Image regen** | `--word-id` + `--regen-mode replace\|subprompt` | Appends one new image using a replacement prompt or sub-prompt inserted before `Output:` in `images[0].prompt`. |
+| **Full regen** | `--word-id` + `--regen-mode full` + `--regen-levels` | Re-runs teaching scenario → level text → scene → image for selected levels (`preK`, `K`, `G1`); optional `--regen-subprompt` guides stage 1. |
 
-### 2) `generate-definitions.yml`
-- Trigger: cron daily + manual workflow dispatch with `roundId`.
-- Reads the same batch file and word candidate records.
-- For each word and each level:
-  - Call Claude/ChatGPT for candidate definitions (N=2 default).
-  - Store as `LevelCandidate` array per level.
-  - Update `WordCandidate` status to `in_review` when both image and
-    definition candidates exist.
+Pipeline order (batch and full regen): teaching scenario → per-level definition/example/tryIt/speak → scene derived from level text → one shared cartoon (`shared-*.png`).
 
-## Prompt Template (Definition)
-- Inputs: word, partOfSpeech, tags, levelId.
-- Outputs: `definition`, `example`, `tryIt`.
-- Constraints: short sentences; age-appropriate tone.
+## Workflow: `generate-word.yaml`
+
+- **Repo:** workflow file lives in `kidwords-app/kidwords-candidates`; checkout uses `CANDIDATES_REPO_TOKEN` and runs Python in that repo.
+- **Triggers:**
+  - **Cron** daily (`0 6 * * *`) — batch for today’s UTC `roundId` unless overridden.
+  - **Manual dispatch** — optional `roundId` for batch; or admin regen with `wordId` + mode inputs.
+- **Batch path** (no `wordId`): `python scripts/generate-word-image.py` with env `ROUND_ID`, `CANDIDATES_REPO_PATH`.
+- **Regen path** (`wordId` set): same script with `--word-id`, `--regen-mode`, `--regen-prompt`, `--regen-subprompt`, `--regen-levels` (full only).
+- **Commit:** pushes changes under `candidates/rounds/` back to the candidates repo.
+
+### Workflow dispatch inputs
+
+| Input | Batch | Image regen | Full regen |
+|-------|-------|-------------|------------|
+| `roundId` | optional (default today UTC) | required (from admin) | required |
+| `wordId` | omit | required | required |
+| `mode` | omit | `replace` \| `subprompt` | `full` |
+| `prompt` | — | replace prompt | — |
+| `subprompt` | — | image sub-prompt | optional text guidance |
+| `levels` | — | — | comma-separated `preK,K,G1` |
+
+## Admin regeneration
+
+The moderation app does **not** call Gemini directly. It:
+
+1. `POST /api/admin/candidates/:wordId/regenerate` — sets status `needs_regen`, then dispatches `generate-word.yaml` via `GitHubWorkflowClient`.
+2. **Image only:** `{ type: "image", mode: "replace"|"subprompt", prompt|subprompt, roundId }`.
+3. **Full:** `{ type: "full", levels: ["preK","K","G1"], subprompt?, roundId }` → workflow `mode=full`, `levels=preK,K,...`.
+
+On success the script sets status `in_review` and appends new `images[]` / `levels[]` entries (existing candidates are kept until a moderator selects winners).
+
+## Batch inputs and outputs
+
+- **Reads:** `inputs/word-batches/YYYY-MM-DD.json` (`words[]` with `word`, `levels`, optional `tags`, `partOfSpeech`).
+- **Writes:**
+  - `candidates/rounds/<roundId>/words/<wordId>.json`
+  - `candidates/rounds/<roundId>/assets/<wordId>/shared-<id>.png`
+- **Audience levels** in batch files use long names (`preschooler`, `kindergartener`, `first grader`); stored level keys are `preK`, `K`, `G1`.
 
 ## Secrets
-- `GEMINI_API_KEY`
-- `CLAUDE_API_KEY` or `OPENAI_API_KEY`
-- `CANDIDATES_REPO_TOKEN` (PAT or GitHub App token for private repo access)
+- `GEMINI_API_KEY` — text and image generation
+- `CANDIDATES_REPO_TOKEN` — PAT with read/write on the candidates repo (checkout + push)
+- Optional SMTP secrets for failure/success email on workflow completion
 
 ## Calling LLM APIs from Actions
-GitHub Actions runners can call external HTTPS APIs. Secrets are injected as
-env vars and must never be echoed in logs.
+GitHub Actions runners call Gemini over HTTPS. Secrets are injected as env vars and must never be echoed in logs.
 
-### Minimal Example (definition call)
-```yaml
-name: llm-smoke-test
-on:
-  workflow_dispatch:
-jobs:
-  call-llm:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Call OpenAI
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          curl https://api.openai.com/v1/responses \
-            -H "Authorization: Bearer $OPENAI_API_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{"model":"gpt-4.1-mini","input":"Define empathy for a 5-year-old."}'
-```
-
-### Minimal Example (Gemini image call)
-```yaml
-name: gemini-image-smoke-test
-on:
-  workflow_dispatch:
-jobs:
-  call-gemini:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Call Gemini image generation
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$GEMINI_API_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "contents": [
-                { "parts": [{ "text": "Generate a kid-friendly cartoon of a rocket in space." }] }
-              ]
-            }'
-```
-
-## Saving Image Assets
-When the model returns base64 image data, the Action should:
-1. Parse response JSON and extract the base64 payload.
-2. Write the decoded bytes to
-   `candidates/rounds/<roundId>/assets/<wordId>/<imageId>.png`.
-3. Append a new `ImageCandidate` entry in the word's JSON with `assetPath`.
-4. Commit and push changes to the private candidate repo.
+## Saving image assets
+1. Decode model image bytes and write under `candidates/rounds/<roundId>/assets/<wordId>/`.
+2. Append `ImageCandidate` with repo-relative `assetPath` (e.g. `candidates/rounds/.../shared-<id>.png`).
+3. Commit and push in the workflow’s “Commit and push” step.
 
 Notes:
-- Prefer stable `imageId` (uuid or short hash of prompt + timestamp).
-- Keep binary assets out of the public repo; only publish selected images.
-- If assets become large, switch to Git LFS in the private repo.
+- Prefer stable `imageId` (short uuid hex).
+- Keep binaries in the private candidates repo; publish only selected images via `publish-word.yaml` / `scripts/publish.py`.
 
-## Rate Limits / Retries
-- Retry 2 times per request with exponential backoff.
-- Batch size limit (default 25 words per run).
-- Log failures to `audit/actions-log.jsonl`.
+## Rate limits / retries
+- Retry transient API failures in script (see `generate-word-image.py`).
+- Batch size is whatever is in the day’s JSON file; cron fails cleanly if that file is missing.
 
-## Acceptance Criteria
-- Workflows can run on schedule and on manual trigger.
-- Generated assets and metadata are stored in the private repo.
-- Failures are logged with wordId and roundId.
-
+## Acceptance criteria
+- Batch workflow runs on schedule and manual trigger when a batch file exists.
+- Admin image and full regen dispatch the same workflow with correct inputs.
+- Generated assets and metadata land in the private repo and are visible in the admin UI.

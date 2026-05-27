@@ -8,8 +8,8 @@ from unittest.mock import MagicMock
 from types import ModuleType
 
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "generate-images.py"
-spec = importlib.util.spec_from_file_location("generate_images", MODULE_PATH)
+MODULE_PATH = Path(__file__).resolve().parents[1] / "generate-word-image.py"
+spec = importlib.util.spec_from_file_location("generate_word_image", MODULE_PATH)
 gen_images = importlib.util.module_from_spec(spec)
 google_module = ModuleType("google")
 genai_module = ModuleType("genai")
@@ -51,38 +51,39 @@ class CartoonPipelineTests(unittest.TestCase):
         self.assertIn("pastel", prompt.lower())
         self.assertIn("No text", prompt)
 
-    def test_build_level_text_prompt_includes_shared_scene(self):
+    def test_build_level_text_prompt_includes_teaching_scenario(self):
         p = gen_images._build_level_text_prompt(
             "share",
             "preschooler",
-            "Two children pass a ball.",
+            "Two children take turns with a ball at the park.",
             "ball",
+            "They pass the ball back and forth.",
         )
         self.assertIn("share", p)
         self.assertIn("preschooler", p)
-        self.assertIn("Two children pass a ball.", p)
-        self.assertIn("ball", p)
+        self.assertIn("Two children take turns", p)
+        self.assertIn("pass the ball", p)
         self.assertIn("speak", p)
-        self.assertIn("HAP-ee", p)
+        self.assertIn("before any picture", p.lower())
 
-    def test_parse_concept_response(self):
+    def test_parse_teaching_scenario_response(self):
         raw = json.dumps(
             {
-                "visual_concept": "sharing a ball",
-                "scene_for_artist": "Two kids and a red ball.",
+                "teaching_scenario": "Two kids share a ball at the park.",
                 "concrete_anchor": "ball",
+                "example_core": "They pass the ball gently.",
                 "avoid": ["treasure hunt"],
             }
         )
-        c = gen_images._parse_concept_response(raw)
+        c = gen_images._parse_teaching_scenario_response(raw)
         self.assertEqual(c["concrete_anchor"], "ball")
         self.assertEqual(c["avoid"], ["treasure hunt"])
 
-    def test_parse_concept_response_rejects_missing_key(self):
+    def test_parse_teaching_scenario_rejects_missing_key(self):
         with self.assertRaises(gen_images.InvalidResponseError):
-            gen_images._parse_concept_response("{}")
+            gen_images._parse_teaching_scenario_response("{}")
 
-    def test_parse_concept_strips_markdown_fence(self):
+    def test_parse_scene_strips_markdown_fence(self):
         inner = json.dumps(
             {
                 "visual_concept": "x",
@@ -92,7 +93,7 @@ class CartoonPipelineTests(unittest.TestCase):
             }
         )
         raw = f"Sure!\n```json\n{inner}\n```\n"
-        c = gen_images._parse_concept_response(raw)
+        c = gen_images._parse_scene_response(raw)
         self.assertEqual(c["visual_concept"], "x")
         self.assertEqual(c["avoid"], [])
 
@@ -108,7 +109,7 @@ class CartoonPipelineTests(unittest.TestCase):
         p = gen_images._parse_text_response(raw)
         self.assertEqual(p["speak"], "HAP-ee")
 
-    def test_parse_concept_prose_before_brace(self):
+    def test_parse_scene_prose_before_brace(self):
         inner = {
             "visual_concept": "a",
             "scene_for_artist": "b",
@@ -116,10 +117,10 @@ class CartoonPipelineTests(unittest.TestCase):
             "avoid": ["d"],
         }
         raw = "Here you go: " + json.dumps(inner)
-        c = gen_images._parse_concept_response(raw)
+        c = gen_images._parse_scene_response(raw)
         self.assertEqual(c["concrete_anchor"], "c")
 
-    def test_parse_concept_omitted_avoid_defaults_empty(self):
+    def test_parse_scene_omitted_avoid_defaults_empty(self):
         raw = json.dumps(
             {
                 "visual_concept": "v",
@@ -127,7 +128,7 @@ class CartoonPipelineTests(unittest.TestCase):
                 "concrete_anchor": "c",
             }
         )
-        c = gen_images._parse_concept_response(raw)
+        c = gen_images._parse_scene_response(raw)
         self.assertEqual(c["avoid"], [])
 
     def test_generate_cartoon_image_saves_file(self):

@@ -21,9 +21,10 @@ LEVEL_ID_MAP = {
     "kindergartener": "K",
     "first grader": "G1",
 }
+AUDIENCE_BY_LEVEL_ID = {v: k for k, v in LEVEL_ID_MAP.items()}
 
 # ---- Cartoon pipeline (Gemini text + image generation) ----
-# One shared illustration concept for the word; level-specific copy; one image.
+# Definition-first: teaching scenario → level copy (definition + example) → scene → one image.
 
 TEXT_PROMPT_RESPONSE_TEMPLATE = {
     "definition": "",
@@ -32,43 +33,68 @@ TEXT_PROMPT_RESPONSE_TEMPLATE = {
     "speak": "",
 }
 
-STAGE1_CONCEPT_PROMPT_TEMPLATE = """You are designing ONE illustration for a children's vocabulary app. The same picture will be shown for preschool, kindergarten, and first grade; only the written explanations will change by age.
+STAGE1_TEACHING_SCENARIO_TEMPLATE = """You are planning vocabulary content for a children's app. The same word will be taught to preschool, kindergarten, and first grade with different wording, but ONE shared picture will illustrate every level.
 
 Word: "{word}"
 Part of speech: "{part_of_speech}"
 Optional tags (themes): {tags}
 
-Requirements:
-- Choose a single concrete scene that makes the meaning obvious without reading text.
-- Use objects and actions a preschooler can name (e.g. cookie, stepstool, playground, book — not abstract ideas alone).
-- The scene must work as-is for all ages; do not rely on reading, school routines, or culture-specific games unless universally obvious.
-- Prefer one focal child or animal and one clear action; avoid busy crowds or tiny details.
+Start from meaning. Plan a single concrete everyday situation a child can understand:
+- The situation should make the word's meaning clear through action and objects, not abstraction alone.
+- Use props and actions a preschooler can name (e.g. toothbrush, backpack, toys, lunchbox).
+- Prefer one clear moment or action; avoid culture-specific games unless obvious.
 - Tone: warm, safe, positive (never scary or shaming).
 
 Return ONLY valid JSON with these keys:
-- "visual_concept": one short phrase (e.g. "one cookie into a jar — just enough")
-- "scene_for_artist": 2–4 sentences describing exactly what to draw (characters, pose, setting, key props). No camera or art-direction jargon.
-- "concrete_anchor": the main prop or action in simple words (for consistency checks)
-- "avoid": array of strings — metaphors or second scenes to NOT add (e.g. a separate "treasure hunt" if we already chose a cookie jar scene)
-
+- "teaching_scenario": 2–3 sentences describing the situation (what is happening and why it explains the word).
+- "concrete_anchor": the main object or action in simple words (for consistency across levels)
+- "example_core": ONE short example sentence idea that clearly shows the word being used in this situation 
+- "avoid": array of strings — extra metaphors or second situations to NOT use
+{admin_guidance_block}
 Do not use a code fence or any text outside the JSON. Use standard JSON only: straight double quotes on keys and string values, no trailing commas."""
 
 STAGE2_LEVEL_TEXT_PROMPT_TEMPLATE = """Word: "{word}"
-Audience: {level} (use vocabulary and sentence length right for this age only).
+Audience: {level} (vocabulary and sentence length for this age only).
 
-Shared illustration (the app will show a picture of THIS scene — your example must fit it):
-{scene_for_artist}
+Teaching situation (all levels share this idea; your copy must stay in this situation):
+{teaching_scenario}
 
-Concrete focus (must stay consistent): {concrete_anchor}
+Concrete focus: {concrete_anchor}
+Core example to adapt (make it natural for this age): {example_core}
 
-Tasks:
-1. "definition" — short, level-appropriate; you may refer to the concrete_anchor in plain words.
-2. "example" — ONE sentence that could be happening in the scene above (same place, props, and idea). Do not introduce a new location or metaphor.
-3. "tryIt" — a simple activity or question for the child; no new visual scenario that contradicts the scene.
-4. "speak" — how to say the word "{word}" aloud for a child or caregiver (the headword only, not a sentence). Use hyphen-separated chunks (one chunk per syllable or clear beat). Mark the stressed syllable with ALL CAPS inside that chunk (e.g. "HAP-ee" for happy, "in-SPY-er" for inspire). Use familiar English spellings for sounds, not IPA. Keep it short.
+Tasks — write teaching copy BEFORE any picture exists:
+1. "definition" — short, accurate, and easy for this age to understand. Say what the word means using the situation above.
+2. "example" — ONE concrete sentence a child can picture. It must match the teaching situation and illustrate the definition. Do not introduce a new place, prop, or story.
+3. "tryIt" — a simple question or activity; stay in the same situation.
+4. "speak" — how to say "{word}" aloud (headword only). Hyphen-separated chunks per syllable/beat; mark the stressed chunk with ALL CAPS (e.g. "pri-OR-i-tize"). Familiar English spellings, not IPA.
 
 Return ONLY valid JSON:
 {text_template}
+No code fence or other text."""
+
+STAGE3_SCENE_FROM_TEXT_TEMPLATE = """You are an art director. A children's vocabulary app already has written definitions and examples for multiple ages. Describe ONE illustration that matches that teaching copy (the picture comes after the words).
+
+Word: "{word}"
+
+Teaching situation:
+{teaching_scenario}
+
+Concrete focus: {concrete_anchor}
+
+Level copy (the drawing must match these examples — same moment, props, and setting):
+{level_copy_block}
+
+Requirements for the scene:
+- Depict what the examples describe; do not invent a different story.
+- One clear scene, readable for ages 4–7; soft, friendly, no text in the image.
+- One focal child or simple character action; minimal clutter.
+
+Return ONLY valid JSON with these keys:
+- "visual_concept": one short phrase summarizing the scene
+- "scene_for_artist": 2–4 sentences describing exactly what to draw (characters, pose, setting, props). No camera jargon.
+- "concrete_anchor": confirm the main prop or action (same as above unless you must narrow it)
+- "avoid": array of strings — anything in the written copy that must NOT appear as a second scene
+
 No code fence or other text."""
 
 STAGE3_IMAGE_PROMPT_TEMPLATE = """Create a single children's vocabulary illustration — one clear scene, no comic panels.
@@ -217,46 +243,95 @@ def _parse_text_response(response_text: str, *, response=None) -> dict:
     }
 
 
-def _parse_concept_response(response_text: str, *, response=None) -> dict:
-    coerced = _coerce_llm_json_text(response_text)
-    try:
-        payload = json.loads(coerced)
-    except json.JSONDecodeError as exc:
-        _debug_log_gemini_parse_failure("concept", response, response_text, coerced, exc)
-        raise InvalidResponseError("Concept response is not valid JSON.") from exc
-    if not isinstance(payload, dict):
-        _debug_log_gemini_parse_failure(
-            "concept", response, response_text, coerced, ValueError("not an object")
-        )
-        raise InvalidResponseError("Concept response JSON must be an object.")
-    for key in ("visual_concept", "scene_for_artist", "concrete_anchor"):
-        if key not in payload:
-            raise InvalidResponseError(f"Concept JSON missing key '{key}'.")
-        if not isinstance(payload[key], str) or not str(payload[key]).strip():
-            raise InvalidResponseError(f"Concept JSON field '{key}' must be a non-empty string.")
-    avoid = payload.get("avoid", [])
+def _parse_string_list_field(payload: dict, key: str) -> list[str]:
+    avoid = payload.get(key, [])
     if avoid is None:
         avoid = []
     if isinstance(avoid, str):
         avoid = [avoid] if avoid.strip() else []
     if not isinstance(avoid, list) or not all(isinstance(x, str) for x in avoid):
-        raise InvalidResponseError("Concept JSON 'avoid' must be an array of strings.")
+        raise InvalidResponseError(f"JSON '{key}' must be an array of strings.")
+    return [str(x).strip() for x in avoid]
+
+
+def _parse_teaching_scenario_response(response_text: str, *, response=None) -> dict:
+    coerced = _coerce_llm_json_text(response_text)
+    try:
+        payload = json.loads(coerced)
+    except json.JSONDecodeError as exc:
+        _debug_log_gemini_parse_failure("teaching_scenario", response, response_text, coerced, exc)
+        raise InvalidResponseError("Teaching scenario response is not valid JSON.") from exc
+    if not isinstance(payload, dict):
+        raise InvalidResponseError("Teaching scenario JSON must be an object.")
+    for key in ("teaching_scenario", "concrete_anchor", "example_core"):
+        if key not in payload:
+            raise InvalidResponseError(f"Teaching scenario JSON missing key '{key}'.")
+        if not isinstance(payload[key], str) or not str(payload[key]).strip():
+            raise InvalidResponseError(f"Teaching scenario field '{key}' must be a non-empty string.")
+    return {
+        "teaching_scenario": str(payload["teaching_scenario"]).strip(),
+        "concrete_anchor": str(payload["concrete_anchor"]).strip(),
+        "example_core": str(payload["example_core"]).strip(),
+        "avoid": _parse_string_list_field(payload, "avoid"),
+    }
+
+
+def _parse_scene_response(response_text: str, *, response=None) -> dict:
+    coerced = _coerce_llm_json_text(response_text)
+    try:
+        payload = json.loads(coerced)
+    except json.JSONDecodeError as exc:
+        _debug_log_gemini_parse_failure("scene", response, response_text, coerced, exc)
+        raise InvalidResponseError("Scene response is not valid JSON.") from exc
+    if not isinstance(payload, dict):
+        raise InvalidResponseError("Scene JSON must be an object.")
+    for key in ("visual_concept", "scene_for_artist", "concrete_anchor"):
+        if key not in payload:
+            raise InvalidResponseError(f"Scene JSON missing key '{key}'.")
+        if not isinstance(payload[key], str) or not str(payload[key]).strip():
+            raise InvalidResponseError(f"Scene JSON field '{key}' must be a non-empty string.")
     return {
         "visual_concept": str(payload["visual_concept"]).strip(),
         "scene_for_artist": str(payload["scene_for_artist"]).strip(),
         "concrete_anchor": str(payload["concrete_anchor"]).strip(),
-        "avoid": [str(x).strip() for x in avoid],
+        "avoid": _parse_string_list_field(payload, "avoid"),
     }
 
 
-def _build_level_text_prompt(word: str, level: str, scene_for_artist: str, concrete_anchor: str) -> str:
+def _build_level_text_prompt(
+    word: str,
+    level: str,
+    teaching_scenario: str,
+    concrete_anchor: str,
+    example_core: str,
+) -> str:
     return STAGE2_LEVEL_TEXT_PROMPT_TEMPLATE.format(
         word=word,
         level=level,
-        scene_for_artist=scene_for_artist,
+        teaching_scenario=teaching_scenario,
         concrete_anchor=concrete_anchor,
+        example_core=example_core,
         text_template=json.dumps(TEXT_PROMPT_RESPONSE_TEMPLATE),
     )
+
+
+def _format_level_copy_block(level_contents: dict[str, dict]) -> str:
+    lines: list[str] = []
+    for level_id in ("preK", "K", "G1"):
+        content = level_contents.get(level_id)
+        if not content:
+            continue
+        lines.append(f"{level_id}:")
+        lines.append(f"  Definition: {content['definition']}")
+        lines.append(f"  Example: {content['example']}")
+    return "\n".join(lines) if lines else "(no level copy)"
+
+
+def _admin_guidance_block(guidance: str = "") -> str:
+    text = (guidance or "").strip()
+    if not text:
+        return ""
+    return f"\nAdmin guidance (follow when planning the situation and examples):\n{text}\n"
 
 
 def _additional_guidance_block(additional_guidance: str = "") -> str:
@@ -275,39 +350,52 @@ def _build_image_prompt(scene_for_artist: str, additional_guidance: str = "") ->
     )
 
 
-def _generate_shared_concept(client: genai.Client, word: str, entry: dict, model: str = TEXT_MODEL) -> dict:
+def _generate_teaching_scenario(
+    client: genai.Client,
+    word: str,
+    entry: dict,
+    model: str = TEXT_MODEL,
+    *,
+    admin_guidance: str = "",
+) -> dict:
     part = entry.get("partOfSpeech") or "noun"
     tags = entry.get("tags") or []
     if not isinstance(tags, list):
         tags = []
     tags_json = json.dumps(tags)
-    prompt = STAGE1_CONCEPT_PROMPT_TEMPLATE.format(
-        word=word, part_of_speech=part, tags=tags_json
+    prompt = STAGE1_TEACHING_SCENARIO_TEMPLATE.format(
+        word=word,
+        part_of_speech=part,
+        tags=tags_json,
+        admin_guidance_block=_admin_guidance_block(admin_guidance),
     )
-    print(f"[cartoon] API concept request model={model} word={word!r}", flush=True)
+    print(f"[cartoon] API teaching-scenario request model={model} word={word!r}", flush=True)
     try:
         response = client.models.generate_content(model=model, contents=prompt)
     except Exception as exc:
         if _is_budget_error(exc):
             raise BudgetLimitError("Budget or quota limit reached.") from exc
-        raise TextGenerationError("Failed to generate shared illustration concept.") from exc
+        raise TextGenerationError("Failed to generate teaching scenario.") from exc
     if response is None:
         raise TextGenerationError("API returned no response.")
     response_text = _extract_text_from_response(response)
-    concept = _parse_concept_response(response_text, response=response)
-    print(f"[cartoon] visual_concept: {concept['visual_concept']!r}", flush=True)
-    return concept
+    scenario = _parse_teaching_scenario_response(response_text, response=response)
+    print(f"[cartoon] example_core: {scenario['example_core']!r}", flush=True)
+    return scenario
 
 
 def _generate_level_content(
     client: genai.Client,
     word: str,
     level: str,
-    scene_for_artist: str,
+    teaching_scenario: str,
     concrete_anchor: str,
+    example_core: str,
     model: str = TEXT_MODEL,
 ) -> dict:
-    prompt = _build_level_text_prompt(word, level, scene_for_artist, concrete_anchor)
+    prompt = _build_level_text_prompt(
+        word, level, teaching_scenario, concrete_anchor, example_core
+    )
     print(f"[cartoon] API text request model={model} word={word!r} level={level!r}", flush=True)
     try:
         response = client.models.generate_content(model=model, contents=prompt)
@@ -319,6 +407,35 @@ def _generate_level_content(
         raise TextGenerationError("API returned no response.")
     response_text = _extract_text_from_response(response)
     return _parse_text_response(response_text, response=response)
+
+
+def _generate_scene_from_level_text(
+    client: genai.Client,
+    word: str,
+    teaching_scenario: str,
+    concrete_anchor: str,
+    level_contents: dict[str, dict],
+    model: str = TEXT_MODEL,
+) -> dict:
+    prompt = STAGE3_SCENE_FROM_TEXT_TEMPLATE.format(
+        word=word,
+        teaching_scenario=teaching_scenario,
+        concrete_anchor=concrete_anchor,
+        level_copy_block=_format_level_copy_block(level_contents),
+    )
+    print(f"[cartoon] API scene-from-text request model={model} word={word!r}", flush=True)
+    try:
+        response = client.models.generate_content(model=model, contents=prompt)
+    except Exception as exc:
+        if _is_budget_error(exc):
+            raise BudgetLimitError("Budget or quota limit reached.") from exc
+        raise TextGenerationError("Failed to derive illustration scene from level copy.") from exc
+    if response is None:
+        raise TextGenerationError("API returned no response.")
+    response_text = _extract_text_from_response(response)
+    scene = _parse_scene_response(response_text, response=response)
+    print(f"[cartoon] scene_for_artist: {scene['scene_for_artist'][:80]!r}...", flush=True)
+    return scene
 
 
 def _extract_image_from_response(response):
@@ -352,10 +469,13 @@ def run_word_visual_pipeline(
     entry: dict,
     levels: List[str],
     output_path: Path,
+    *,
+    additional_guidance: str = "",
+    text_guidance: str = "",
 ) -> tuple[Path, str, dict[str, dict]]:
-    """One shared scene concept, level-specific JSON text, one illustration.
+    """Teaching scenario → level copy → scene from text → one shared illustration.
 
-    Returns ``(output_path, image_prompt, level_gemini_id -> level_content)`` for each
+    Returns ``(output_path, image_prompt, level_id -> level_content)`` for each
     requested audience level in ``levels``.
     """
     word = (entry.get("word") or "").strip()
@@ -371,17 +491,23 @@ def run_word_visual_pipeline(
         raise ConfigurationError("GEMINI_API_KEY is missing from the environment.")
     client = genai.Client(api_key=api_key)
 
-    concept = _generate_shared_concept(client, word, entry)
-    scene = concept["scene_for_artist"]
-    anchor = concept["concrete_anchor"]
+    scenario = _generate_teaching_scenario(client, word, entry, admin_guidance=text_guidance)
+    teaching = scenario["teaching_scenario"]
+    anchor = scenario["concrete_anchor"]
+    example_core = scenario["example_core"]
 
     level_contents: dict[str, dict] = {}
     for level in ordered:
-        content = _generate_level_content(client, word, level, scene, anchor)
+        content = _generate_level_content(
+            client, word, level, teaching, anchor, example_core
+        )
         print(f"[cartoon] {level} definition: {content['definition']!r}", flush=True)
         level_contents[LEVEL_ID_MAP[level]] = content
 
-    image_prompt = _build_image_prompt(scene)
+    scene = _generate_scene_from_level_text(client, word, teaching, anchor, level_contents)
+    image_prompt = _build_image_prompt(
+        scene["scene_for_artist"], additional_guidance=additional_guidance
+    )
     out = _generate_cartoon_image(client, image_prompt, output_path)
     print(f"[cartoon] done -> {out}", flush=True)
     return out, image_prompt, level_contents
@@ -491,6 +617,101 @@ def resolve_regen_image_prompt(mode: str, prompt: str, subprompt: str, candidate
             raise ValueError("subprompt mode requires a non-empty subprompt")
         return insert_regen_before_output(base, extra)
     raise ValueError(f"Unknown regen mode: {mode!r} (expected replace or subprompt)")
+
+
+def _parse_regen_level_ids(levels_csv: str) -> List[str]:
+    """Map admin level ids (preK,K,G1) to audience level strings."""
+    if not levels_csv.strip():
+        raise ValueError("full regen requires at least one level id (preK, K, G1)")
+    out: List[str] = []
+    for raw in levels_csv.split(","):
+        level_id = raw.strip()
+        if not level_id:
+            continue
+        audience = AUDIENCE_BY_LEVEL_ID.get(level_id)
+        if not audience:
+            raise ValueError(f"Unknown level id {level_id!r}; expected preK, K, or G1")
+        out.append(audience)
+    if not out:
+        raise ValueError("full regen requires at least one level id (preK, K, G1)")
+    validate_levels(out, "regen")
+    return _ordered_generation_levels(out)
+
+
+def regenerate_full_for_word(
+    word_id: str,
+    round_id: str,
+    candidates_repo: Path,
+    levels_csv: str,
+    text_guidance: str = "",
+) -> int:
+    """Re-run definition-first pipeline for selected levels; append text + image candidates."""
+    candidate_path = (
+        candidates_repo / "candidates" / "rounds" / round_id / "words" / f"{word_id}.json"
+    )
+    if not candidate_path.exists():
+        raise FileNotFoundError(f"Word candidate not found: {candidate_path}")
+
+    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+    word = candidate.get("word") or word_id
+    audience_levels = _parse_regen_level_ids(levels_csv)
+
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ConfigurationError("GEMINI_API_KEY is missing from the environment.")
+    client = genai.Client(api_key=api_key)
+
+    now = datetime.now(timezone.utc).isoformat()
+    assets_dir = candidates_repo / "candidates" / "rounds" / round_id / "assets"
+    image_id = uuid.uuid4().hex[:10]
+    output_path = assets_dir / word_id / f"shared-{image_id}.png"
+    rel_path = str(output_path.as_posix())
+
+    pipeline_entry = {
+        "word": word,
+        "partOfSpeech": candidate.get("partOfSpeech") or "noun",
+        "tags": candidate.get("tags") or [],
+        "levels": audience_levels,
+    }
+    print(
+        f"[regen-full] wordId={word_id!r} levels={audience_levels!r} guidance={text_guidance[:60]!r}...",
+        flush=True,
+    )
+    _out_path, image_prompt, level_contents = run_word_visual_pipeline(
+        pipeline_entry,
+        audience_levels,
+        output_path,
+        text_guidance=text_guidance,
+    )
+
+    images = list(candidate.get("images") or [])
+    images.append(
+        {
+            "imageId": image_id,
+            "prompt": image_prompt,
+            "model": "gemini",
+            "assetPath": rel_path,
+            "createdAt": now,
+        }
+    )
+    candidate["images"] = images
+    for level_id, level_content in level_contents.items():
+        candidate["levels"].setdefault(level_id, []).append(
+            {
+                "definition": level_content["definition"],
+                "example": level_content["example"],
+                "tryIt": level_content["tryIt"],
+                "speak": level_content["speak"],
+                "model": "gemini",
+            }
+        )
+    candidate["status"] = "in_review"
+    candidate["updatedAt"] = now
+    candidate_path.write_text(
+        json.dumps(candidate, indent=2, sort_keys=True), encoding="utf-8"
+    )
+    print(f"[regen-full] appended image {image_id!r} and {len(level_contents)} level(s)", flush=True)
+    return 1
 
 
 def regenerate_image_for_word(
@@ -694,8 +915,13 @@ def parse_args(argv: Iterable[str]):
     parser.add_argument(
         "--regen-mode",
         default=os.environ.get("REGEN_MODE", "replace"),
-        choices=("replace", "subprompt"),
-        help="Admin regen: replace full prompt or append subprompt.",
+        choices=("replace", "subprompt", "full"),
+        help="Admin regen: replace | subprompt (image only) | full (text + image).",
+    )
+    parser.add_argument(
+        "--regen-levels",
+        default=os.environ.get("REGEN_LEVELS", ""),
+        help="Admin full regen: comma-separated level ids (preK,K,G1).",
     )
     parser.add_argument(
         "--regen-prompt",
@@ -723,28 +949,41 @@ def main(argv: Iterable[str]) -> int:
             print("Error: --candidates-repo (or CANDIDATES_REPO_PATH) required with --word-id.", file=sys.stderr)
             return 1
         try:
-            created = regenerate_image_for_word(
-                args.word_id,
-                args.round_id,
-                Path(args.candidates_repo),
-                args.regen_mode,
-                args.regen_prompt or "",
-                args.regen_subprompt or "",
-            )
+            if args.regen_mode == "full":
+                created = regenerate_full_for_word(
+                    args.word_id,
+                    args.round_id,
+                    Path(args.candidates_repo),
+                    args.regen_levels,
+                    args.regen_subprompt or "",
+                )
+            else:
+                created = regenerate_image_for_word(
+                    args.word_id,
+                    args.round_id,
+                    Path(args.candidates_repo),
+                    args.regen_mode,
+                    args.regen_prompt or "",
+                    args.regen_subprompt or "",
+                )
         except (FileNotFoundError, ValueError) as exc:
             print(str(exc), file=sys.stderr)
             return 1
         except BudgetLimitError as exc:
             print(f"Error: {exc}", file=sys.stderr)
             return 2
-        except (ImageGenerationError, ConfigurationError) as exc:
+        except (
+            ImageGenerationError,
+            TextGenerationError,
+            ConfigurationError,
+        ) as exc:
             print(f"Error: {exc}", file=sys.stderr)
             return 1
         except Exception as exc:
             print(f"Regen failed: {exc}", file=sys.stderr)
             traceback.print_exc(file=sys.stderr)
             return 1
-        print(f"Regen complete: {created} image(s) for {args.word_id!r}.")
+        print(f"Regen complete: {created} update(s) for {args.word_id!r}.")
         return 0
 
     # Single-word mode: shared concept + level text + one image

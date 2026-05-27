@@ -24,7 +24,7 @@ Allowed values for `levels` (each word must include at least one):
 - `"kindergartener"`
 - `"first grader"`
 
-These match the audience levels expected by the prompt template in `scripts/generate-images.py`.
+These match the audience levels expected by the prompt template in `scripts/generate-word-image.py`.
 
 ## Validation Rules
 - Word is lowercase alpha or hyphenated (normalize to slug).

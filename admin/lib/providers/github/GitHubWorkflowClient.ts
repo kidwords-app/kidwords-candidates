@@ -6,10 +6,9 @@ import { makeGitHubClient, type GitHubConfig } from './github-client';
  * See specs/pipeline-03-generation-jobs.md for what each workflow does.
  */
 const WORKFLOWS = {
-  generateImages:      'generate-images.yaml',
-  generateDefinitions: 'generate-definitions.yaml',
-  publishWord:         'publish-word.yaml',
-  publishRound:        'publish-round.yaml',
+  generateWord: 'generate-word.yaml',
+  publishWord:  'publish-word.yaml',
+  publishRound: 'publish-round.yaml',
 } as const;
 
 const DEFAULT_REF = 'main';
@@ -24,7 +23,7 @@ export class GitHubWorkflowClient implements WorkflowClient {
   async triggerRegeneration(wordId: string, roundId: string, options: RegenOptions): Promise<void> {
     console.info('[workflow] triggerRegeneration', { wordId, roundId, options });
     if (options.type === 'image') {
-      await this.gh.dispatchWorkflow(WORKFLOWS.generateImages, DEFAULT_REF, {
+      await this.gh.dispatchWorkflow(WORKFLOWS.generateWord, DEFAULT_REF, {
         wordId,
         roundId,
         mode:      options.mode,
@@ -32,11 +31,12 @@ export class GitHubWorkflowClient implements WorkflowClient {
         subprompt: options.mode === 'subprompt' ? options.subprompt : '',
       });
     } else {
-      // type === 'full': regenerate text first, then image
-      await this.gh.dispatchWorkflow(WORKFLOWS.generateDefinitions, DEFAULT_REF, {
+      await this.gh.dispatchWorkflow(WORKFLOWS.generateWord, DEFAULT_REF, {
         wordId,
         roundId,
+        mode:      'full',
         levels:    options.levels.join(','),
+        prompt:    '',
         subprompt: options.subprompt ?? '',
       });
     }

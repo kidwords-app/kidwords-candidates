@@ -28,13 +28,13 @@ describe('GitHubWorkflowClient', () => {
   // ── triggerRegeneration ──────────────────────────────────────────────────────
 
   describe('triggerRegeneration', () => {
-    it('dispatches generate-images.yaml for type=image mode=replace', async () => {
+    it('dispatches generate-word.yaml for type=image mode=replace', async () => {
       mockDispatch();
       await client.triggerRegeneration('empathy', '2026-03-03', {
         type: 'image', mode: 'replace', prompt: 'two children sharing',
       });
       expect(fetchMock).toHaveBeenCalledWith(
-        dispatchUrl('generate-images.yaml'),
+        dispatchUrl('generate-word.yaml'),
         expect.objectContaining({ method: 'POST' }),
       );
       const body = JSON.parse(fetchMock.mock.calls[0][1].body);
@@ -43,7 +43,7 @@ describe('GitHubWorkflowClient', () => {
       expect(body.inputs.prompt).toBe('two children sharing');
     });
 
-    it('dispatches generate-images.yaml for type=image mode=subprompt', async () => {
+    it('dispatches generate-word.yaml for type=image mode=subprompt', async () => {
       mockDispatch();
       await client.triggerRegeneration('empathy', '2026-03-03', {
         type: 'image', mode: 'subprompt', subprompt: 'warmer colors',
@@ -53,16 +53,17 @@ describe('GitHubWorkflowClient', () => {
       expect(body.inputs.subprompt).toBe('warmer colors');
     });
 
-    it('dispatches generate-definitions.yaml for type=full', async () => {
+    it('dispatches generate-word.yaml for type=full', async () => {
       mockDispatch();
       await client.triggerRegeneration('empathy', '2026-03-03', {
         type: 'full', levels: ['preK', 'K'], subprompt: 'simpler',
       });
       expect(fetchMock).toHaveBeenCalledWith(
-        dispatchUrl('generate-definitions.yaml'),
+        dispatchUrl('generate-word.yaml'),
         expect.anything(),
       );
       const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+      expect(body.inputs.mode).toBe('full');
       expect(body.inputs.levels).toBe('preK,K');
       expect(body.inputs.subprompt).toBe('simpler');
     });

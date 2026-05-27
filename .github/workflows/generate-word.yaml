@@ -1,4 +1,4 @@
-name: generate-images
+name: generate-word
 
 on:
   workflow_dispatch:
@@ -10,13 +10,16 @@ on:
         description: "Single word to regenerate (admin regen); omit for full batch"
         required: false
       mode:
-        description: "Image regen mode: replace | subprompt (only with wordId)"
+        description: "Regen mode: replace | subprompt | full (only with wordId)"
+        required: false
+      levels:
+        description: "Full regen level ids (preK,K,G1) — mode=full only"
         required: false
       prompt:
         description: "Replacement image prompt (mode=replace)"
         required: false
       subprompt:
-        description: "Text appended to existing image prompt (mode=subprompt)"
+        description: "Guidance for full regen, or image subprompt (mode=subprompt)"
         required: false
   schedule:
     - cron: "0 6 * * *"
@@ -55,7 +58,7 @@ jobs:
             echo "roundId=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Generate images
+      - name: Generate word candidates
         working-directory: candidates-repo
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -63,25 +66,27 @@ jobs:
           CANDIDATES_REPO_PATH: .
           WORD_ID: ${{ github.event.inputs.wordId }}
           REGEN_MODE: ${{ github.event.inputs.mode }}
+          REGEN_LEVELS: ${{ github.event.inputs.levels }}
           REGEN_PROMPT: ${{ github.event.inputs.prompt }}
           REGEN_SUBPROMPT: ${{ github.event.inputs.subprompt }}
         run: |
           set -euo pipefail
           echo "::debug::PWD=$PWD"
           if [ -n "${WORD_ID:-}" ]; then
-            echo "::notice::Single-word image regen wordId=$WORD_ID roundId=$ROUND_ID mode=${REGEN_MODE:-replace}"
-            python -u scripts/generate-images.py \
+            echo "::notice::Single-word regen wordId=$WORD_ID roundId=$ROUND_ID mode=${REGEN_MODE:-replace}"
+            python -u scripts/generate-word-image.py \
               --round-id "$ROUND_ID" \
               --candidates-repo . \
               --word-id "$WORD_ID" \
               --regen-mode "${REGEN_MODE:-replace}" \
+              --regen-levels "${REGEN_LEVELS:-}" \
               --regen-prompt "${REGEN_PROMPT:-}" \
               --regen-subprompt "${REGEN_SUBPROMPT:-}"
           else
             echo "::debug::Batch file path: $PWD/inputs/word-batches/$ROUND_ID.json"
             echo "::debug::Listing inputs/word-batches:"
             ls -la inputs/word-batches/ 2>&1 || true
-            python -u scripts/generate-images.py
+            python -u scripts/generate-word-image.py
           fi
 
       - name: Commit and push
@@ -94,7 +99,7 @@ jobs:
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "Generate images for ${{ steps.round.outputs.roundId }}"
+          git commit -m "Generate word candidates for ${{ steps.round.outputs.roundId }}"
           git push origin HEAD
         working-directory: candidates-repo
 
@@ -107,7 +112,7 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "generate-images ${{ steps.round.outputs.roundId }}: ${{ job.status }}"
+          subject: "generate-word ${{ steps.round.outputs.roundId }}: ${{ job.status }}"
           to: ${{ secrets.NOTIFY_EMAIL_TO }}
           from: ${{ secrets.NOTIFY_EMAIL_FROM || 'github-actions[bot]@users.noreply.github.com' }}
           body: |
