@@ -52,6 +52,11 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "G1": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     }
   },
@@ -61,7 +66,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-07-12T20:46:45.251Z",
+  "updatedAt": "2026-07-12T20:46:49.375Z",
   "word": "choice",
   "wordId": "choice"
 }
