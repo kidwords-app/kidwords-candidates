@@ -55,13 +55,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 1,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-07-12T20:48:42.659Z",
+  "updatedAt": "2026-07-12T20:48:46.520Z",
   "word": "clue",
   "wordId": "clue"
 }
