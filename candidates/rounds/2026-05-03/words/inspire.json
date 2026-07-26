@@ -57,13 +57,13 @@
     },
     "imageId": "33008112cb"
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 2,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-07-26T18:09:37.974Z",
+  "updatedAt": "2026-07-26T18:09:39.810Z",
   "word": "inspire",
   "wordId": "inspire"
 }
