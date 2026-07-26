@@ -48,6 +48,11 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "G1": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     },
     "imageId": "33008112cb"
@@ -58,7 +63,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-07-26T18:09:30.634Z",
+  "updatedAt": "2026-07-26T18:09:37.974Z",
   "word": "inspire",
   "wordId": "inspire"
 }
