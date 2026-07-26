@@ -44,7 +44,8 @@
         "example": 0,
         "tryIt": 0
       }
-    }
+    },
+    "imageId": "33008112cb"
   },
   "status": "pending",
   "subPrompts": {},
@@ -52,7 +53,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-07-26T18:09:13.445Z",
+  "updatedAt": "2026-07-26T18:09:18.455Z",
   "word": "inspire",
   "wordId": "inspire"
 }
