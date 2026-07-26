@@ -60,13 +60,13 @@
       }
     }
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 2,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-07-26T18:10:26.887Z",
+  "updatedAt": "2026-07-26T18:10:30.103Z",
   "word": "concept",
   "wordId": "concept"
 }
