@@ -46,8 +46,14 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "K": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
-    }
+    },
+    "imageId": "ebeb92733a"
   },
   "status": "pending",
   "subPrompts": {},
@@ -55,7 +61,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-10-18T22:15:02.622Z",
+  "updatedAt": "2026-10-18T22:15:08.770Z",
   "word": "sequence",
   "wordId": "sequence"
 }
