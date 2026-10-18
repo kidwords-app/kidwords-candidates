@@ -51,6 +51,11 @@
         "definition": 0,
         "example": 0,
         "tryIt": 0
+      },
+      "G1": {
+        "definition": 0,
+        "example": 0,
+        "tryIt": 0
       }
     },
     "imageId": "ebeb92733a"
@@ -61,7 +66,7 @@
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-10-18T22:15:08.770Z",
+  "updatedAt": "2026-10-18T22:15:13.448Z",
   "word": "sequence",
   "wordId": "sequence"
 }
