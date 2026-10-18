@@ -14,6 +14,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     GitHub({
       clientId:     process.env.AUTH_GITHUB_ID!,
       clientSecret: process.env.AUTH_GITHUB_SECRET!,
+      // GitHub rolled out RFC 9207 and now returns `iss` on the OAuth callback.
+      // Without an explicit issuer, Auth.js validates against its placeholder
+      // (`https://authjs.dev`) and rejects sign-in. Pin GitHub's real issuer.
+      issuer: 'https://github.com/login/oauth',
     }),
   ],
   callbacks: {
