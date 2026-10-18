@@ -60,13 +60,13 @@
     },
     "imageId": "ebeb92733a"
   },
-  "status": "pending",
+  "status": "approved",
   "subPrompts": {},
   "syllables": 2,
   "tags": [
     "thinking"
   ],
-  "updatedAt": "2026-10-18T22:15:13.448Z",
+  "updatedAt": "2026-10-18T22:15:15.393Z",
   "word": "sequence",
   "wordId": "sequence"
 }
