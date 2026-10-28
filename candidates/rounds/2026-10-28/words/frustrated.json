@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-10-28T11:56:44.918648+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-10-28/assets/frustrated/shared-b214faa8a7.png",
+      "createdAt": "2026-10-28T11:56:44.918648+00:00",
+      "imageId": "b214faa8a7",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child, around 5-6 years old, is seated on a colorful playmat. Their brow is slightly furrowed, and their mouth is a soft, determined line as they gently try to turn a bright, irregularly shaped puzzle piece. The puzzle piece is clearly not fitting into its designated spot in the partially completed puzzle spread out in front of them. Their hands are holding the piece, attempting to make it go in, but it just won't, showing their effort and mild frustration.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Frustrated means you feel a little upset or annoyed because you're trying really, really hard to do something, like make that puzzle piece fit, but it just won't work.",
+        "example": "I feel so frustrated when this puzzle piece won't go into my puzzle!",
+        "model": "gemini",
+        "speak": "frus-TRA-ted",
+        "tryIt": "What makes you feel frustrated when you're working on a puzzle?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "When you feel frustrated, you're trying very hard to do something, like put in this puzzle piece, but it just won't work, and it makes you feel a little bit upset.",
+        "example": "You feel frustrated when you try and try to put the puzzle piece in, but it still won't fit.",
+        "model": "gemini",
+        "speak": "frus-TRAT-ed",
+        "tryIt": "What face might you make if you feel frustrated because this puzzle piece just won't go in?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Frustrated means you feel a little upset or stuck when you try and try to do something, like put a puzzle piece in, but it just won't work.",
+        "example": "It's frustrating when this puzzle piece won't fit, even when you try to turn it different ways.",
+        "model": "gemini",
+        "speak": "frus-TRAT-ed",
+        "tryIt": "Can you make a face like you're feeling frustrated because the puzzle piece won't fit?"
+      }
+    ]
+  },
+  "partOfSpeech": "adjective",
+  "roundId": "2026-10-28",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-10-28T11:56:44.918648+00:00",
+  "word": "frustrated",
+  "wordId": "frustrated"
+}
