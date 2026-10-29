@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-10-29T12:06:00.745226+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-10-29/assets/transition/shared-d9cc0166cc.png",
+      "createdAt": "2026-10-29T12:06:00.745226+00:00",
+      "imageId": "d9cc0166cc",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA friendly child, about 5 years old, walks away from an outdoor playground. They gently carry a colorful playground ball in their arms. The child is looking forward, moving towards an open classroom door, which is partially visible on the right side of the illustration. A hint of playground equipment like a slide or swing set is visible in the background, out of focus, indicating the 'outside play' they are leaving behind.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Transition means changing. Like changing from playing outside to getting ready inside.",
+        "example": "The transition from outside play to inside helps us get ready for snack time.",
+        "model": "gemini",
+        "speak": "tran-SI-tion",
+        "tryIt": "What do we do during our transition from playing outside to walking inside?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Transition means changing from playing outside to getting ready inside.",
+        "example": "The transition from playing outside to going inside helps us get ready for quiet time.",
+        "model": "gemini",
+        "speak": "tran-SI-shun",
+        "tryIt": "What do we do during our transition from playing with balls to walking inside?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Transition means changing from one thing to another. Like when we change from playing outside to going inside.",
+        "example": "The transition from outside play to inside helps us get ready for snack time.",
+        "model": "gemini",
+        "speak": "tran-SI-tion",
+        "tryIt": "What do we call the change when we stop playing outside and get ready to go inside?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-10-29",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-10-29T12:06:00.745226+00:00",
+  "word": "transition",
+  "wordId": "transition"
+}
