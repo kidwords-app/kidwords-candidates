@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-10-30T11:57:51.096634+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-10-30/assets/appropriate/shared-1aa2dc4383.png",
+      "createdAt": "2026-10-30T11:57:51.096634+00:00",
+      "imageId": "1aa2dc4383",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA happy, gentle-looking child, around 5-6 years old, stands in a cozy bedroom. They are holding up a pair of soft, colorful pajamas with both hands, looking ready to put them on. The pajamas are simple and inviting. In the background, a comfortable bed with a friendly stuffed animal on it suggests it's time for sleep. The room is clean and uncluttered.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "When something is **appropriate**, it means it's the right thing for that time. Your soft pajamas are appropriate for bedtime because they are just right for sleeping.",
+        "example": "Your soft pajamas are **appropriate** for bedtime.",
+        "model": "gemini",
+        "speak": "ap-PRO-pri-ate",
+        "tryIt": "Is a heavy winter coat appropriate to wear to bed?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Appropriate means it's the right thing to wear or do. Your pajamas are the right clothes for sleeping.",
+        "example": "Your cozy pajamas are appropriate to wear when it's time for bed.",
+        "model": "gemini",
+        "speak": "ap-PRO-pri-ate",
+        "tryIt": "You picked your favorite pajamas for bed. Tell me, are they *appropriate* for sleeping?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Appropriate means something is just right for what you are doing.",
+        "example": "Your soft pajamas are *appropriate* to wear when it's time for bed.",
+        "model": "gemini",
+        "speak": "a-PRO-pree-ayt",
+        "tryIt": "You picked your comfy pajamas for bed. Is that *appropriate* for sleeping?"
+      }
+    ]
+  },
+  "partOfSpeech": "adjective",
+  "roundId": "2026-10-30",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 4,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-10-30T11:57:51.096634+00:00",
+  "word": "appropriate",
+  "wordId": "appropriate"
+}
