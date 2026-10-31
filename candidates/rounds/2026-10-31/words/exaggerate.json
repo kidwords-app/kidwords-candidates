@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-10-31T11:32:12.169687+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-10-31/assets/exaggerate/shared-19f147ee39.png",
+      "createdAt": "2026-10-31T11:32:12.169687+00:00",
+      "imageId": "19f147ee39",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA smiling child, roughly 5-6 years old, stands in a grassy outdoor setting, perhaps a backyard or park. They are enthusiastically spreading their arms wide, extending them as far as they can reach to their sides. One of their hands is open, palms up, as if holding or showing something, but the 'something' (the ladybug) is invisible or implied to be tiny. The background is simple, suggesting open space.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "To exaggerate means to make something seem much, much bigger than it really is, like when you spread your arms wide for a tiny ladybug!",
+        "example": "Look! She *exaggerated* how big the ladybug was when she stretched her arms so wide!",
+        "model": "gemini",
+        "speak": "ex-AGG-er-ate",
+        "tryIt": "If you found a tiny ladybug and wanted to *exaggerate* its size, what would you do with your arms?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "It means to make something look much, much bigger than it really is, like when the ladybug was tiny but you stretched your arms wide to show it was HUGE!",
+        "example": "Look! She *exaggerated* how big the ladybug was when she stretched her arms so wide!",
+        "model": "gemini",
+        "speak": "ex-AGG-uh-rait",
+        "tryIt": "If you found a tiny bug, how would you *exaggerate* its size with your arms?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "It means making something seem much, much bigger than it really is, like when you stretched your arms so wide for that tiny ladybug.",
+        "example": "You exaggerated how big the tiny ladybug was when you spread your arms out so wide!",
+        "model": "gemini",
+        "speak": "ex-AGG-er-ate",
+        "tryIt": "When you stretch your arms really wide for a super tiny bug, are you exaggerating its size?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-10-31",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 4,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-10-31T11:32:12.169687+00:00",
+  "word": "exaggerate",
+  "wordId": "exaggerate"
+}
