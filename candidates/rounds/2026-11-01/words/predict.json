@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-01T12:29:43.276648+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-01/assets/predict/shared-9b4ff44838.png",
+      "createdAt": "2026-11-01T12:29:43.276648+00:00",
+      "imageId": "9b4ff44838",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child (around 5-6 years old) stands indoors, near a closed door in a simple, cozy entryway. Their head is tilted slightly, and they have a curious, thoughtful expression. A colorful backpack and a favorite jacket hang neatly on hooks next to the door, clearly visible to the child. The background is clean and uncluttered.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "When you predict, you use clues, like your backpack and jacket by the door, to make a good guess about what might happen next.",
+        "example": "Looking at your backpack and jacket, I predict we are going to the park!",
+        "model": "gemini",
+        "speak": "pre-DICT",
+        "tryIt": "Look at your backpack and jacket by the door. What do *you* predict we're going to do?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "To *predict* means to use clues, like your jacket and backpack by the door, to guess what will happen soon!",
+        "example": "Oh! Your jacket and backpack are by the door. I *predict* we are going to the park!",
+        "model": "gemini",
+        "speak": "pre-DICT",
+        "tryIt": "Now, look at your jacket and backpack. What do *you* predict we will do?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "When you look at clues, like your jacket and backpack by the door, and guess what we'll do, you **predict**!",
+        "example": "I predict we are going to the park!",
+        "model": "gemini",
+        "speak": "pre-DICT",
+        "tryIt": "Your backpack and jacket are ready! What do *you* predict we will do?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-11-01",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-01T12:29:43.276648+00:00",
+  "word": "predict",
+  "wordId": "predict"
+}
