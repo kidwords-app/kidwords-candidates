@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-02T14:29:25.692816+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-02/assets/boundary/shared-a2c68dfc25.png",
+      "createdAt": "2026-11-02T14:29:25.692816+00:00",
+      "imageId": "a2c68dfc25",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nTwo children are seated comfortably at a rectangular table, each focused on drawing on their own piece of paper. A bright, colorful strip of tape runs directly down the middle of the table surface, clearly dividing their workspace. One child's hand, holding a crayon, is just inside their designated space next to the tape, while the other child looks thoughtfully at their paper, respecting the boundary.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "A boundary is like the tape on our table. It shows where your space stops and my space begins.",
+        "example": "The tape makes a boundary so we each have our own space to draw.",
+        "model": "gemini",
+        "speak": "BOUN-da-ry",
+        "tryIt": "Can you show me the boundary that the tape makes on our table?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "A boundary is a line, like our tape, that shows where your special drawing space ends and mine begins.",
+        "example": "The tape makes a boundary so we each have our own space to draw.",
+        "model": "gemini",
+        "speak": "BOUN-da-ry",
+        "tryIt": "Can you point to the boundary our tape makes on the table?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "A boundary is like the tape that shows where your special drawing space ends.",
+        "example": "The colorful tape makes a boundary so we each have our own space for drawing.",
+        "model": "gemini",
+        "speak": "BOUN-da-ry",
+        "tryIt": "Where is the boundary that shows your drawing space?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-11-02",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-02T14:29:25.692816+00:00",
+  "word": "boundary",
+  "wordId": "boundary"
+}
