@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-03T13:26:18.178716+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-03/assets/accident/shared-55738d5814.png",
+      "createdAt": "2026-11-03T13:26:18.178716+00:00",
+      "imageId": "55738d5814",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child, about 5 years old, stands next to a simple, sturdy table. Their hand gently holds a brightly colored plastic cup, tilted just enough that a small, round puddle of juice has just spread on the table surface in front of them. The child's eyes are wide with a mild surprise, a gentle 'oops' expression on their face, as they look at the unexpected spill. The background is soft and minimalist, keeping the focus entirely on the child and the juice.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "It's when something happens, like juice spilling, that you didn't mean to do.",
+        "example": "The spilled juice was an accident.",
+        "model": "gemini",
+        "speak": "AC-ci-dent",
+        "tryIt": "When the juice spills and you didn't mean for it to, what do we call that?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "An accident is when something happens by surprise, and no one meant for it to happen, like the spilled juice.",
+        "example": "The juice spilling on the table was an accident.",
+        "model": "gemini",
+        "speak": "AC-ci-dent",
+        "tryIt": "When the juice spilled and no one meant to, was that an accident or on purpose?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "An accident is something that happens, but you didn't mean for it to.",
+        "example": "When your juice spilled, that was an accident.",
+        "model": "gemini",
+        "speak": "AC-ci-dent",
+        "tryIt": "Was spilling the juice an accident?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-11-03",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-03T13:26:18.178716+00:00",
+  "word": "accident",
+  "wordId": "accident"
+}
