@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-04T13:37:44.684826+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-04/assets/opinion/shared-126ef9038b.png",
+      "createdAt": "2026-11-04T13:37:44.684826+00:00",
+      "imageId": "126ef9038b",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nTwo friendly children sit on a bright rug in a colorful playroom, facing each other. One child holds a single, large, red toy block, looking upwards with an imaginative, slightly excited expression, clearly envisioning a tall tower. The second child sits opposite, looking at the same block with a thoughtful, focused expression, with hands slightly lowered and open, subtly suggesting a flatter structure like a bridge. The block is centered between them as the object of their different thoughts.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "An **opinion** is what you think about something. Like when one friend thinks this block is best for a tower, and the other thinks it's best for a bridge.",
+        "example": "My opinion is that this block is perfect for a tall tower.",
+        "model": "gemini",
+        "speak": "o-PIN-ion",
+        "tryIt": "What's *your* opinion about this block? Would it make a good tower or a good bridge?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "An **opinion** is what *you* think about something, like if this block is best for a tower or a bridge.",
+        "example": "My opinion is that this block is perfect for a tall tower.",
+        "model": "gemini",
+        "speak": "o-PIN-ion",
+        "tryIt": "What's *your opinion*? Do you think this block is better for a tall tower or a long bridge?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "An opinion is what you think inside your head about something, like if a block is better for a tall tower or a bridge.",
+        "example": "My opinion is that this block would make the best tall tower!",
+        "model": "gemini",
+        "speak": "o-PIN-ion",
+        "tryIt": "What's your opinion? Do you think this block is better for a tall tower or a bridge?"
+      }
+    ]
+  },
+  "partOfSpeech": "noun",
+  "roundId": "2026-11-04",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-04T13:37:44.684826+00:00",
+  "word": "opinion",
+  "wordId": "opinion"
+}
