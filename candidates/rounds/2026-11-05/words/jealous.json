@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-05T13:50:26.010163+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-05/assets/jealous/shared-1d75b9c589.png",
+      "createdAt": "2026-11-05T13:50:26.010163+00:00",
+      "imageId": "1d75b9c589",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nIn a bright play area, two children are sitting on the floor, happily adding blocks to a very tall, colorful tower they have built together. A third child stands a short distance away, looking intently at the impressive tower with a soft, longing expression on their face. Their hands are clasped gently in front of them, conveying a quiet wish to have the tower or have built it.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Jealous means you really wish you had something that someone else has, like the tall tower.",
+        "example": "The third child was jealous of their tall block tower.",
+        "model": "gemini",
+        "speak": "JEAL-ous",
+        "tryIt": "If the third child is feeling jealous, what might they be wishing about the tower?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Jealous means you see something someone else has, and you wish it was yours instead.",
+        "example": "The third child feels jealous of the tall, colorful tower the other kids built.",
+        "model": "gemini",
+        "speak": "JEAL-ous",
+        "tryIt": "Imagine you saw a super cool block tower and wished it was yours. Would you be feeling jealous?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "When you see something cool someone else has, and you wish you had it too, that's being jealous.",
+        "example": "The third child is jealous of their tall block tower.",
+        "model": "gemini",
+        "speak": "JEAL-ous",
+        "tryIt": "The child sees the tower and feels jealous. What do you think they wish for?"
+      }
+    ]
+  },
+  "partOfSpeech": "adjective",
+  "roundId": "2026-11-05",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-05T13:50:26.010163+00:00",
+  "word": "jealous",
+  "wordId": "jealous"
+}
