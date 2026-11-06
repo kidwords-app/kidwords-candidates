@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-06T13:35:24.458941+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-06/assets/cooperate/shared-45eaec03f1.png",
+      "createdAt": "2026-11-06T13:35:24.458941+00:00",
+      "imageId": "45eaec03f1",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nTwo children are building a very tall block tower. One child, kneeling or sitting comfortably, gently holds the wide base of the tower steady with both hands, looking up at the tower. The other child, standing or reaching, is carefully placing a block on top of the growing tower. The tower is already quite tall, reaching between the children's heads, and is made of colorful, simple blocks. They are focused on their task, sharing a sense of teamwork.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Cooperate means to work together with someone, like when friends help each other build a tall block tower.",
+        "example": "They cooperate to build a super tall tower.",
+        "model": "gemini",
+        "speak": "co-OP-er-ate",
+        "tryIt": "How do the friends cooperate to build their super tall tower?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "When you cooperate, you work together and help each other, like holding the blocks steady so the tower doesn't fall down.",
+        "example": "They cooperate to build a super tall tower.",
+        "model": "gemini",
+        "speak": "co-OP-er-ate",
+        "tryIt": "How did the children cooperate when they built their super tall tower?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "When you **cooperate**, you work together with a friend to do something, like build a super tall tower.",
+        "example": "They cooperate to build a super tall tower.",
+        "model": "gemini",
+        "speak": "co-OP-er-ate",
+        "tryIt": "How do the friends cooperate to build their super tall tower?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-11-06",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 4,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-06T13:35:24.458941+00:00",
+  "word": "cooperate",
+  "wordId": "cooperate"
+}
