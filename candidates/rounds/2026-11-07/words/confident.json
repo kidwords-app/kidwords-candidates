@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-07T12:15:21.466971+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-07/assets/confident/shared-44297f47b9.png",
+      "createdAt": "2026-11-07T12:15:21.466971+00:00",
+      "imageId": "44297f47b9",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA cheerful child, about 6 years old, stands at the very top of a bright yellow playground slide. She has a wide, confident smile on her face and looks eagerly forward. Her body is slightly leaning into the slide's opening, with hands lightly gripping the side rails, conveying readiness to go down by herself. The background shows a simplified view of a sunny playground with minimal distractions, keeping the focus entirely on the child and the slide.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "When you are confident, you know you can do something and feel good and ready to try it, just like that kid on the slide!",
+        "example": "The child is confident she can slide down all by herself.",
+        "model": "gemini",
+        "speak": "CON-fi-dent",
+        "tryIt": "Make a confident face like you're ready to slide down all by yourself! What would it look like?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "When you feel confident, you know you can do something, like slide down the slide all by yourself, and you're not scared!",
+        "example": "She is confident she can slide down by herself!",
+        "model": "gemini",
+        "speak": "CON-fi-dent",
+        "tryIt": "The child feels confident! What does she know she can do all by herself?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "When you feel confident, you feel brave and know you can do something, like slide down all by yourself!",
+        "example": "She is confident she can slide down the slide by herself!",
+        "model": "gemini",
+        "speak": "CON-fi-dent",
+        "tryIt": "If you were at the slide, would you feel confident to go down?"
+      }
+    ]
+  },
+  "partOfSpeech": "adjective",
+  "roundId": "2026-11-07",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-07T12:15:21.466971+00:00",
+  "word": "confident",
+  "wordId": "confident"
+}
