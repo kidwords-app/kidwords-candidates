@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-08T12:35:53.561880+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-08/assets/overwhelmed/shared-5e13afea15.png",
+      "createdAt": "2026-11-08T12:35:53.561880+00:00",
+      "imageId": "5e13afea15",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child, about 5-6 years old, stands slightly hunched in the middle of a simple, open room, looking down at the floor. Their hands are open at their sides in a gesture of mild bewilderment, and their expression is a soft frown, indicating feeling lost or unsure where to begin. The floor is largely covered with a colorful, sprawling assortment of building blocks, several toy cars, and a few soft stuffed animals, creating a visible jumble. An empty toy bin is visible in the background, hinting at where the toys came from.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Overwhelmed means there are so many toys on the floor, it feels like too much to pick up, and you don't know where to begin.",
+        "example": "The child felt overwhelmed looking at all the toys on the floor.",
+        "model": "gemini",
+        "speak": "o-ver-WHELMED",
+        "tryIt": "Imagine you're the child looking at all those toys. If you feel overwhelmed, which toy would you pick up first?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Overwhelmed means there are so many toys to pick up that it feels like too much, and you don't know where to start.",
+        "example": "The child felt overwhelmed looking at the big pile of blocks and cars on the floor.",
+        "model": "gemini",
+        "speak": "o-ver-WHELMED",
+        "tryIt": "When you feel overwhelmed by all the toys, what's one tiny toy you could pick up right now?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Overwhelmed means you have so many toys to pick up, it feels like way too much to do at once.",
+        "example": "You feel *overwhelmed* when you look at all those blocks, cars, and animals covering the floor.",
+        "model": "gemini",
+        "speak": "o-ver-WHELMED",
+        "tryIt": "If you feel *overwhelmed* by all these toys, what's one thing we could put away first?"
+      }
+    ]
+  },
+  "partOfSpeech": "adjective",
+  "roundId": "2026-11-08",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-08T12:35:53.561880+00:00",
+  "word": "overwhelmed",
+  "wordId": "overwhelmed"
+}
