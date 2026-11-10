@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-10T14:06:32.700591+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-10/assets/embarrassed/shared-a3d8c01728.png",
+      "createdAt": "2026-11-10T14:06:32.700591+00:00",
+      "imageId": "a3d8c01728",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA young child, around 5-6 years old, is seated at a simple wooden table. Their milk cup has just tipped over, and a small pool of white milk spreads across the table surface. The child is looking down towards the spilled milk, their shoulders slightly hunched, and their cheeks have a very subtle pink flush.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "When the milk spilled, the child felt embarrassed. That means they felt a little shy and wished it didn't happen, especially with people watching.",
+        "example": "Her cheeks felt warm and she looked down when the milk spilled, feeling embarrassed.",
+        "model": "gemini",
+        "speak": "em-BARE-ast",
+        "tryIt": "Have you ever spilled something by accident and felt a little embarrassed?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "When you spill the milk and feel warm in your cheeks, and wish it didn't happen, you feel embarrassed.",
+        "example": "The child felt embarrassed when their milk cup tipped over and made a big mess!",
+        "model": "gemini",
+        "speak": "em-BA-rrassed",
+        "tryIt": "If you accidentally spill your milk, how might your face feel if you are embarrassed?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "When you feel embarrassed, it means you feel a little shy and maybe your cheeks get warm, wishing the milk hadn't spilled.",
+        "example": "Oops! The child felt embarrassed when the milk spilled, and quickly looked down.",
+        "model": "gemini",
+        "speak": "em-BARR-assed",
+        "tryIt": "Remember when the child spilled the milk? What did they do that showed they felt embarrassed?"
+      }
+    ]
+  },
+  "partOfSpeech": "adjective",
+  "roundId": "2026-11-10",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 3,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-10T14:06:32.700591+00:00",
+  "word": "embarrassed",
+  "wordId": "embarrassed"
+}
