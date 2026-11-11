@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-11T13:23:23.415288+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-11/assets/observe/shared-4f89c9068b.png",
+      "createdAt": "2026-11-11T13:23:23.415288+00:00",
+      "imageId": "4f89c9068b",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nA child, approximately 5-7 years old, is kneeling gently beside a large, vibrant green leaf. Their face is close to the leaf, eyes wide and focused intently on a small, red ladybug with black spots that is slowly crawling across its surface. The child's posture shows careful attention, perhaps with one hand gently resting on the ground nearby, indicating they are still and absorbed in watching. The background is softly blurred to suggest a garden setting without distracting details.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "To observe means to watch something super carefully with your eyes to see all the little details.",
+        "example": "I observe the ladybug as it crawls on the green leaf.",
+        "model": "gemini",
+        "speak": "ob-SERVE",
+        "tryIt": "Can you observe how many tiny spots the ladybug has on its back?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "To **observe** means to watch something very carefully with your eyes, like when you watch the ladybug and notice all its little spots and how it moves.",
+        "example": "I **observe** the ladybug as it slowly crawls across the green leaf.",
+        "model": "gemini",
+        "speak": "ob-SERVE",
+        "tryIt": "Can you **observe** the ladybug and tell me if it has tiny antennae?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Observe means you look super close at something, like when you watch the ladybug to see everything it does.",
+        "example": "You observe the ladybug as it walks on the leaf.",
+        "model": "gemini",
+        "speak": "ob-SERVE",
+        "tryIt": "What do you observe the ladybug doing right now?"
+      }
+    ]
+  },
+  "partOfSpeech": "verb",
+  "roundId": "2026-11-11",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 2,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-11T13:23:23.415288+00:00",
+  "word": "observe",
+  "wordId": "observe"
+}
