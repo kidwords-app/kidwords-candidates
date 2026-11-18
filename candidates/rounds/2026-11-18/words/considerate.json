@@ -1,0 +1,53 @@
+{
+  "createdAt": "2026-11-18T14:55:46.265579+00:00",
+  "images": [
+    {
+      "assetPath": "candidates/rounds/2026-11-18/assets/considerate/shared-376eceb8b2.png",
+      "createdAt": "2026-11-18T14:55:46.265579+00:00",
+      "imageId": "376eceb8b2",
+      "model": "gemini",
+      "prompt": "Create a single children's vocabulary illustration \u2014 one clear scene, no comic panels.\n\nScene to depict (follow closely; do not add a second story or setting):\nTwo young children are seated on the floor in a playroom. One child, with a large, colorful pile of building blocks in front of them, extends an open hand holding a few blocks towards their friend. The friend, sitting opposite, initially looks a little sad or wistful, but is now looking up with a hint of surprise and budding happiness at the gesture. The setting is simple, focusing on the children and the blocks.\n\nArt style (match a gentle educational app, not bold marketing vector):\n- 2D cartoon, soft rounded shapes, friendly proportions.\n- Color: soft pastel palette \u2014 warm cream or light beige background, muted blues, gentle browns, soft coral or yellow accents; avoid neon or harsh saturation.\n- Line: soft brown or dusty blue outlines; not heavy black outlines.\n- Mood: calm, kind, hopeful; the character can show a content or thoughtful expression when appropriate.\n- Setting: simple, readable background (e.g. home, classroom, park) with minimal clutter.\n- Lighting: soft and even, no dramatic shadows.\n\nHard rules:\n- No text, letters, numbers, logos, or labels anywhere in the image.\n- No scary, violent, or shaming imagery.\n\n\n\nOutput: one square-friendly illustration suitable for a flashcard."
+    }
+  ],
+  "levels": {
+    "G1": [
+      {
+        "definition": "Considerate means you think about how your friend feels, and then you do something kind to help them.",
+        "example": "It was considerate of her to share her blocks with her sad friend.",
+        "model": "gemini",
+        "speak": "con-SID-er-ate",
+        "tryIt": "Imagine your friend wants to build a really tall tower, but they don't have enough blocks. What's a considerate thing you could do?"
+      }
+    ],
+    "K": [
+      {
+        "definition": "Considerate means you think about how someone else feels and do something kind to help them.",
+        "example": "The child was considerate when they shared their blocks with their friend.",
+        "model": "gemini",
+        "speak": "con-SID-er-ate",
+        "tryIt": "If you saw your friend was sad and had no blocks, what would be a considerate thing to do?"
+      }
+    ],
+    "preK": [
+      {
+        "definition": "Being considerate means you think about how your friend feels and share your blocks to make them happy.",
+        "example": "The child was considerate when they shared blocks so their friend could build too.",
+        "model": "gemini",
+        "speak": "con-SID-er-ate",
+        "tryIt": "How can *you* be considerate if your friend wants to play with blocks but doesn't have any?"
+      }
+    ]
+  },
+  "partOfSpeech": "adjective",
+  "roundId": "2026-11-18",
+  "selected": {},
+  "status": "pending",
+  "subPrompts": {},
+  "syllables": 4,
+  "tags": [
+    "thinking"
+  ],
+  "updatedAt": "2026-11-18T14:55:46.265579+00:00",
+  "word": "considerate",
+  "wordId": "considerate"
+}
